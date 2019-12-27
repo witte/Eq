@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="yxA5M3" name="Eq" projectType="audioplug" jucerVersion="5.4.4"
+              version="0.0.1" companyName="witte" companyWebsite="witte.github.io"
+              reportAppUsage="0" displaySplashScreen="0" pluginVST3Category="EQ"
+              pluginAAXCategory="1" cppLanguageStandard="17" pluginFormats="buildAU,buildStandalone,buildVST3">
+  <MAINGROUP id="NnWy28" name="Eq">
+    <GROUP id="{8888BDC9-A6E6-1532-04D7-9B156CED93F7}" name="Helpers">
+      <FILE id="lVNO0x" name="FrequenciesTable.h" compile="0" resource="0"
+            file="Source/Helpers/FrequenciesTable.h"/>
+      <FILE id="A75S7e" name="ParameterHelpers.h" compile="0" resource="0"
+            file="Source/Helpers/ParameterHelpers.h"/>
+    </GROUP>
+    <GROUP id="{90024838-927A-5660-593C-4A87477B2601}" name="Components">
+      <FILE id="H7RgqI" name="BandEditor.cpp" compile="1" resource="0" file="Source/Components/BandEditor.cpp"/>
+      <FILE id="dOxwCT" name="BandEditor.h" compile="0" resource="0" file="Source/Components/BandEditor.h"/>
+      <FILE id="vx8dqa" name="Knob.cpp" compile="1" resource="0" file="Source/Components/Knob.cpp"/>
+      <FILE id="TMPTfH" name="Knob.h" compile="0" resource="0" file="Source/Components/Knob.h"/>
+      <FILE id="t2Eyp5" name="SpectrumAnalyzer.cpp" compile="1" resource="0"
+            file="Source/Components/SpectrumAnalyzer.cpp"/>
+      <FILE id="MHpegD" name="SpectrumAnalyzer.h" compile="0" resource="0"
+            file="Source/Components/SpectrumAnalyzer.h"/>
+      <FILE id="sWkEAn" name="TextEditor.cpp" compile="1" resource="0" file="Source/Components/TextEditor.cpp"/>
+      <FILE id="i7Dpyx" name="TextEditor.h" compile="0" resource="0" file="Source/Components/TextEditor.h"/>
+    </GROUP>
+    <GROUP id="{CA23D808-4F4B-A946-B8D1-D82367E6E3B0}" name="LookAndFeel">
+      <FILE id="AjmFe4" name="fontaudio.ttf" compile="0" resource="1" file="Source/LookAndFeel/fontaudio.ttf"/>
+      <FILE id="V9ZvJG" name="OpenSansCondensed-Bold.ttf" compile="0" resource="1"
+            file="Source/LookAndFeel/OpenSansCondensed-Bold.ttf"/>
+      <FILE id="scY8jr" name="OpenSansCondensed-Light.ttf" compile="0" resource="1"
+            file="Source/LookAndFeel/OpenSansCondensed-Light.ttf"/>
+      <FILE id="WpPTLY" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/LookAndFeel/LookAndFeel.cpp"/>
+      <FILE id="lOK7Zy" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel/LookAndFeel.h"/>
+      <FILE id="JSgnwX" name="texture.png" compile="0" resource="1" file="Source/LookAndFeel/texture.png"/>
+    </GROUP>
+    <GROUP id="{21A73452-AD32-8A18-FD42-F495F26F673E}" name="Source">
+      <FILE id="QYVUnT" name="EqProcessor.cpp" compile="1" resource="0" file="Source/EqProcessor.cpp"/>
+      <FILE id="exJ1jG" name="EqProcessor.h" compile="0" resource="0" file="Source/EqProcessor.h"/>
+      <FILE id="Wgtqvb" name="EqEditor.cpp" compile="1" resource="0" file="Source/EqEditor.cpp"/>
+      <FILE id="wHc0Td" name="EqEditor.h" compile="0" resource="0" file="Source/EqEditor.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="0" name="Release" osxCompatibility="10.9 SDK"/>
+        <CONFIGURATION isDebug="1" name="Debug" linkTimeOptimisation="0" optimisation="1"
+                       osxCompatibility="10.9 SDK"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+        <MODULEPATH id="juce_audio_devices" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <VS2019 targetFolder="Builds/VisualStudio2019">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+        <MODULEPATH id="juce_audio_devices" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+      </MODULEPATHS>
+    </VS2019>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+        <MODULEPATH id="juce_audio_devices" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <CLION targetFolder="Builds/CLion" clionXcodeEnabled="1" clionMakefileEnabled="1">
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+        <MODULEPATH id="juce_audio_devices" path="../0-2019-05-02 Octopus/QtTracktionEngine"/>
+      </MODULEPATHS>
+    </CLION>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="0" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_opengl" showAllCode="0" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <LIVE_SETTINGS>
+    <OSX buildEnabled="1"/>
+    <LINUX/>
+  </LIVE_SETTINGS>
+  <JUCEOPTIONS JUCE_VST3_CAN_REPLACE_VST2="0" JUCE_STRICT_REFCOUNTEDPOINTER="1"
+               JUCE_WEB_BROWSER="0" JUCE_INCLUDE_ZLIB_CODE="1" JUCE_USE_CURL="0"
+               JUCE_USE_FLAC="0" JUCE_USE_OGGVORBIS="0" JUCE_USE_WINDOWS_MEDIA_FORMAT="0"
+               JUCE_USE_MP3AUDIOFORMAT="0" JUCE_USE_LAME_AUDIO_FORMAT="0" JUCE_DISABLE_COREGRAPHICS_FONT_SMOOTHING="1"
+               JUCE_PLUGINHOST_VST3="1" JUCE_PLUGINHOST_AU="1"/>
+</JUCERPROJECT>
