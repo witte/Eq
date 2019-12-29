@@ -36,6 +36,10 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
     auto* lastType = tree.getRawParameterValue (getPrmName (bandNumber, "Type"));
     type.setSelectedId (int (*lastType + 1.0f));
     type.setJustificationType (Justification::centred);
+    type.onChange = [&] ()
+    {
+        gain.setEnabled (on.getToggleState() && type.getSelectedId() != 1 && type.getSelectedId() != 5);
+    };
 
     on.onStateChange = [&] ()
     {
@@ -43,11 +47,12 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
 
         type.setEnabled (isOn);
         freq.setEnabled (isOn);
-        gain.setEnabled (isOn);
+        gain.setEnabled (isOn && type.getSelectedId() != 1 && type.getSelectedId() != 5);
         q   .setEnabled (isOn);
     };
 
     on.onStateChange();
+    type.onChange();
 }
 
 void BandEditor::resized()
