@@ -4,8 +4,7 @@
 namespace witte
 {
 
-TextEditor::TextEditor (Value& refValue, int _decimals = 0, bool acceptsNegativeValues = true, String initialValue = {},
-                        bool initialValueSelected = true) :
+TextEditor::TextEditor (Value& refValue, int _decimals = 0, bool acceptsNegativeValues = true, String initialValue = {}) :
     juce::TextEditor(), value {refValue}, decimals {_decimals}
 {
     setJustification (Justification::centred);
@@ -23,12 +22,10 @@ TextEditor::TextEditor (Value& refValue, int _decimals = 0, bool acceptsNegative
         }
     };
 
-    if (initialValue.isEmpty())
-    {
-        initialValue = String (static_cast<double> (refValue.getValue()), decimals);
-    }
-
-    setText (initialValue, initialValueSelected, true);
+    if (! initialValue.isEmpty())
+        setText (initialValue);
+    else
+        valueChanged (value);
 }
 
 TextEditor::~TextEditor()
@@ -44,23 +41,27 @@ void TextEditor::resized()
     juce::TextEditor::resized();
 }
 
+void TextEditor::focusGained (Component::FocusChangeType)
+{
+    clearCharacters();
+
+    lastSelectionStart = value < 0.0? 1 : 0;
+    lastSelectionEnd = getText().length();
+
+    setHighlightedRegion ({lastSelectionStart, lastSelectionEnd});
+}
+
+void TextEditor::clearCharacters()
+{
+    setText (getText().removeCharacters (" abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?/*+"), false);
+}
+
 bool TextEditor::keyPressed (const KeyPress& key)
 {
     if ((onKeyPressed != nullptr) && onKeyPressed (key))
         return true;
 
     return juce::TextEditor::keyPressed (key);
-}
-
-void TextEditor::setText (const String& newText, bool selectAllText, bool sendTextChangeMessage)
-{
-    if (selectAllText)
-    {
-        lastSelectionStart = value < 0.0? 1 : 0;
-        lastSelectionEnd = newText.length();
-    }
-
-    juce::TextEditor::setText (newText, sendTextChangeMessage);
 }
 
 String TextEditor::filterNewText (juce::TextEditor&, const String& newInput)
@@ -102,9 +103,10 @@ String TextEditor::filterNewText (juce::TextEditor&, const String& newInput)
     return newInput;
 }
 
-void TextEditor::valueChanged (Value& value)
+void TextEditor::valueChanged (Value&)
 {
-    setText (String (static_cast<double> (value.getValue()), decimals), true, true);
+    setText (String (static_cast<double> (value.getValue()), decimals), true);
+    focusGained (FocusChangeType::focusChangedDirectly);
 }
 
 

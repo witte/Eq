@@ -157,7 +157,7 @@ bool Knob::keyPressed (const KeyPress& key)
 
         if (allowedCharacters.contains (keyChar))
         {
-            openEditor (String {keyChar}, false);
+            openEditor (String {keyChar});
             return true;
         }
         else
@@ -167,15 +167,14 @@ bool Knob::keyPressed (const KeyPress& key)
     }
 }
 
-void Knob::openEditor (String initialValue, bool initialValueSelected)
+void Knob::openEditor (String initialValue)
 {
     if (textEditor != nullptr) return;
 
     textEditor = std::make_unique<witte::TextEditor> (getValueObject(),
                                                       decimals,
                                                       getMinimum() < 0.0,
-                                                      initialValue,
-                                                      initialValueSelected);
+                                                      initialValue);
     witte::TextEditor& ed = *textEditor;
     addAndMakeVisible (textEditor.get());
     ed.addListener (this);

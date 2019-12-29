@@ -10,17 +10,22 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
       band2 {tree, 2},
       band3 {tree, 3},
       band4 {tree, 4},
-      band5 {tree, 5}
+      band5 {tree, 5},
+      attOutputGain {vts, "OutGain", outputGain}
 {
     setOpaque (true);
     setWantsKeyboardFocus (true);
-    addAndMakeVisible (analyzer);
 
+    outputGain.setSliderStyle  (Slider::SliderStyle::LinearVertical);
+    outputGain.setTextBoxStyle (Slider::TextBoxBelow, false, 62, 22);
+
+    addAndMakeVisible (analyzer);
     addAndMakeVisible (band1);
     addAndMakeVisible (band2);
     addAndMakeVisible (band3);
     addAndMakeVisible (band4);
     addAndMakeVisible (band5);
+    addAndMakeVisible (outputGain);
     
     auto size = processor.getSavedEditorSize();
     setResizable (true, true);
@@ -66,6 +71,7 @@ void EqAudioProcessorEditor::resized()
     bands.items.add (FlexItem (band3).withFlex (1.0f).withMargin (1));
     bands.items.add (FlexItem (band4).withFlex (1.0f).withMargin (1));
     bands.items.add (FlexItem (band5).withFlex (1.0f).withMargin (1));
+    bands.items.add (FlexItem (outputGain).withWidth (bandsWidth * 0.1f).withMargin (4));
     bands.performLayout (bounds.removeFromBottom (bandsHeight).reduced ((bounds.getWidth() - bandsWidth) * 0.5f, 1));
 
     analyzer.setBounds (bounds);

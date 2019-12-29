@@ -36,6 +36,8 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) :
         ScopedLock lockedForWriting (freqPathCreationLock);
         bandsPositionsPath.clear();
 
+        float outputGain = *processor.prm_outputGain;
+
         for (int i = 1; i <= 5; ++i)
         {
             EqAudioProcessor::Band& band = (i == 1)? processor.band1 :
@@ -51,7 +53,7 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) :
             if (band.active)
             {
                 float bandX = x + (getPositionForFrequency (*band.prm_freq) * width);
-                float bandY = jmap (*band.prm_gain , -26.0f, 26.0f, bottom, y);
+                float bandY = jmap (*band.prm_gain + outputGain, -26.0f, 26.0f, bottom, y);
 
                 bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
             }
@@ -67,14 +69,16 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) :
                 FloatVectorOperations::multiply (magnitudesOut.data(), magnitudes.data(), int (magnitudesOut.size()));
         }
 
+
+
         frequencyCurvePath.clear();
         frequencyCurvePath.startNewSubPath (x,
-                jmap (float (Decibels::gainToDecibels (magnitudesOut [0])), -26.0f, 26.0f, bottom, y));
+                jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, bottom, y));
 
         for (size_t i = 1; i < frequencies.size(); ++i)
         {
             float xx = x + (getPositionForFrequency (frequencies[i]) * width);
-            float gain = Decibels::gainToDecibels (magnitudesOut [i]);
+            float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
             float yy = jmap (gain, -26.0f, 26.0f, bottom, y);
 
             frequencyCurvePath.lineTo (xx, yy);
@@ -260,9 +264,9 @@ void SpectrumAnalyzer::drawNextFrame()
         fftInput.performFrequencyOnlyForwardTransform (fftBufferInput.getWritePointer (0));
 
         ScopedLock lockedForWriting (pathCreationLock);
-        avgInput.addFrom  (0,             0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples(), -1.0f);
-        avgInput.copyFrom (avgInputPtr, 0, fftBufferInput.getReadPointer (0),       avgInput.getNumSamples(), 1.0f / (avgInput.getNumSamples() * (avgInput.getNumChannels() - 1)));
-        avgInput.addFrom  (0,             0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples());
+        avgInput.addFrom  (0,           0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples(), -1.0f);
+        avgInput.copyFrom (avgInputPtr, 0, fftBufferInput.getReadPointer (0),     avgInput.getNumSamples(), 1.0f / (avgInput.getNumSamples() * (avgInput.getNumChannels() - 1)));
+        avgInput.addFrom  (0,           0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples());
 
         if (++avgInputPtr == avgInput.getNumChannels()) avgInputPtr = 1;
     }

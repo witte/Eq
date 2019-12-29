@@ -38,14 +38,17 @@ EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", st
         parameters.addParameterListener (gain, &band);
         parameters.addParameterListener (q,    &band);
     }
+
+    prm_outputGain = parameters.getRawParameterValue ("OutGain");
+    parameters.addParameterListener ("OutGain", this);
 }
 
-void EqAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
 {
-    sampleRate = sampleRate;
+    sampleRate = _sampleRate;
     
     dsp::ProcessSpec spec;
-    spec.sampleRate = sampleRate;
+    spec.sampleRate = _sampleRate;
     spec.maximumBlockSize = uint32 (samplesPerBlock);
     spec.numChannels = uint32 (getTotalNumOutputChannels ());
 
@@ -61,11 +64,11 @@ void EqAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     band4.processor.prepare (spec);
     band5.processor.prepare (spec);
 
-    abstractFifoInput.setTotalSize  (int (sampleRate));
-    abstractFifoOutput.setTotalSize (int (sampleRate));
+    abstractFifoInput.setTotalSize  (int (_sampleRate));
+    abstractFifoOutput.setTotalSize (int (_sampleRate));
 
-    audioFifoInput.setSize  (1, int (sampleRate));
-    audioFifoOutput.setSize (1, int (sampleRate));
+    audioFifoInput.setSize  (1, int (_sampleRate));
+    audioFifoOutput.setSize (1, int (_sampleRate));
 
     abstractFifoInput.reset();
     abstractFifoOutput.reset();
@@ -86,6 +89,8 @@ void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*m
     if (band3.active) band3.processor.process (context);
     if (band4.active) band4.processor.process (context);
     if (band5.active) band5.processor.process (context);
+
+    buffer.applyGain (Decibels::decibelsToGain (*prm_outputGain));
 
     pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
 }
@@ -140,6 +145,14 @@ void EqAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 }
 
 AudioProcessorEditor* EqAudioProcessor::createEditor() { return new witte::EqAudioProcessorEditor (*this, parameters); }
+
+void EqAudioProcessor::parameterChanged (const String&, float newValue)
+{
+    *prm_outputGain = newValue;
+
+    if (onBandParametersChange != nullptr)
+        onBandParametersChange (0);
+}
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()     { return new EqAudioProcessor(); }
 

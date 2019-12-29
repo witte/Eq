@@ -1,4 +1,5 @@
 #include "LookAndFeel.h"
+#include "../Components/Label.h"
 
 namespace witte
 {
@@ -29,49 +30,6 @@ LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4 ()
     LookAndFeel::setDefaultLookAndFeel (this);
 }
 
-//void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos,
-//                                    const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider)
-//{
-//    auto outline = findColour (Slider::rotarySliderOutlineColourId);
-//    auto fill    = findColour (Slider::rotarySliderFillColourId);
-
-//    Rectangle<float> bounds (x, y, width, height);
-//    DBG (bounds.toString());
-
-////    const RotaryParameters& rp = getRotaryParameters();
-////    auto toAngle = rp.startAngleRadians + valueToProportionOfLength (getValue()) *
-////                   (rp.endAngleRadians - rp.startAngleRadians);
-
-//    if (!slider.isEnabled())
-//    {
-//        fill = fill.darker (0.6);
-//        outline = outline.darker (0.6);
-//    }
-//    else if (slider.hasKeyboardFocus (true))
-//    {
-//        g.setColour (Colours::white.withAlpha (0.04f));
-////        g.fillRect (bounds);
-//        g.fillAll ();
-
-//        fill = fill.brighter (0.01);
-//        outline = outline.brighter (0.4);
-//    }
-
-//    g.setColour (fill);
-//    g.fillEllipse (bounds);
-
-////    auto height = knobBounds.getHeight();
-//    auto arcBounds = bounds.reduced (height * 0.12f);
-
-//    Path valueArc;
-//    valueArc.addArc (arcBounds.getX(),     arcBounds.getY(),
-//                     arcBounds.getWidth(), arcBounds.getHeight(),
-//                     rotaryStartAngle, sliderPos, true);
-
-//    g.setColour (outline);
-//    g.strokePath (valueArc, PathStrokeType (height * 0.14f, PathStrokeType::curved, PathStrokeType::butt));
-//}
-
 void LookAndFeel::drawCornerResizer (Graphics& g, int w, int h, bool isMouseOver, bool isMouseDragging)
 {
     g.setColour ((isMouseOver || isMouseDragging) ? Colour {static_cast<uint8> (50), 140, 193, 0.5f} : Colour {static_cast<uint8> (29), 39, 49, 0.42f});
@@ -88,8 +46,6 @@ void LookAndFeel::drawCornerResizer (Graphics& g, int w, int h, bool isMouseOver
     }
 }
 
-//void LookAndFeel::drawButtonBackground (Graphics& g, Button& button, const Colour& backgroundColour,
-//                                        bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 void LookAndFeel::drawButtonBackground (Graphics& g, Button&, const Colour&,
                                         bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
@@ -121,7 +77,7 @@ void LookAndFeel::drawComboBox (Graphics& g, int, int, bool isButtonDown, int, i
         g.fillAll (Colours::white.withAlpha (uint8 (12)));
 }
 
-void LookAndFeel::positionComboBoxText (ComboBox& box, Label& label)
+void LookAndFeel::positionComboBoxText (ComboBox& box, juce::Label& label)
 {
     label.setBounds (box.getLocalBounds());
     label.setFont (getComboBoxFont (box));
@@ -188,43 +144,62 @@ void LookAndFeel::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
     g.drawText (text, r, Justification::centred, false);
 }
 
+int LookAndFeel::getSliderThumbRadius (Slider&)
+{
+    return 0;
+}
 
+void LookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                                    float sliderPos, float, float, const Slider::SliderStyle, Slider& slider)
+{
+    auto fill    = slider.findColour (Slider::rotarySliderFillColourId);
+    auto outline = slider.findColour (Slider::rotarySliderOutlineColourId);
 
-//Slider::SliderLayout LookAndFeel::getSliderLayout (Slider& slider)
-//{
-//    auto bounds = slider.getBounds().toFloat();
-//    DBG (bounds.toString());
+    if (slider.hasKeyboardFocus (true))
+    {
+        g.fillAll (Colours::white.withAlpha (0.04f));
 
-//    float x = bounds.getX();
-//    float y = bounds.getY();
-//    float w = bounds.getWidth();
-//    float h = bounds.getHeight();
-//    float ratio = h * 3.0f;
+        fill = fill.brighter (0.01f);
+        outline = outline.brighter (0.4f);
+    }
 
-//    if (ratio < w)
-//    {
-//        x = (w * 0.5f) - (ratio * 0.5f);
-//        w = ratio;
-//    }
-//    else
-//    {
-//        ratio = w / 3.0f;
-//        y = (h * 0.5f) - (ratio * 0.5f);
-//        h = ratio;
-//    }
+    g.setColour (fill);
+    g.fillRect (x, y, width, height);
 
-//    Slider::SliderLayout layout;
-//    layout.textBoxBounds = Rectangle<int> (x, y, w, h).reduced (1);
-//    layout.sliderBounds = layout.textBoxBounds.removeFromRight (h);
+    g.setColour (outline);
 
-//    return layout;
-//}
+    Rectangle<float> rect = slider.isHorizontal()? Rectangle<float> (x, y, sliderPos - x, height)
+                                                 : Rectangle<float> (x, sliderPos, width, y + (height - sliderPos));
+    g.fillRect (rect.reduced (slider.isHorizontal()? height * 0.2f : width * 0.2f).toNearestIntEdges());
+}
 
-void LookAndFeel::drawLabel (Graphics& g, Label& label)
+juce::Label* LookAndFeel::createSliderTextBox (Slider& slider)
+{
+    return new witte::Label (slider.getValueObject());
+}
+
+Slider::SliderLayout LookAndFeel::getSliderLayout (Slider& slider)
+{
+    auto bounds = slider.getLocalBounds();
+    float w = bounds.getWidth();
+
+    Slider::SliderLayout layout;
+
+    if (slider.isVertical())
+    {
+        layout.textBoxBounds = bounds.removeFromBottom (w * 0.44f);
+        bounds.removeFromTop (w * 0.18f);
+        layout.sliderBounds = bounds.reduced (w * 0.42f, 0.0f);
+    }
+
+    return layout;
+}
+
+void LookAndFeel::drawLabel (Graphics& g, juce::Label& label)
 {
     if (label.isBeingEdited()) return;
 
-    auto color = Colours::white.darker (0.4f);
+    auto color = Colours::white.darker (0.2f);
     if (!label.isEnabled()) color = color.darker (0.8f);
 
     g.setFont (getLabelFont (label));

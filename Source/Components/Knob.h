@@ -38,7 +38,7 @@ class Knob : public juce::Slider, private juce::TextEditor::Listener
 
         bool keyPressed (const KeyPress& key) override;
 
-        void openEditor (String initialValue = {}, bool initialValueSelected = true);
+        void openEditor (String initialValue = {});
         void closeEditor (bool updateValue = true);
 
         int decimals {0};

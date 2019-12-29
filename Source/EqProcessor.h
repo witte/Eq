@@ -2,7 +2,7 @@
 #include "JuceHeader.h"
 #include "Helpers/ParameterHelpers.h"
 
-class EqAudioProcessor : public AudioProcessor
+class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeState::Listener
 {
     public:
         EqAudioProcessor();
@@ -26,7 +26,7 @@ class EqAudioProcessor : public AudioProcessor
             return (layouts.getMainInputChannelSet() == layouts.getMainOutputChannelSet());
         }
 
-        void prepareToPlay (double sampleRate, int samplesPerBlock)  override;
+        void prepareToPlay (double _sampleRate, int samplesPerBlock) override;
         void processBlock (AudioBuffer<float>&, MidiBuffer&)         override;
         void releaseResources()                                      override {}
 
@@ -37,6 +37,9 @@ class EqAudioProcessor : public AudioProcessor
 
         Point<int> getSavedEditorSize() const            { return editorSize; }
         void setSavedEditorSize (const Point<int>& size) { editorSize = size; }
+
+        float* prm_outputGain {nullptr};
+        void parameterChanged (const String&, float newValue) override;
 
         enum
         {
@@ -120,6 +123,8 @@ class EqAudioProcessor : public AudioProcessor
             witte::makePrmFreq   ("5Freq", "5 Freq",                20000.0f, "Frequency"),
             witte::makePrmDb     ("5Gain", "5 Gain",                    0.0f, "Gain"     ),
             witte::makePrmFloat  ("5Q",    "5 Q",    0.1f, 10.0f, 1.0f, 0.7f, "Q"        ),
+
+            witte::makePrmDb     ("OutGain", "Output Gain", 0.0f, "OutGain")
         };
         UndoManager                  undoManager;
         AudioProcessorValueTreeState parameters;

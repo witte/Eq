@@ -39,7 +39,8 @@ class LookAndFeel : public juce::LookAndFeel_V4
         void drawComboBox (Graphics&, int width, int height, bool isButtonDown,
                            int buttonX, int buttonY, int buttonW, int buttonH,
                            ComboBox&) override;
-        void positionComboBoxText (ComboBox&, Label&) override;
+
+        void positionComboBoxText (ComboBox&, juce::Label&) override;
 
         void drawPopupMenuBackground (Graphics&, int width, int height) override;
 
@@ -48,10 +49,20 @@ class LookAndFeel : public juce::LookAndFeel_V4
                                 const String& text, const String& shortcutKeyText,
                                 const Drawable* icon, const Colour* textColourToUse) override;
 
+        int getSliderThumbRadius (Slider&) override;
+
+        Slider::SliderLayout getSliderLayout (Slider& slider) override;
+
+        void drawLinearSlider (Graphics&, int x, int y, int width, int height,
+                               float sliderPos, float minSliderPos, float maxSliderPos,
+                               const Slider::SliderStyle, Slider&) override;
 
 
 
-        void drawLabel (Graphics& g, Label& label) override;
+        juce::Label* createSliderTextBox (Slider&) override;
+
+
+        void drawLabel (Graphics& g, juce::Label& label) override;
 
 
     private:
