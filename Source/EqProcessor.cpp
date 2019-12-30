@@ -24,13 +24,13 @@ EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", st
         String gain {i}; gain << "Gain";
         String q    {i}; q    << "Q";
 
-        band.prm_on   = parameters.getRawParameterValue (on);
-        band.prm_type = parameters.getRawParameterValue (type);
-        band.prm_freq = parameters.getRawParameterValue (freq);
-        band.prm_gain = parameters.getRawParameterValue (gain);
-        band.prm_q    = parameters.getRawParameterValue (q);
+        band.prmOn   = parameters.getRawParameterValue (on);
+        band.prmType = parameters.getRawParameterValue (type);
+        band.prmFreq = parameters.getRawParameterValue (freq);
+        band.prmGain = parameters.getRawParameterValue (gain);
+        band.prmQ    = parameters.getRawParameterValue (q);
 
-        band.active = *band.prm_on > 0.5f;
+        band.active = *band.prmOn > 0.5f;
 
         parameters.addParameterListener (on,   &band);
         parameters.addParameterListener (type, &band);
@@ -39,7 +39,7 @@ EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", st
         parameters.addParameterListener (q,    &band);
     }
 
-    prm_outputGain = parameters.getRawParameterValue ("OutGain");
+    prmOutputGain = parameters.getRawParameterValue ("OutGain");
     parameters.addParameterListener ("OutGain", this);
 }
 
@@ -90,7 +90,7 @@ void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*m
     if (band4.active) band4.processor.process (context);
     if (band5.active) band5.processor.process (context);
 
-    buffer.applyGain (Decibels::decibelsToGain (*prm_outputGain));
+    buffer.applyGain (Decibels::decibelsToGain (prmOutputGain->load()));
 
     pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
 }
@@ -148,7 +148,7 @@ AudioProcessorEditor* EqAudioProcessor::createEditor() { return new witte::EqAud
 
 void EqAudioProcessor::parameterChanged (const String&, float newValue)
 {
-    *prm_outputGain = newValue;
+    *prmOutputGain = newValue;
 
     if (onBandParametersChange != nullptr)
         onBandParametersChange (0);
@@ -163,15 +163,15 @@ void EqAudioProcessor::Band::parameterChanged (const String& parameter, float ne
 
     if (str == "On")
     {
-        *prm_on = newValue;
+        *prmOn = newValue;
         active = newValue > 0.5f;
     }
     else
     {
-             if (str == "Type") *prm_type = newValue;
-        else if (str == "Freq") *prm_freq = newValue;
-        else if (str == "Gain") *prm_gain = newValue;
-        else if (str == "Q")    *prm_q    = newValue;
+             if (str == "Type") *prmType = newValue;
+        else if (str == "Freq") *prmFreq = newValue;
+        else if (str == "Gain") *prmGain = newValue;
+        else if (str == "Q")    *prmQ    = newValue;
 
         updateFilter();
     }
@@ -182,22 +182,22 @@ void EqAudioProcessor::Band::parameterChanged (const String& parameter, float ne
 
 void EqAudioProcessor::Band::updateFilter()
 {
-    switch (int (*prm_type))
+    switch (int (*prmType))
     {
         case 0: *processor.state = *dsp::IIR::Coefficients<float>::makeHighPass (eqProcessor.sampleRate,
-                                   *prm_freq, *prm_q);
+                                   *prmFreq, *prmQ);
             break;
         case 1: *processor.state = *dsp::IIR::Coefficients<float>::makeLowShelf (eqProcessor.sampleRate,
-                                   *prm_freq, *prm_q, Decibels::decibelsToGain (*prm_gain));
+                                   *prmFreq, *prmQ, Decibels::decibelsToGain (prmGain->load()));
             break;
         case 2: *processor.state = *dsp::IIR::Coefficients<float>::makePeakFilter (eqProcessor.sampleRate,
-                                   *prm_freq, *prm_q, Decibels::decibelsToGain (*prm_gain));
+                                   *prmFreq, *prmQ, Decibels::decibelsToGain (prmGain->load()));
             break;
         case 3: *processor.state = *dsp::IIR::Coefficients<float>::makeHighShelf (eqProcessor.sampleRate,
-                                   *prm_freq, *prm_q, Decibels::decibelsToGain (*prm_gain));
+                                   *prmFreq, *prmQ, Decibels::decibelsToGain (prmGain->load()));
             break;
         case 4: *processor.state = *dsp::IIR::Coefficients<float>::makeLowPass (eqProcessor.sampleRate,
-                                   *prm_freq, *prm_q);
+                                   *prmFreq, *prmQ);
             break;
     }
 }

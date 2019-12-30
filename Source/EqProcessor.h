@@ -38,7 +38,7 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         Point<int> getSavedEditorSize() const            { return editorSize; }
         void setSavedEditorSize (const Point<int>& size) { editorSize = size; }
 
-        float* prm_outputGain {nullptr};
+        std::atomic<float>* prmOutputGain {nullptr};
         void parameterChanged (const String&, float newValue) override;
 
         enum
@@ -61,11 +61,11 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
 
             bool active {true};
 
-            float* prm_on   {nullptr};
-            float* prm_type {nullptr};
-            float* prm_freq {nullptr};
-            float* prm_gain {nullptr};
-            float* prm_q    {nullptr};
+            std::atomic<float>* prmOn   {nullptr};
+            std::atomic<float>* prmType {nullptr};
+            std::atomic<float>* prmFreq {nullptr};
+            std::atomic<float>* prmGain {nullptr};
+            std::atomic<float>* prmQ    {nullptr};
 
             void parameterChanged (const String& parameter, float newValue) override;
 

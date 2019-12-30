@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="yxA5M3" name="Eq" projectType="audioplug" jucerVersion="5.4.4"
+<JUCERPROJECT id="yxA5M3" name="Eq" projectType="audioplug" jucerVersion="5.4.5"
               version="0.0.1" companyName="witte" companyWebsite="witte.github.io"
               reportAppUsage="0" displaySplashScreen="0" pluginVST3Category="EQ"
               pluginAAXCategory="1" cppLanguageStandard="17" pluginFormats="buildAU,buildStandalone,buildVST3">

@@ -36,7 +36,7 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) :
         ScopedLock lockedForWriting (freqPathCreationLock);
         bandsPositionsPath.clear();
 
-        float outputGain = *processor.prm_outputGain;
+        float outputGain = *processor.prmOutputGain;
 
         for (int i = 1; i <= 5; ++i)
         {
@@ -52,8 +52,8 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) :
 
             if (band.active)
             {
-                float bandX = x + (getPositionForFrequency (*band.prm_freq) * width);
-                float bandY = jmap (*band.prm_gain + outputGain, -26.0f, 26.0f, bottom, y);
+                float bandX = x + (getPositionForFrequency (*band.prmFreq) * width);
+                float bandY = jmap (*band.prmGain + outputGain, -26.0f, 26.0f, bottom, y);
 
                 bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
             }

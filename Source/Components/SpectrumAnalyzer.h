@@ -14,8 +14,6 @@ class SpectrumAnalyzer : public Component, private Timer
         void paint (Graphics&) override;
         void resized() override;
 
-        float decayTime = 12.0f;
-
 
     private:
         EqAudioProcessor& processor;
