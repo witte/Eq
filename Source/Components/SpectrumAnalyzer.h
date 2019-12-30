@@ -8,7 +8,7 @@ namespace witte
 class SpectrumAnalyzer : public Component, private Timer
 {
     public:
-        SpectrumAnalyzer (EqAudioProcessor&);
+        SpectrumAnalyzer (EqAudioProcessor&, AudioProcessorValueTreeState&);
         ~SpectrumAnalyzer() override;
 
         void paint (Graphics&) override;
@@ -17,6 +17,7 @@ class SpectrumAnalyzer : public Component, private Timer
 
     private:
         EqAudioProcessor& processor;
+        AudioProcessorValueTreeState& tree;
 
         dsp::FFT fftInput  {12};
         dsp::FFT fftOutput {12};
@@ -38,6 +39,10 @@ class SpectrumAnalyzer : public Component, private Timer
         CriticalSection pathCreationLock;
         CriticalSection freqPathCreationLock;
 
+        int movingBand {-1};
+        int hoveringBand {-1};
+        std::array<Rectangle<float>, 5> plotAreas {{}};
+
         std::vector<double> frequencies;
         std::vector<double> magnitudesBand1;
         std::vector<double> magnitudesBand2;
@@ -45,6 +50,7 @@ class SpectrumAnalyzer : public Component, private Timer
         std::vector<double> magnitudesBand4;
         std::vector<double> magnitudesBand5;
         std::vector<double> magnitudesOut;
+
 
         static constexpr float maxdB =  6.0f;
         static constexpr float mindB = -84.0f;
@@ -56,6 +62,11 @@ class SpectrumAnalyzer : public Component, private Timer
         {
             return (std::log (freq / 20.0f) / std::log (2.0f)) / 10.0f;
         }
+        static float getFrequencyForPosition (float pos)
+        {
+            return 20.0f * std::pow (2.0f, pos * 10.0f);
+        }
+
         static float getPositionForGain (float gain, float top, float bottom)
         {
             return jmap (Decibels::gainToDecibels (gain, mindB), mindB, maxdB, bottom, top);
@@ -68,6 +79,11 @@ class SpectrumAnalyzer : public Component, private Timer
 
             return (x > 0.0f) ? x : 0.0f;
         }
+
+        void mouseDown (const MouseEvent& event) override;
+        void mouseMove (const MouseEvent& event) override;
+        void mouseDrag (const MouseEvent& event) override;
+        void mouseUp   (const MouseEvent&) override;
 
         Font openSansBold;
 

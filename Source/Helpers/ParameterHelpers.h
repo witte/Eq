@@ -34,17 +34,17 @@ static std::unique_ptr<RangedAudioParameter> makePrmFreq (const String& paramete
                                                           const String& label = {})
 {
     NormalisableRange<float> range { 20.0f, 20000.0f,
-        [] (float /*start*/, float /*end*/, float proportion) // proportion to frequency
+        [] (float, float, float proportion) // proportion to frequency
         {
             return freqTable.at (static_cast<unsigned long> (proportion * (freqTableSize - 1) + 0.5f));
         },
         
-        [] (float /*start*/, float /*end*/, float value) // frequency to proportion
+        [] (float, float, float value) // frequency to proportion
         {
-            unsigned long index = 0;
+            long index = 0;
             for (unsigned long i = 0; i < freqTableSize; ++i)
             {
-                if (qFuzzyCompare (value, freqTable.at (i)))
+                if (value <= freqTable.at (i))
                 {
                     index = i;
                     break;
@@ -54,7 +54,7 @@ static std::unique_ptr<RangedAudioParameter> makePrmFreq (const String& paramete
             return index / (freqTableSize - 1);
         },
 
-        [] (float /*start*/, float /*end*/, float value)
+        [] (float, float, float value)
         {
             if (value <=    20.0f) return    20.0f;
             if (value >= 20000.0f) return 20000.0f;

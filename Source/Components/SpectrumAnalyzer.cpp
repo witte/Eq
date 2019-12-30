@@ -3,10 +3,19 @@
 namespace witte
 {
 
-SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) :
-    processor {eqProcessor}
+static String getPrmName (int bandNumber, const String& paramName)
+{
+    String str (bandNumber);
+    str << paramName;
+    return  str;
+}
+
+SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor, AudioProcessorValueTreeState& _tree) :
+    processor {eqProcessor},
+    tree {_tree}
 {
     setOpaque (true);
+
     auto typefaceBold = Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedBold_ttf, BinaryData::OpenSansCondensedBold_ttfSize);
     openSansBold = Font (typefaceBold);
 
@@ -55,6 +64,7 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) :
                 float bandX = x + (getPositionForFrequency (*band.prmFreq) * width);
                 float bandY = jmap (*band.prmGain + outputGain, -26.0f, 26.0f, bottom, y);
 
+                plotAreas[i-1] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
                 bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
             }
 
@@ -239,11 +249,76 @@ void SpectrumAnalyzer::paint (Graphics& g)
         }
         g.drawText (str, pos - 21, y + (height * 0.5f) - 14, 42, 28, Justification::centred);
     }
+
+    if (hoveringBand >= 0)
+    {
+        g.setColour (Colours::rebeccapurple.withAlpha (0.5f));
+        g.fillEllipse (plotAreas[hoveringBand]);
+    }
 }
 
 void SpectrumAnalyzer::resized()
 {
     processor.onBandParametersChange (0);
+}
+
+void SpectrumAnalyzer::mouseDown (const MouseEvent& event)
+{
+    for (int i = 0; i < 5; ++i)
+    {
+        if (plotAreas[i].contains (event.getPosition().toFloat().translated (-2.0f, -2.0f)))
+        {
+            movingBand = i;
+            break;
+        }
+    }
+}
+
+void SpectrumAnalyzer::mouseMove (const MouseEvent& event)
+{
+    for (int i = 0; i < 5; ++i)
+    {
+        if (plotAreas[i].contains (event.getPosition().toFloat().translated (-2.0f, -2.0f)))
+        {
+            hoveringBand = i;
+            repaint();
+            return;
+        }
+    }
+
+    hoveringBand = -1;
+    repaint();
+}
+
+void SpectrumAnalyzer::mouseDrag (const MouseEvent& event)
+{
+    if (movingBand < 0) return;
+
+    const auto bounds = getLocalBounds().toFloat();
+    const auto x = bounds.getX();
+    const auto y = bounds.getY();
+    const auto width  = bounds.getWidth();
+    const auto bottom = bounds.getBottom();
+
+    float freqForPos = getFrequencyForPosition ((event.position.getX() - 2.0f) / (x + width));
+    freqForPos = std::clamp (freqForPos, 20.0f, 20000.0f);
+
+    String str = getPrmName (movingBand + 1, "Freq");
+    float newValue = tree.getParameterRange (str).convertTo0to1 (freqForPos);
+    tree.getParameter (str)->setValueNotifyingHost (newValue);
+
+
+    float gainForPos = jmap (event.position.getY(), bottom, y, -26.0f, 26.0f) - *processor.prmOutputGain;
+    gainForPos = std::clamp (gainForPos, -24.0f, 24.0f);
+    str = getPrmName (movingBand + 1, "Gain");
+    newValue = tree.getParameterRange (str).convertTo0to1 (gainForPos);
+    tree.getParameter (str)->setValueNotifyingHost (newValue);
+}
+
+void SpectrumAnalyzer::mouseUp (const MouseEvent&)
+{
+    movingBand = -1;
+    hoveringBand = -1;
 }
 
 void SpectrumAnalyzer::drawNextFrame()

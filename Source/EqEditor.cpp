@@ -5,7 +5,7 @@ namespace witte
 
 EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor {&p}, processor {p}, tree {vts},
-      analyzer {processor},
+      analyzer {processor, tree},
       band1 {tree, 1},
       band2 {tree, 2},
       band3 {tree, 3},
