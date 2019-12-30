@@ -6,7 +6,7 @@ An equalizer plugin made with the Juce framework. My attempt at writing a simple
 <br>
 
 ## Dependencies
-Juce: https://github.com/WeAreROLI/JUCE
+Juce: https://github.com/WeAreROLI/JUCE (develop branch)
 <br>
 <br>
 
