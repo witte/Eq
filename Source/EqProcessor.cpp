@@ -9,14 +9,11 @@ namespace IDs
 }
 
 EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", std::move (prmLayout)),
-    band1 {*this, 1}, band2 {*this, 2}, band3 {*this, 3}, band4 {*this, 4}, band5 {*this, 5}
+    bands { Band {*this, 1}, Band {*this, 2}, Band {*this, 3}, Band {*this, 4}, Band {*this, 5} }
 {
     for (unsigned long i = 1; i <= 5; ++i)
     {
-        Band& band = (i == 1)? band1 :
-                     (i == 2)? band2 :
-                     (i == 3)? band3 :
-                     (i == 4)? band4 : band5;
+        Band& band = bands[i - 1];
 
         String on   {i}; on   << "On";
         String type {i}; type << "Type";
@@ -52,17 +49,11 @@ void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
     spec.maximumBlockSize = uint32 (samplesPerBlock);
     spec.numChannels = uint32 (getTotalNumOutputChannels ());
 
-    band1.updateFilter();
-    band2.updateFilter();
-    band3.updateFilter();
-    band4.updateFilter();
-    band5.updateFilter();
-
-    band1.processor.prepare (spec);
-    band2.processor.prepare (spec);
-    band3.processor.prepare (spec);
-    band4.processor.prepare (spec);
-    band5.processor.prepare (spec);
+    for (auto& band : bands)
+    {
+        band.updateFilter();
+        band.processor.prepare (spec);
+    }
 
     abstractFifoInput.setTotalSize  (int (_sampleRate));
     abstractFifoOutput.setTotalSize (int (_sampleRate));
@@ -84,11 +75,10 @@ void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*m
 
     pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
 
-    if (band1.active) band1.processor.process (context);
-    if (band2.active) band2.processor.process (context);
-    if (band3.active) band3.processor.process (context);
-    if (band4.active) band4.processor.process (context);
-    if (band5.active) band5.processor.process (context);
+    for (auto& band : bands)
+    {
+        if (band.active) band.processor.process (context);
+    }
 
     buffer.applyGain (Decibels::decibelsToGain (prmOutputGain->load()));
 

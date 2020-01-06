@@ -44,11 +44,7 @@ class SpectrumAnalyzer : public Component, private Timer
         std::array<Rectangle<float>, 5> plotAreas {{}};
 
         std::vector<double> frequencies;
-        std::vector<double> magnitudesBand1;
-        std::vector<double> magnitudesBand2;
-        std::vector<double> magnitudesBand3;
-        std::vector<double> magnitudesBand4;
-        std::vector<double> magnitudesBand5;
+        std::array<std::vector<double>, 5> magnitudes;
         std::vector<double> magnitudesOut;
 
 

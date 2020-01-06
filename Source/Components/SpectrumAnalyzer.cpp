@@ -25,11 +25,10 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor, AudioProcesso
     {
         frequencies [i] = 20.0 * std::pow (2.0, i / (frequencies.size() * 0.1));
     }
-    magnitudesBand1.resize (frequencies.size(), 1.0);
-    magnitudesBand2.resize (frequencies.size(), 1.0);
-    magnitudesBand3.resize (frequencies.size(), 1.0);
-    magnitudesBand4.resize (frequencies.size(), 1.0);
-    magnitudesBand5.resize (frequencies.size(), 1.0);
+
+    for (auto& magnitudesBand : magnitudes)
+        magnitudesBand.resize (frequencies.size(), 1.0);
+
     magnitudesOut.resize (frequencies.size(), 1.0);
 
     avgInput.clear();
@@ -313,31 +312,24 @@ void SpectrumAnalyzer::drawFrequencyCurve()
 
     float outputGain = *processor.prmOutputGain;
 
-    for (int i = 1; i <= 5; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-        EqAudioProcessor::Band& band = (i == 1)? processor.band1 :
-                                       (i == 2)? processor.band2 :
-                                       (i == 3)? processor.band3 :
-                                       (i == 4)? processor.band4 : processor.band5;
+        auto& band = processor.getBands()[i];
 
         if (!band.active) continue;
 
-        auto& magnitudes = (i == 1)? magnitudesBand1 :
-                           (i == 2)? magnitudesBand2 :
-                           (i == 3)? magnitudesBand3 :
-                           (i == 4)? magnitudesBand4 : magnitudesBand5;
-
+        auto& magnitudesBand = magnitudes[i];
         band.processor.state->getMagnitudeForFrequencyArray (frequencies.data(),
-                                                             magnitudes.data(),
+                                                             magnitudesBand.data(),
                                                              frequencies.size(), processor.getSampleRate());
 
         float bandX = x + (getPositionForFrequency (*band.prmFreq) * width);
         float bandY = jmap (*band.prmGain + outputGain, -26.0f, 26.0f, bottom, y);
 
-        plotAreas[i-1] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
+        plotAreas[i] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
         bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
 
-        FloatVectorOperations::multiply (magnitudesOut.data(), magnitudes.data(), int (magnitudesOut.size()));
+        FloatVectorOperations::multiply (magnitudesOut.data(), magnitudesBand.data(), int (magnitudesOut.size()));
     }
 
     frequencyCurvePath.clear();

@@ -81,11 +81,7 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
                 int index {0};
         };
 
-        Band band1;
-        Band band2;
-        Band band3;
-        Band band4;
-        Band band5;
+        std::array<Band, 5>& getBands() { return bands; }
 
 
     private:
@@ -127,6 +123,8 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         };
         UndoManager                  undoManager;
         AudioProcessorValueTreeState parameters;
+
+        std::array<Band, 5> bands;
 
         void pushNextSampleToFifo (const AudioBuffer<float>& buffer, int startChannel, int numChannels,
                                    AbstractFifo& absFifo, AudioBuffer<float>& fifo);
