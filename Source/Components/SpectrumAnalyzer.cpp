@@ -235,7 +235,7 @@ void SpectrumAnalyzer::mouseDrag (const MouseEvent& event)
     tree.getParameter (str)->setValueNotifyingHost (newValue);
 
 
-    float gainForPos = jmap (event.position.getY(), bottom, y, -26.0f, 26.0f) - *processor.prmOutputGain;
+    float gainForPos = jmap (event.position.getY(), bottom, y, -26.0f, 26.0f);
     gainForPos = std::clamp (gainForPos, -24.0f, 24.0f);
     str = getPrmName (movingBand + 1, "Gain");
     newValue = tree.getParameterRange (str).convertTo0to1 (gainForPos);
@@ -324,7 +324,7 @@ void SpectrumAnalyzer::drawFrequencyCurve()
                                                              frequencies.size(), processor.getSampleRate());
 
         float bandX = x + (getPositionForFrequency (*band.prmFreq) * width);
-        float bandY = jmap (*band.prmGain + outputGain, -26.0f, 26.0f, bottom, y);
+        float bandY = jmap (band.prmGain->load(), -26.0f, 26.0f, bottom, y);
 
         plotAreas[i] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
         bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
