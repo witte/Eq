@@ -32,77 +32,6 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor, AudioProcesso
     magnitudesBand5.resize (frequencies.size(), 1.0);
     magnitudesOut.resize (frequencies.size(), 1.0);
 
-    processor.onBandParametersChange = [&] (int index)
-    {
-        const auto bounds = getLocalBounds().toFloat().reduced (2.0f);
-        const auto x = bounds.getX();
-        const auto y = bounds.getY();
-        const auto width  = bounds.getWidth();
-        const auto bottom = bounds.getBottom();
-
-        std::fill (magnitudesOut.begin(), magnitudesOut.end(), 1.0);
-
-        ScopedLock lockedForWriting (freqPathCreationLock);
-        bandsPositionsPath.clear();
-
-        float outputGain = *processor.prmOutputGain;
-
-        for (int i = 1; i <= 5; ++i)
-        {
-            EqAudioProcessor::Band& band = (i == 1)? processor.band1 :
-                                           (i == 2)? processor.band2 :
-                                           (i == 3)? processor.band3 :
-                                           (i == 4)? processor.band4 : processor.band5;
-
-            auto& magnitudes = (i == 1)? magnitudesBand1 :
-                               (i == 2)? magnitudesBand2 :
-                               (i == 3)? magnitudesBand3 :
-                               (i == 4)? magnitudesBand4 : magnitudesBand5;
-
-            if (band.active)
-            {
-                float bandX = x + (getPositionForFrequency (*band.prmFreq) * width);
-                float bandY = jmap (*band.prmGain + outputGain, -26.0f, 26.0f, bottom, y);
-
-                plotAreas[i-1] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
-                bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
-            }
-
-            if (i == index)
-            {
-                band.processor.state->getMagnitudeForFrequencyArray (frequencies.data(),
-                                                                     magnitudes.data(),
-                                                                     frequencies.size(), processor.getSampleRate());
-            }
-
-            if (band.active)
-                FloatVectorOperations::multiply (magnitudesOut.data(), magnitudes.data(), int (magnitudesOut.size()));
-        }
-
-
-
-        frequencyCurvePath.clear();
-        frequencyCurvePath.startNewSubPath (x,
-                jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, bottom, y));
-
-        for (size_t i = 1; i < frequencies.size(); ++i)
-        {
-            float xx = x + (getPositionForFrequency (frequencies[i]) * width);
-            float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
-            float yy = jmap (gain, -26.0f, 26.0f, bottom, y);
-
-            frequencyCurvePath.lineTo (xx, yy);
-        }
-
-        processor.nextFFTBlockReady = true;
-    };
-
-    processor.onBandParametersChange (1);
-    processor.onBandParametersChange (2);
-    processor.onBandParametersChange (3);
-    processor.onBandParametersChange (4);
-    processor.onBandParametersChange (5);
-
     avgInput.clear();
     avgOutput.clear();
 
@@ -122,7 +51,6 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor, AudioProcesso
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
-    processor.onBandParametersChange = nullptr;
 }
 
 void SpectrumAnalyzer::paint (Graphics& g)
@@ -259,7 +187,7 @@ void SpectrumAnalyzer::paint (Graphics& g)
 
 void SpectrumAnalyzer::resized()
 {
-    processor.onBandParametersChange (0);
+    drawFrequencyCurve();
 }
 
 void SpectrumAnalyzer::mouseDown (const MouseEvent& event)
@@ -370,14 +298,77 @@ void SpectrumAnalyzer::drawNextFrame()
     }
 }
 
+void SpectrumAnalyzer::drawFrequencyCurve()
+{
+    const auto bounds = getLocalBounds().toFloat().reduced (2.0f);
+    const auto x = bounds.getX();
+    const auto y = bounds.getY();
+    const auto width  = bounds.getWidth();
+    const auto bottom = bounds.getBottom();
+
+    std::fill (magnitudesOut.begin(), magnitudesOut.end(), 1.0);
+
+    ScopedLock lockedForWriting (freqPathCreationLock);
+    bandsPositionsPath.clear();
+
+    float outputGain = *processor.prmOutputGain;
+
+    for (int i = 1; i <= 5; ++i)
+    {
+        EqAudioProcessor::Band& band = (i == 1)? processor.band1 :
+                                       (i == 2)? processor.band2 :
+                                       (i == 3)? processor.band3 :
+                                       (i == 4)? processor.band4 : processor.band5;
+
+        if (!band.active) continue;
+
+        auto& magnitudes = (i == 1)? magnitudesBand1 :
+                           (i == 2)? magnitudesBand2 :
+                           (i == 3)? magnitudesBand3 :
+                           (i == 4)? magnitudesBand4 : magnitudesBand5;
+
+        band.processor.state->getMagnitudeForFrequencyArray (frequencies.data(),
+                                                             magnitudes.data(),
+                                                             frequencies.size(), processor.getSampleRate());
+
+        float bandX = x + (getPositionForFrequency (*band.prmFreq) * width);
+        float bandY = jmap (*band.prmGain + outputGain, -26.0f, 26.0f, bottom, y);
+
+        plotAreas[i-1] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
+        bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
+
+        FloatVectorOperations::multiply (magnitudesOut.data(), magnitudes.data(), int (magnitudesOut.size()));
+    }
+
+    frequencyCurvePath.clear();
+    frequencyCurvePath.startNewSubPath (x,
+            jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, bottom, y));
+
+    for (size_t i = 1; i < frequencies.size(); ++i)
+    {
+        float xx = x + (getPositionForFrequency (frequencies[i]) * width);
+        float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
+        float yy = jmap (gain, -26.0f, 26.0f, bottom, y);
+
+        frequencyCurvePath.lineTo (xx, yy);
+    }
+}
+
 void SpectrumAnalyzer::timerCallback()
 {
-    if (!processor.nextFFTBlockReady.load()) return;
+    if (processor.nextFFTBlockReady.load())
+    {
+        drawNextFrame();
+        processor.nextFFTBlockReady.store (false);
+        repaint();
+    }
 
-    drawNextFrame();
-    repaint();
-
-    processor.nextFFTBlockReady.store (false);
+    if (processor.frequenciesCurveChanged)
+    {
+        drawFrequencyCurve();
+        processor.frequenciesCurveChanged.store (false);
+        repaint();
+    }
 }
 
 }

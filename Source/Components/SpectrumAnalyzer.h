@@ -92,6 +92,7 @@ class SpectrumAnalyzer : public Component, private Timer
         bool isEmpty = true;
 
         void drawNextFrame();
+        void drawFrequencyCurve();
 
         void timerCallback() override;
     

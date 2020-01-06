@@ -54,6 +54,7 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         AbstractFifo abstractFifoOutput { 2 * fftSize };
         AudioBuffer<float> audioFifoOutput;
 
+        std::atomic<bool> frequenciesCurveChanged = false;
 
         struct Band : public AudioProcessorValueTreeState::Listener
         {
@@ -85,8 +86,6 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         Band band3;
         Band band4;
         Band band5;
-
-        std::function<void (int)> onBandParametersChange;
 
 
     private:

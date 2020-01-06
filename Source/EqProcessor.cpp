@@ -149,16 +149,13 @@ AudioProcessorEditor* EqAudioProcessor::createEditor() { return new witte::EqAud
 void EqAudioProcessor::parameterChanged (const String&, float newValue)
 {
     *prmOutputGain = newValue;
-
-    if (onBandParametersChange != nullptr)
-        onBandParametersChange (0);
+    frequenciesCurveChanged.store (true);
 }
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()     { return new EqAudioProcessor(); }
 
 void EqAudioProcessor::Band::parameterChanged (const String& parameter, float newValue)
 {
-//    std::cout << parameter.toStdString() << ": " << newValue << std::endl;
     String str = parameter.substring (1, parameter.length());
 
     if (str == "On")
@@ -176,8 +173,7 @@ void EqAudioProcessor::Band::parameterChanged (const String& parameter, float ne
         updateFilter();
     }
 
-    if (eqProcessor.onBandParametersChange != nullptr)
-        eqProcessor.onBandParametersChange (index);
+    eqProcessor.frequenciesCurveChanged.store (true);
 }
 
 void EqAudioProcessor::Band::updateFilter()
