@@ -310,35 +310,34 @@ void SpectrumAnalyzer::drawFrequencyCurve()
     ScopedLock lockedForWriting (freqPathCreationLock);
     bandsPositionsPath.clear();
 
-    float outputGain = *processor.prmOutputGain;
-
     for (int i = 0; i < 5; ++i)
     {
-        auto& band = processor.getBands()[i];
+        auto& band = processor.getBands() [i];
 
-        if (!band.active) continue;
+        if (band.prmOn->load() <= 0.5f) continue;
 
-        auto& magnitudesBand = magnitudes[i];
+        auto& magnitudesBand = magnitudes [i];
         band.processor.state->getMagnitudeForFrequencyArray (frequencies.data(),
                                                              magnitudesBand.data(),
                                                              frequencies.size(), processor.getSampleRate());
 
-        float bandX = x + (getPositionForFrequency (*band.prmFreq) * width);
+        float bandX = x + (getPositionForFrequency (band.prmFreq->load()) * width);
         float bandY = jmap (band.prmGain->load(), -26.0f, 26.0f, bottom, y);
 
-        plotAreas[i] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
+        plotAreas [i] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
         bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
 
         FloatVectorOperations::multiply (magnitudesOut.data(), magnitudesBand.data(), int (magnitudesOut.size()));
     }
 
+    float outputGain = *processor.prmOutputGain;
     frequencyCurvePath.clear();
     frequencyCurvePath.startNewSubPath (x,
             jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, bottom, y));
 
     for (size_t i = 1; i < frequencies.size(); ++i)
     {
-        float xx = x + (getPositionForFrequency (frequencies[i]) * width);
+        float xx = x + (getPositionForFrequency (frequencies [i]) * width);
         float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
         float yy = jmap (gain, -26.0f, 26.0f, bottom, y);
 

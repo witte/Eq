@@ -158,21 +158,15 @@ void EqAudioProcessor::Band::parameterChanged (const String& parameter, float ne
 {
     String str = parameter.substring (1, parameter.length());
 
-    if (str == "On")
-    {
-        *prmOn = newValue;
-        active = newValue > 0.5f;
-    }
-    else
-    {
-             if (str == "Type") *prmType = newValue;
-        else if (str == "Freq") *prmFreq = newValue;
-        else if (str == "Gain") *prmGain = newValue;
-        else if (str == "Q")    *prmQ    = newValue;
+         if (str == "On"  ) *prmOn   = newValue;
+    else if (str == "Type") *prmType = newValue;
+    else if (str == "Freq") *prmFreq = newValue;
+    else if (str == "Gain") *prmGain = newValue;
+    else                    *prmQ    = newValue;
 
-        updateFilter();
-    }
+    if (str != "On") updateFilter();
 
+    active = *prmOn > 0.5f && (*prmGain == 0.0f? (*prmType == 0.0f || *prmType == 4.0f) : true);
     eqProcessor.frequenciesCurveChanged.store (true);
 }
 
