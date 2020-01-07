@@ -54,18 +54,6 @@ void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
         band.updateFilter();
         band.processor.prepare (spec);
     }
-
-    abstractFifoInput.setTotalSize  (int (_sampleRate));
-    abstractFifoOutput.setTotalSize (int (_sampleRate));
-
-    audioFifoInput.setSize  (1, int (_sampleRate));
-    audioFifoOutput.setSize (1, int (_sampleRate));
-
-    abstractFifoInput.reset();
-    abstractFifoOutput.reset();
-
-    audioFifoInput.clear();
-    audioFifoOutput.clear();
 }
 
 void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiMessages*/)
@@ -73,7 +61,7 @@ void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*m
     dsp::AudioBlock<float> ioBuffer (buffer);
     dsp::ProcessContextReplacing<float> context  (ioBuffer);
 
-    pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
+    if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
 
     for (auto& band : bands)
     {
@@ -82,7 +70,7 @@ void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*m
 
     buffer.applyGain (Decibels::decibelsToGain (prmOutputGain->load()));
 
-    pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
+    if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
 }
 
 void EqAudioProcessor::pushNextSampleToFifo (const AudioBuffer<float>& buffer, int startChannel, int numChannels,
@@ -93,6 +81,7 @@ void EqAudioProcessor::pushNextSampleToFifo (const AudioBuffer<float>& buffer, i
     int start1, block1, start2, block2;
     absFifo.prepareToWrite (buffer.getNumSamples(), start1, block1, start2, block2);
     fifo.copyFrom (0, start1, buffer.getReadPointer (startChannel), block1);
+
     if (block2 > 0)
         fifo.copyFrom (0, start2, buffer.getReadPointer (startChannel, block1), block2);
 
@@ -101,6 +90,7 @@ void EqAudioProcessor::pushNextSampleToFifo (const AudioBuffer<float>& buffer, i
         if (block1 > 0) fifo.addFrom (0, start1, buffer.getReadPointer (channel), block1);
         if (block2 > 0) fifo.addFrom (0, start2, buffer.getReadPointer (channel, block1), block2);
     }
+
     absFifo.finishedWrite (block1 + block2);
     nextFFTBlockReady.store (true);
 };
@@ -142,7 +132,27 @@ void EqAudioProcessor::parameterChanged (const String&, float newValue)
     frequenciesCurveChanged.store (true);
 }
 
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()     { return new EqAudioProcessor(); }
+void EqAudioProcessor::setCopyToFifo (bool _copyToFifo)
+{
+    if (_copyToFifo)
+    {
+        abstractFifoInput.setTotalSize  (int (sampleRate));
+        abstractFifoOutput.setTotalSize (int (sampleRate));
+
+        audioFifoInput.setSize  (1, int (sampleRate));
+        audioFifoOutput.setSize (1, int (sampleRate));
+
+        abstractFifoInput.reset();
+        abstractFifoOutput.reset();
+
+        audioFifoInput.clear();
+        audioFifoOutput.clear();
+    }
+
+    copyToFifo.store (_copyToFifo);
+}
+
+AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new EqAudioProcessor(); }
 
 void EqAudioProcessor::Band::parameterChanged (const String& parameter, float newValue)
 {

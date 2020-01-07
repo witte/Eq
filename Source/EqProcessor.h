@@ -41,6 +41,8 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         std::atomic<float>* prmOutputGain {nullptr};
         void parameterChanged (const String&, float newValue) override;
 
+        void setCopyToFifo (bool _copyToFifo);
+
         enum
         {
             fftOrder  = 11,
@@ -48,10 +50,10 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         };
         std::atomic<bool> nextFFTBlockReady = false;
 
-        AbstractFifo abstractFifoInput { 2 * fftSize };
+        AbstractFifo abstractFifoInput {1};
         AudioBuffer<float> audioFifoInput;
 
-        AbstractFifo abstractFifoOutput { 2 * fftSize };
+        AbstractFifo abstractFifoOutput {1};
         AudioBuffer<float> audioFifoOutput;
 
         std::atomic<bool> frequenciesCurveChanged = false;
@@ -126,6 +128,7 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
 
         std::array<Band, 5> bands;
 
+        std::atomic<bool> copyToFifo = false;
         void pushNextSampleToFifo (const AudioBuffer<float>& buffer, int startChannel, int numChannels,
                                    AbstractFifo& absFifo, AudioBuffer<float>& fifo);
 

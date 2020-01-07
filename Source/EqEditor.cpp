@@ -39,6 +39,8 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
 #ifdef JUCE_OPENGL
     openGLContext.attachTo (*getTopLevelComponent());
 #endif
+
+    processor.setCopyToFifo (true);
 }
 
 EqAudioProcessorEditor::~EqAudioProcessorEditor()
@@ -48,6 +50,8 @@ EqAudioProcessorEditor::~EqAudioProcessorEditor()
 #ifdef JUCE_OPENGL
     openGLContext.detach();
 #endif
+
+    processor.setCopyToFifo (false);
 }
 
 void EqAudioProcessorEditor::paint (Graphics& g)

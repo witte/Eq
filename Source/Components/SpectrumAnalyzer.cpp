@@ -290,7 +290,7 @@ void SpectrumAnalyzer::drawNextFrame()
 
         ScopedLock lockedForWriting (pathCreationLock);
         avgOutput.addFrom  (0,            0, avgOutput.getReadPointer (avgOutputPtr), avgOutput.getNumSamples(), -1.0f);
-        avgOutput.copyFrom (avgOutputPtr, 0, fftBufferOutput.getReadPointer (0), avgOutput.getNumSamples(), 1.0f / (avgOutput.getNumSamples() * (avgOutput.getNumChannels() - 1)));
+        avgOutput.copyFrom (avgOutputPtr, 0, fftBufferOutput.getReadPointer (0),      avgOutput.getNumSamples(), 1.0f / (avgOutput.getNumSamples() * (avgOutput.getNumChannels() - 1)));
         avgOutput.addFrom  (0,            0, avgOutput.getReadPointer (avgOutputPtr), avgOutput.getNumSamples());
 
         if (++avgOutputPtr == avgOutput.getNumChannels()) avgOutputPtr = 1;
@@ -355,7 +355,7 @@ void SpectrumAnalyzer::timerCallback()
         repaint();
     }
 
-    if (processor.frequenciesCurveChanged)
+    if (processor.frequenciesCurveChanged.load())
     {
         drawFrequencyCurve();
         processor.frequenciesCurveChanged.store (false);
