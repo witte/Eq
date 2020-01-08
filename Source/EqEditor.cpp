@@ -36,21 +36,12 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
 
     setResizeLimits (defaultW / 2, defaultH / 2, defaultW * 2, defaultH * 2);
 
-#ifdef JUCE_OPENGL
-    openGLContext.attachTo (*getTopLevelComponent());
-#endif
-
     processor.setCopyToFifo (true);
 }
 
 EqAudioProcessorEditor::~EqAudioProcessorEditor()
 {
     setLookAndFeel (nullptr);
-
-#ifdef JUCE_OPENGL
-    openGLContext.detach();
-#endif
-
     processor.setCopyToFifo (false);
 }
 

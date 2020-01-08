@@ -21,10 +21,6 @@ class EqAudioProcessorEditor : public AudioProcessorEditor
         EqAudioProcessor& processor;
         AudioProcessorValueTreeState& tree;
 
-#ifdef JUCE_OPENGL
-        OpenGLContext openGLContext;
-#endif
-
         witte::LookAndFeel loolAndFeel;
 
         Image background {ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)};
