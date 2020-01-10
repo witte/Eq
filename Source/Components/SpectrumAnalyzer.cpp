@@ -34,6 +34,8 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor, AudioProcesso
     avgInput.clear();
     avgOutput.clear();
 
+    fftPoints.resize (processor.fftSize);
+
     {
         ScopedLock lockedForWriting (pathCreationLock);
         inP.preallocateSpace  (processor.fftSize * 2);
@@ -52,82 +54,89 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 {
 }
 
+float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& point)
+{
+    float level = 0.0f;
+
+    for (int i = point.firstBinIndex; i <= point.lastBinIndex; ++i)
+    {
+        if (buffer[i] > level) level = buffer[i];
+    }
+
+    return Decibels::gainToDecibels (level, mindB);
+}
+
 void SpectrumAnalyzer::paint (Graphics& g)
 {
-    const auto bounds = getLocalBounds().toFloat().reduced (2.0f);
-    const auto x = bounds.getX();
-    const auto y = bounds.getY();
+    const auto bounds = getLocalBounds().toFloat();
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
-    const auto bottom = bounds.getBottom();
 
     auto baseColor = Colour {uint8 (1), uint8 (28), uint8 (39)};
     g.fillAll (baseColor);
 
     g.setColour (baseColor.brighter (0.028f));
-
-    auto gains = { -12.0f, -24.0f, -36.0f, -48.0f, -60.0f, -72.0f, -84.0f };
-    auto bandGains = { 24.0f, 12.0f, -12.0f, -24.0f };
-
-    auto freqsA = { 100.0f, 1000.0f, 10000.0f };
-    auto freqsB = {  20.0f,   30.0f,   40.0f,   50.0f,   60.0f,   70.0f,   80.0f,   90.0f,
-                    200.0f,  300.0f,  400.0f,  500.0f,  600.0f,  700.0f,  800.0f,  900.0f,
-                   2000.0f, 3000.0f, 4000.0f, 5000.0f, 6000.0f, 7000.0f, 8000.0f, 9000.0f,
-                  20000.0f };
-
-    g.drawHorizontalLine (int (height * 0.5f), x, x + width);
+    g.drawHorizontalLine (int (height * 0.5f), 0, width);
 
     for (auto& bandGain : bandGains)
     {
-        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, bottom, y));
-        g.drawHorizontalLine (pos, x, x + width);
+        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
+        g.drawHorizontalLine (pos, 0, width);
     }
 
     for (auto& freq : freqsB)
     {
-        int pos = x + (roundToInt (getPositionForFrequency (freq) * width));
-        g.drawVerticalLine (pos, y, bottom);
+        int pos = roundToInt (getPositionForFrequency (freq) * width);
+        g.drawVerticalLine (pos, 0, height);
     }
 
 
     g.setColour (baseColor.brighter (0.08f));
     for (auto& freq : freqsA)
     {
-        int pos = x + (roundToInt (getPositionForFrequency (freq) * width));
-        g.drawVerticalLine (pos, y, bottom);
+        int pos = roundToInt (getPositionForFrequency (freq) * width);
+        g.drawVerticalLine (pos, 0, height);
     }
 
     const auto* fftDataInput  = avgInput.getReadPointer (0);
     const auto* fftDataOutput = avgOutput.getReadPointer (0);
-    const auto  factor  = width / 10.0f;
 
     {
         ScopedLock lockedForReading (pathCreationLock);
 
         inP.clear();
         outP.clear();
-        inP.startNewSubPath (x, bottom);
-        outP.startNewSubPath (x, jmap (Decibels::gainToDecibels (fftDataInput [0], mindB), mindB, maxdB, bottom, y));
 
-        for (int i = 0; i < avgInput.getNumSamples(); ++i)
         {
-            float freqX = x + (factor * indexToX (i));
-            float freqLevel = jmap (Decibels::gainToDecibels (fftDataInput [i], mindB), mindB, maxdB, bottom, y);
+            fftPoint& point = fftPoints[0];
+            int yy = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
-            inP.lineTo  (freqX, roundToInt (freqLevel));
-            outP.lineTo (freqX, roundToInt (freqLevel));
+            inP.startNewSubPath  (point.x, yy);
+            outP.startNewSubPath (point.x, yy);
         }
 
-        for (int i = avgInput.getNumSamples() - 1; i >= 0; --i)
+        for (int i = 0; i < fftPointsSize; ++i)
         {
-            float freqX = x + (factor * indexToX (i));
-            float freqLevel = jmap (Decibels::gainToDecibels (fftDataOutput [i], mindB), mindB, maxdB, bottom, y);
+            fftPoint& point = fftPoints[i];
+            int yy = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
-            outP.lineTo (freqX, roundToInt (freqLevel));
+            inP.lineTo  (point.x, yy);
+            outP.lineTo (point.x, yy);
         }
+
+        for (int i = fftPointsSize - 1; i >= 0; --i)
+        {
+            fftPoint& point = fftPoints[i];
+            int yy = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+
+            outP.lineTo (point.x, yy);
+        }
+
         outP.closeSubPath();
-        inP.lineTo (width, bottom);
-        inP.lineTo (x, bottom);
+
+        inP.lineTo (width, height);
+        inP.lineTo (0.0f, height);
+        inP.closeSubPath();
 
         g.setColour (Colours::yellowgreen.withAlpha (0.42f));
         g.fillPath (outP);
@@ -138,24 +147,23 @@ void SpectrumAnalyzer::paint (Graphics& g)
 
     {
         ScopedLock lockedForReading (freqPathCreationLock);
-        
+
         g.setColour (Colour {0xff4ea5ac});
         g.strokePath (frequencyCurvePath, frequencyCurve);
         g.fillPath (bandsPositionsPath);
     }
 
-
     g.setColour (baseColor.brighter (1.2f));
     for (auto& bandGain : bandGains)
     {
-        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, bottom, y));
-        g.drawText (String {bandGain}, x + width - 44, pos - 14, 42, 28, Justification::centredRight);
+        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
+        g.drawText (String {bandGain}, width - 44, pos - 14, 42, 28, Justification::centredRight);
     }
 
     for (auto& gain : gains)
     {
-        int pos = roundToInt (jmap (gain + 6.0f, mindB, maxdB, bottom, y));
-        g.drawText (String { std::abs (gain)}, x + 2, pos - 14, 42, 28, Justification::centredLeft);
+        int pos = roundToInt (jmap (gain + 6.0f, mindB, maxdB, height, 0.0f));
+        g.drawText (String { std::abs (gain)}, 2, pos - 14, 42, 28, Justification::centredLeft);
     }
 
     g.setFont (openSansBold);
@@ -163,7 +171,7 @@ void SpectrumAnalyzer::paint (Graphics& g)
     g.setColour (baseColor.brighter (2.8f));
     for (auto& freq : freqsA)
     {
-        int pos = roundToInt (getPositionForFrequency (freq) * (x + width));
+        int pos = roundToInt (getPositionForFrequency (freq) * width);
         String str;
         if (freq >= 1000)
         {
@@ -174,7 +182,8 @@ void SpectrumAnalyzer::paint (Graphics& g)
         {
             str << freq;
         }
-        g.drawText (str, pos - 21, y + (height * 0.5f) - 14, 42, 28, Justification::centred);
+
+        g.drawText (str, pos - 21, (height * 0.5f) - 14, 42, 28, Justification::centred);
     }
 
     if (hoveringBand >= 0)
@@ -186,6 +195,36 @@ void SpectrumAnalyzer::paint (Graphics& g)
 
 void SpectrumAnalyzer::resized()
 {
+    auto widthFactor = getLocalBounds().getWidth() / 10.0f;
+    auto sampleRate = float (processor.getSampleRate());
+    auto fftSize = fftInput.getSize();
+
+    fftPointsSize = 0;
+    int lastX = 0;
+    fftPoints[0].firstBinIndex = 0;
+
+    int i = 0;
+    while (i < processor.fftSize)
+    {
+        fftPoint& point = fftPoints [fftPointsSize];
+        point.firstBinIndex = i;
+        point.x = lastX;
+        
+        int x = lastX;
+        while ((x <= lastX) && (i < processor.fftSize))
+        {
+            ++i;
+
+            auto pos = std::log ( ((sampleRate * i) / fftSize) / 20.f) / std::log (2.0f);
+            x = (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0;
+        }
+        
+        point.lastBinIndex = i - 1;
+
+        ++fftPointsSize;
+        lastX = x;
+    }
+    
     drawFrequencyCurve();
 }
 
@@ -223,9 +262,8 @@ void SpectrumAnalyzer::mouseDrag (const MouseEvent& event)
 
     const auto bounds = getLocalBounds().toFloat();
     const auto x = bounds.getX();
-    const auto y = bounds.getY();
     const auto width  = bounds.getWidth();
-    const auto bottom = bounds.getBottom();
+    const auto height = bounds.getHeight();
 
     float freqForPos = getFrequencyForPosition ((event.position.getX() - 2.0f) / (x + width));
     freqForPos = std::clamp (freqForPos, 20.0f, 20000.0f);
@@ -235,7 +273,7 @@ void SpectrumAnalyzer::mouseDrag (const MouseEvent& event)
     tree.getParameter (str)->setValueNotifyingHost (newValue);
 
 
-    float gainForPos = jmap (event.position.getY(), bottom, y, -26.0f, 26.0f);
+    float gainForPos = jmap (event.position.getY(), height, 0.0f, -26.0f, 26.0f);
     gainForPos = std::clamp (gainForPos, -24.0f, 24.0f);
     str = getPrmName (movingBand + 1, "Gain");
     newValue = tree.getParameterRange (str).convertTo0to1 (gainForPos);
@@ -301,9 +339,8 @@ void SpectrumAnalyzer::drawFrequencyCurve()
 {
     const auto bounds = getLocalBounds().toFloat().reduced (2.0f);
     const auto x = bounds.getX();
-    const auto y = bounds.getY();
     const auto width  = bounds.getWidth();
-    const auto bottom = bounds.getBottom();
+    const auto height = bounds.getHeight();
 
     std::fill (magnitudesOut.begin(), magnitudesOut.end(), 1.0);
 
@@ -322,7 +359,7 @@ void SpectrumAnalyzer::drawFrequencyCurve()
                                                              frequencies.size(), processor.getSampleRate());
 
         float bandX = x + (getPositionForFrequency (band.prmFreq->load()) * width);
-        float bandY = jmap (band.prmGain->load(), -26.0f, 26.0f, bottom, y);
+        float bandY = jmap (band.prmGain->load(), -26.0f, 26.0f, height, 0.0f);
 
         plotAreas [i] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
         bandsPositionsPath.addEllipse (bandX - 2.5f, bandY - 2.5f, 5.0f, 5.0f);
@@ -333,13 +370,13 @@ void SpectrumAnalyzer::drawFrequencyCurve()
     float outputGain = *processor.prmOutputGain;
     frequencyCurvePath.clear();
     frequencyCurvePath.startNewSubPath (x,
-            jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, bottom, y));
+            jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, height, 0.0f));
 
     for (size_t i = 1; i < frequencies.size(); ++i)
     {
         float xx = x + (getPositionForFrequency (frequencies [i]) * width);
         float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
-        float yy = jmap (gain, -26.0f, 26.0f, bottom, y);
+        float yy = jmap (gain, -26.0f, 26.0f, height, 0.0f);
 
         frequencyCurvePath.lineTo (xx, yy);
     }
