@@ -19,6 +19,8 @@ class SpectrumAnalyzer : public Component, private Timer
         EqAudioProcessor& processor;
         AudioProcessorValueTreeState& tree;
 
+        Colour baseColor {uint8 (1), uint8 (28), uint8 (39)};
+
         dsp::FFT fftInput  {12};
         dsp::FFT fftOutput {12};
 
@@ -49,7 +51,6 @@ class SpectrumAnalyzer : public Component, private Timer
         int fftPointsSize = 0;
         std::vector<fftPoint> fftPoints;
 
-        float widthFactor;
         float getFftPointLevel (const float* buffer, const fftPoint& point);
 
 
@@ -67,6 +68,7 @@ class SpectrumAnalyzer : public Component, private Timer
         std::array<Rectangle<float>, 5> plotAreas {{}};
 
         std::vector<double> frequencies;
+        std::vector<Point<float>> frequenciesPoints;
         std::array<std::vector<double>, 5> magnitudes;
         std::vector<double> magnitudesOut;
 
@@ -102,11 +104,15 @@ class SpectrumAnalyzer : public Component, private Timer
 
         void drawNextFrame();
         void drawFrequencyCurve();
+        Image backgroundImage {Image::ARGB, 768 * 2, 482 * 2, true};
+        Image foregroundImage {Image::ARGB, 768 * 2, 482 * 2, true};
+
+        void drawSpectrumCurves (Graphics& g, float width, float height);
+        void drawBackgroundImage();
+        void drawForegroundImage();
 
         void timerCallback() override;
     
-        PathStrokeType frequencyCurve {1.5f, PathStrokeType::JointStyle::beveled};
-
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumAnalyzer)
 };

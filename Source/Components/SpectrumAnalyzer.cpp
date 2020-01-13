@@ -26,6 +26,8 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor, AudioProcesso
         frequencies [i] = 20.0 * std::pow (2.0, i / (frequencies.size() * 0.1));
     }
 
+    frequenciesPoints.resize (frequencies.size());
+
     for (auto& magnitudesBand : magnitudes)
         magnitudesBand.resize (frequencies.size(), 1.0);
 
@@ -72,119 +74,19 @@ void SpectrumAnalyzer::paint (Graphics& g)
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
 
-    auto baseColor = Colour {uint8 (1), uint8 (28), uint8 (39)};
-    g.fillAll (baseColor);
+    g.drawImageAt (backgroundImage, 0, 0);
 
-    g.setColour (baseColor.brighter (0.028f));
-    g.drawHorizontalLine (int (height * 0.5f), 0, width);
-
-    for (auto& bandGain : bandGains)
-    {
-        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
-        g.drawHorizontalLine (pos, 0, width);
-    }
-
-    for (auto& freq : freqsB)
-    {
-        int pos = roundToInt (getPositionForFrequency (freq) * width);
-        g.drawVerticalLine (pos, 0, height);
-    }
-
-
-    g.setColour (baseColor.brighter (0.08f));
-    for (auto& freq : freqsA)
-    {
-        int pos = roundToInt (getPositionForFrequency (freq) * width);
-        g.drawVerticalLine (pos, 0, height);
-    }
-
-    const auto* fftDataInput  = avgInput.getReadPointer (0);
-    const auto* fftDataOutput = avgOutput.getReadPointer (0);
-
-    {
-        ScopedLock lockedForReading (pathCreationLock);
-
-        inP.clear();
-        outP.clear();
-
-        {
-            fftPoint& point = fftPoints[0];
-            int yy = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
-
-            inP.startNewSubPath  (point.x, yy);
-            outP.startNewSubPath (point.x, yy);
-        }
-
-        for (int i = 0; i < fftPointsSize; ++i)
-        {
-            fftPoint& point = fftPoints[i];
-            int yy = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
-
-            inP.lineTo  (point.x, yy);
-            outP.lineTo (point.x, yy);
-        }
-
-        for (int i = fftPointsSize - 1; i >= 0; --i)
-        {
-            fftPoint& point = fftPoints[i];
-            int yy = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
-
-            outP.lineTo (point.x, yy);
-        }
-
-        outP.closeSubPath();
-
-        inP.lineTo (width, height);
-        inP.lineTo (0.0f, height);
-        inP.closeSubPath();
-
-        g.setColour (Colours::yellowgreen.withAlpha (0.42f));
-        g.fillPath (outP);
-
-        g.setColour (baseColor.brighter (0.18f).withAlpha (uint8 (182)));
-        g.fillPath (inP);
-    }
+    drawSpectrumCurves (g, width, height);
 
     {
         ScopedLock lockedForReading (freqPathCreationLock);
 
         g.setColour (Colour {0xff4ea5ac});
-        g.strokePath (frequencyCurvePath, frequencyCurve);
+        g.fillPath (frequencyCurvePath);
         g.fillPath (bandsPositionsPath);
     }
 
-    g.setColour (baseColor.brighter (1.2f));
-    for (auto& bandGain : bandGains)
-    {
-        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
-        g.drawText (String {bandGain}, width - 44, pos - 14, 42, 28, Justification::centredRight);
-    }
-
-    for (auto& gain : gains)
-    {
-        int pos = roundToInt (jmap (gain + 6.0f, mindB, maxdB, height, 0.0f));
-        g.drawText (String { std::abs (gain)}, 2, pos - 14, 42, 28, Justification::centredLeft);
-    }
-
-    g.setFont (openSansBold);
-    g.setFont (15.0f);
-    g.setColour (baseColor.brighter (2.8f));
-    for (auto& freq : freqsA)
-    {
-        int pos = roundToInt (getPositionForFrequency (freq) * width);
-        String str;
-        if (freq >= 1000)
-        {
-            str << (freq / 1000);
-            str << "k";
-        }
-        else
-        {
-            str << freq;
-        }
-
-        g.drawText (str, pos - 21, (height * 0.5f) - 14, 42, 28, Justification::centred);
-    }
+    g.drawImageAt (foregroundImage, 0, 0);
 
     if (hoveringBand >= 0)
     {
@@ -226,6 +128,8 @@ void SpectrumAnalyzer::resized()
     }
     
     drawFrequencyCurve();
+    drawBackgroundImage();
+    drawForegroundImage();
 }
 
 void SpectrumAnalyzer::mouseDown (const MouseEvent& event)
@@ -337,8 +241,7 @@ void SpectrumAnalyzer::drawNextFrame()
 
 void SpectrumAnalyzer::drawFrequencyCurve()
 {
-    const auto bounds = getLocalBounds().toFloat().reduced (2.0f);
-    const auto x = bounds.getX();
+    const auto bounds = getLocalBounds().toFloat();
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
 
@@ -358,7 +261,7 @@ void SpectrumAnalyzer::drawFrequencyCurve()
                                                              magnitudesBand.data(),
                                                              frequencies.size(), processor.getSampleRate());
 
-        float bandX = x + (getPositionForFrequency (band.prmFreq->load()) * width);
+        float bandX = getPositionForFrequency (band.prmFreq->load()) * width;
         float bandY = jmap (band.prmGain->load(), -26.0f, 26.0f, height, 0.0f);
 
         plotAreas [i] = {bandX - 12.0f, bandY - 12.0f, 24.0f, 24.0f};
@@ -369,16 +272,149 @@ void SpectrumAnalyzer::drawFrequencyCurve()
 
     float outputGain = *processor.prmOutputGain;
     frequencyCurvePath.clear();
-    frequencyCurvePath.startNewSubPath (x,
+    frequencyCurvePath.startNewSubPath (0.0f,
             jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, height, 0.0f));
 
     for (size_t i = 1; i < frequencies.size(); ++i)
     {
-        float xx = x + (getPositionForFrequency (frequencies [i]) * width);
+        float xx = getPositionForFrequency (frequencies [i]) * width;
         float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
         float yy = jmap (gain, -26.0f, 26.0f, height, 0.0f);
 
-        frequencyCurvePath.lineTo (xx, yy);
+        frequencyCurvePath.lineTo (xx, yy - 0.5f);
+        frequenciesPoints[i] = {xx, yy + 0.5f};
+    }
+
+    for (size_t i = frequencies.size() - 1; i > 0; --i)
+    {
+        frequencyCurvePath.lineTo (frequenciesPoints [i]);
+    }
+
+    frequencyCurvePath.closeSubPath();
+}
+
+void SpectrumAnalyzer::drawSpectrumCurves (Graphics& g, float width, float height)
+{
+    ScopedLock lockedForReading (pathCreationLock);
+
+    const auto* fftDataInput  = avgInput.getReadPointer (0);
+    const auto* fftDataOutput = avgOutput.getReadPointer (0);
+
+    inP.clear();
+    outP.clear();
+
+    {
+        fftPoint& point = fftPoints[0];
+        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+
+        inP.startNewSubPath  (point.x, y);
+        outP.startNewSubPath (point.x, y);
+    }
+
+    for (int i = 0; i < fftPointsSize; ++i)
+    {
+        fftPoint& point = fftPoints[i];
+        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+
+        inP.lineTo  (point.x, y);
+        outP.lineTo (point.x, y);
+    }
+
+    for (int i = fftPointsSize - 1; i >= 0; --i)
+    {
+        fftPoint& point = fftPoints[i];
+        int y = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+
+        outP.lineTo (point.x, y);
+    }
+
+    outP.closeSubPath();
+
+    inP.lineTo (width, height);
+    inP.lineTo (0.0f, height);
+    inP.closeSubPath();
+
+    g.setColour (Colours::yellowgreen.withAlpha (0.42f));
+    g.fillPath (outP);
+
+    g.setColour (baseColor.brighter (0.18f).withAlpha (uint8 (182)));
+    g.fillPath (inP);
+
+}
+
+void SpectrumAnalyzer::drawBackgroundImage()
+{
+    const auto bounds = getLocalBounds().toFloat();
+    const auto width  = bounds.getWidth();
+    const auto height = bounds.getHeight();
+
+    Graphics g {backgroundImage};
+    g.fillAll (baseColor);
+
+    g.setColour (baseColor.brighter (0.01f));
+    g.drawHorizontalLine (int (height * 0.5f), 0, width);
+
+    for (auto& bandGain : bandGains)
+    {
+        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
+        g.drawHorizontalLine (pos, 0, width);
+    }
+
+    for (auto& freq : freqsB)
+    {
+        int pos = roundToInt (getPositionForFrequency (freq) * width);
+        g.drawVerticalLine (pos, 0, height);
+    }
+
+    g.setColour (baseColor.brighter (0.032f));
+    for (auto& freq : freqsA)
+    {
+        int pos = roundToInt (getPositionForFrequency (freq) * width);
+        g.drawVerticalLine (pos, 0, height);
+    }
+}
+
+void SpectrumAnalyzer::drawForegroundImage()
+{
+    const auto bounds = getLocalBounds().toFloat();
+    const auto width  = bounds.getWidth();
+    const auto height = bounds.getHeight();
+
+    foregroundImage.clear (foregroundImage.getBounds());
+
+    Graphics g {foregroundImage};
+    g.setColour (baseColor.brighter (1.2f));
+
+    for (auto& bandGain : bandGains)
+    {
+        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
+        g.drawText (String {bandGain}, width - 44, pos - 14, 42, 28, Justification::centredRight);
+    }
+
+    for (auto& gain : gains)
+    {
+        int pos = roundToInt (jmap (gain + 6.0f, mindB, maxdB, height, 0.0f));
+        g.drawText (String { std::abs (gain)}, 2, pos - 14, 42, 28, Justification::centredLeft);
+    }
+
+    g.setFont (openSansBold);
+    g.setFont (15.0f);
+    g.setColour (baseColor.brighter (2.8f));
+    for (auto& freq : freqsA)
+    {
+        int pos = roundToInt (getPositionForFrequency (freq) * width);
+        String str;
+        if (freq >= 1000)
+        {
+            str << (freq / 1000);
+            str << "k";
+        }
+        else
+        {
+            str << freq;
+        }
+
+        g.drawText (str, pos - 21, (height * 0.5f) - 14, 42, 28, Justification::centred);
     }
 }
 
