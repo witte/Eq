@@ -20,14 +20,10 @@ LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4 ()
 
     setColour (ToggleButton::textColourId, Colours::white.darker (0.2f));
 
-    auto typeface = Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedLight_ttf, BinaryData::OpenSansCondensedLight_ttfSize);
-    setDefaultSansSerifTypeface (typeface);
+    fontDefault = {Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedLight_ttf, BinaryData::OpenSansCondensedLight_ttfSize)};
+    LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface (fontDefault.getTypeface());
 
-
-    auto typeface2 = Typeface::createSystemTypefaceFor (BinaryData::fontaudio_ttf, BinaryData::fontaudio_ttfSize);
-    fontAudio = Font (typeface2);
-
-    LookAndFeel::setDefaultLookAndFeel (this);
+    fontAudio = Typeface::createSystemTypefaceFor (BinaryData::fontaudio_ttf, BinaryData::fontaudio_ttfSize);
 }
 
 void LookAndFeel::drawCornerResizer (Graphics& g, int w, int h, bool isMouseOver, bool isMouseDragging)
@@ -176,6 +172,14 @@ void LookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int he
 juce::Label* LookAndFeel::createSliderTextBox (Slider& slider)
 {
     return new witte::Label (slider.getValueObject());
+}
+
+Font LookAndFeel::getLabelFont (juce::Label& label)
+{
+    Font font = label.getFont();
+    font.setHeight (label.getHeight() * 0.94f);
+
+    return font;
 }
 
 Slider::SliderLayout LookAndFeel::getSliderLayout (Slider& slider)

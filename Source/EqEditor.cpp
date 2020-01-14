@@ -16,7 +16,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     setOpaque (true);
     setWantsKeyboardFocus (true);
 
-    outputGain.setSliderStyle  (Slider::SliderStyle::LinearVertical);
+    outputGain.setSliderStyle (Slider::SliderStyle::LinearVertical);
     outputGain.setTextBoxStyle (Slider::TextBoxBelow, false, 62, 22);
 
     addAndMakeVisible (analyzer);
@@ -26,7 +26,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     addAndMakeVisible (band4);
     addAndMakeVisible (band5);
     addAndMakeVisible (outputGain);
-    
+
     auto size = processor.getSavedEditorSize();
     setResizable (true, true);
     setSize (size.x, size.y);
@@ -35,6 +35,8 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     int defaultH = 482;
 
     setResizeLimits (defaultW / 2, defaultH / 2, defaultW * 2, defaultH * 2);
+
+    setLookAndFeel (&lookAndFeel);
 
     processor.setCopyToFifo (true);
 }

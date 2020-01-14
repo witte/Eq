@@ -20,8 +20,7 @@ class EqAudioProcessorEditor : public AudioProcessorEditor
     private:
         EqAudioProcessor& processor;
         AudioProcessorValueTreeState& tree;
-
-        witte::LookAndFeel loolAndFeel;
+        witte::LookAndFeel lookAndFeel;
 
         Image background {ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)};
 

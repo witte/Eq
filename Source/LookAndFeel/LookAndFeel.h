@@ -57,15 +57,14 @@ class LookAndFeel : public juce::LookAndFeel_V4
                                float sliderPos, float minSliderPos, float maxSliderPos,
                                const Slider::SliderStyle, Slider&) override;
 
-
-
         juce::Label* createSliderTextBox (Slider&) override;
 
-
+        Font getLabelFont (juce::Label& label) override;
         void drawLabel (Graphics& g, juce::Label& label) override;
 
 
     private:
+        Font fontDefault;
         Font fontAudio;
 
 
