@@ -1,6 +1,5 @@
 #pragma once
 #include "JuceHeader.h"
-#include "Knob.h"
 
 namespace witte
 {
@@ -18,13 +17,12 @@ class BandEditor : public juce::Component
     private:
         AudioProcessorValueTreeState& tree;
 
-
-        ToggleButton on   {String::fromUTF8 (u8"\uf16b")};
+        ToggleButton on {String::fromUTF8 (u8"\uf16b")};
         ComboBox     type;
         PopupMenu    contextMenu;
-        witte::Knob  freq {1};
-        witte::Knob  gain {2};
-        witte::Knob  q    {2};
+        Slider freq;
+        Slider gain;
+        Slider q   ;
 
         AudioProcessorValueTreeState::ButtonAttachment   attOn;
         AudioProcessorValueTreeState::ComboBoxAttachment attType;

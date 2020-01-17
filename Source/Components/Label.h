@@ -8,13 +8,16 @@ namespace witte
 class Label : public juce::Label
 {
     public:
-        Label (Value& _value);
+        Label (Value& _value, Range<double> _range);
 
-        void resized() override;
+        bool keyPressed (const KeyPress& key) override;
 
+    protected:
+        void editorShown (juce::TextEditor*) override;
 
     private:
         Value& value;
+        Range<double> range;
         TextEditor* createEditorComponent() override;
 
 

@@ -169,15 +169,53 @@ void LookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int he
     g.fillRect (rect.reduced (slider.isHorizontal()? height * 0.2f : width * 0.2f).toNearestIntEdges());
 }
 
+void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int height,
+                                    float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, Slider& slider)
+{
+    auto outline = findColour (Slider::rotarySliderOutlineColourId);
+    auto fill    = findColour (Slider::rotarySliderFillColourId);
+    auto text    = Colours::white.darker (0.2f);
+
+    auto toAngle = rotaryStartAngle + sliderPosProportional * (rotaryEndAngle - rotaryStartAngle);
+
+    if (!slider.isEnabled())
+    {
+        fill = fill.darker (0.8f);
+        outline = outline.darker (0.8f);
+        text = text.darker (0.8f);
+    }
+    else if (slider.hasKeyboardFocus (true))
+    {
+        g.setColour (Colours::white.withAlpha (0.04f));
+        g.fillAll();
+
+        fill = fill.brighter (0.01f);
+        outline = outline.brighter (0.4f);
+    }
+
+    g.setColour (fill);
+    g.fillEllipse (x, y, width, height);
+
+    auto arcBounds = Rectangle<float> (x, y, width, height).reduced (height * 0.12f);
+
+    Path valueArc;
+    valueArc.addArc (arcBounds.getX(),     arcBounds.getY(),
+                     arcBounds.getWidth(), arcBounds.getHeight(),
+                     rotaryStartAngle, toAngle, true);
+
+    g.setColour (outline);
+    g.strokePath (valueArc, PathStrokeType (height * 0.14f, PathStrokeType::curved, PathStrokeType::butt));
+}
+
 juce::Label* LookAndFeel::createSliderTextBox (Slider& slider)
 {
-    return new witte::Label (slider.getValueObject());
+    return new witte::Label (slider.getValueObject(), slider.getRange());
 }
 
 Font LookAndFeel::getLabelFont (juce::Label& label)
 {
     Font font = label.getFont();
-    font.setHeight (label.getHeight() * 0.94f);
+    font.setHeight (label.getHeight() * 0.86f);
 
     return font;
 }
@@ -194,6 +232,33 @@ Slider::SliderLayout LookAndFeel::getSliderLayout (Slider& slider)
         layout.textBoxBounds = bounds.removeFromBottom (w * 0.44f);
         bounds.removeFromTop (w * 0.18f);
         layout.sliderBounds = bounds.reduced (w * 0.42f, 0.0f);
+    }
+    else if (slider.isHorizontal())
+    {
+        // TODO
+    }
+    else if (slider.isRotary())
+    {
+        float x = bounds.getX();
+        float y = bounds.getY();
+        float w = bounds.getWidth();
+        float h = bounds.getHeight();
+        float ratio = h * 3.0f;
+
+        if (ratio < w)
+        {
+            x = (w * 0.5f) - (ratio * 0.5f);
+            w = ratio;
+        }
+        else
+        {
+            ratio = w / 3.0f;
+            y = (h * 0.5f) - (ratio * 0.5f);
+            h = ratio;
+        }
+
+        layout.textBoxBounds = Rectangle<int> (x, y, w, h).reduced (1);
+        layout.sliderBounds  = layout.textBoxBounds.removeFromRight (h);
     }
 
     return layout;

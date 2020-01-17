@@ -17,6 +17,14 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
     attGain {tree, getPrmName (bandNumber, "Gain"), gain},
     attQ    {tree, getPrmName (bandNumber, "Q"   ), q}
 {
+    freq.setSliderStyle  (Slider::RotaryVerticalDrag);
+    gain.setSliderStyle  (Slider::RotaryVerticalDrag);
+    q   .setSliderStyle  (Slider::RotaryVerticalDrag);
+
+    freq.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 28);
+    gain.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 28);
+    q   .setTextBoxStyle (Slider::TextBoxLeft, false, 60, 28);
+
     freq.setMouseDragSensitivity (520);
     gain.setMouseDragSensitivity (520);
     q.setMouseDragSensitivity    (520);

@@ -17,7 +17,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     setWantsKeyboardFocus (true);
 
     outputGain.setSliderStyle (Slider::SliderStyle::LinearVertical);
-    outputGain.setTextBoxStyle (Slider::TextBoxBelow, false, 62, 22);
+    outputGain.setTextBoxStyle (Slider::TextBoxLeft, false, 62, 22);
 
     addAndMakeVisible (analyzer);
     addAndMakeVisible (band1);

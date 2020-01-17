@@ -3,32 +3,28 @@
 
 namespace witte
 {
-class Knob;
 
 class TextEditor : public juce::TextEditor,
                    public juce::TextEditor::InputFilter,
                    private Value::Listener
 {
     public:
-        TextEditor (Value& refValue, int decimals, bool acceptsNegativeValues, String initialValue);
+        TextEditor (Value& _value, Range<double>& _range);
         ~TextEditor() override;
 
         String filterNewText (juce::TextEditor& ed, const String& newInput) override;
 
         void resized() override;
 
-        void focusGained (FocusChangeType) override;
-
-        std::function<bool (const KeyPress&)> onKeyPressed {nullptr};
-
         void clearCharacters();
+
 
     private:
         Value& value;
-        String filterString {};
+        Range<double>& range;
+        String filterString {"-.0123456789"};
         int decimals {0};
 
-        bool keyPressed (const KeyPress& key) override;
         void valueChanged (Value&) override;
 
         int lastSelectionStart {-1};

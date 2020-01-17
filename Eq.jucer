@@ -14,8 +14,6 @@
     <GROUP id="{90024838-927A-5660-593C-4A87477B2601}" name="Components">
       <FILE id="H7RgqI" name="BandEditor.cpp" compile="1" resource="0" file="Source/Components/BandEditor.cpp"/>
       <FILE id="dOxwCT" name="BandEditor.h" compile="0" resource="0" file="Source/Components/BandEditor.h"/>
-      <FILE id="vx8dqa" name="Knob.cpp" compile="1" resource="0" file="Source/Components/Knob.cpp"/>
-      <FILE id="TMPTfH" name="Knob.h" compile="0" resource="0" file="Source/Components/Knob.h"/>
       <FILE id="qmCzwV" name="Label.cpp" compile="1" resource="0" file="Source/Components/Label.cpp"/>
       <FILE id="WnSKWc" name="Label.h" compile="0" resource="0" file="Source/Components/Label.h"/>
       <FILE id="t2Eyp5" name="SpectrumAnalyzer.cpp" compile="1" resource="0"
