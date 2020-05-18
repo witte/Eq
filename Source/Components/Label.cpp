@@ -11,7 +11,7 @@ Label::Label (Value& _value, Range<double> _range) : value {_value}, range {_ran
     setJustificationType (Justification::centred);
 }
 
-TextEditor* Label::createEditorComponent()
+juce::TextEditor* Label::createEditorComponent()
 {
     auto* editor = new witte::TextEditor (value, range);
 

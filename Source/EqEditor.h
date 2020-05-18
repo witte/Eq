@@ -3,6 +3,7 @@
 #include "Components/BandEditor.h"
 #include "Components/SpectrumAnalyzer.h"
 #include "LookAndFeel/LookAndFeel.h"
+#include <BinaryData.h>
 
 namespace witte
 {

@@ -1,4 +1,6 @@
 #include "SpectrumAnalyzer.h"
+#include <juce_audio_processors/juce_audio_processors.h>
+#include <BinaryData.h>
 
 namespace witte
 {

@@ -1,6 +1,11 @@
 #pragma once
-#include "JuceHeader.h"
+#include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
+#include <juce_gui_basics/juce_gui_basics.h>
+
 #include "../EqProcessor.h"
+
+using namespace juce;
 
 namespace witte
 {
@@ -24,7 +29,7 @@ class SpectrumAnalyzer : public Component, private Timer
         dsp::FFT fftInput  {12};
         dsp::FFT fftOutput {12};
 
-        dsp::WindowingFunction<float> hannWindow {size_t (fftInput.getSize()),  dsp::WindowingFunction<float>::hann};
+        dsp::WindowingFunction<float> hannWindow {size_t (fftInput.getSize()), dsp::WindowingFunction<float>::hann};
 
         AudioBuffer<float> fftBufferInput  { 1, fftInput.getSize()  * 2 };
         AudioBuffer<float> fftBufferOutput { 1, fftOutput.getSize() * 2 };

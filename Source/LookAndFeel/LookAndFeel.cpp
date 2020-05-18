@@ -1,4 +1,5 @@
 #include "LookAndFeel.h"
+#include <BinaryData.h>
 #include "../Components/Label.h"
 
 namespace witte

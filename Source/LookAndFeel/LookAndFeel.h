@@ -1,18 +1,20 @@
 #pragma once
-#include "JuceHeader.h"
+#include <juce_gui_basics/juce_gui_basics.h>
+
+using namespace juce;
 
 namespace witte
 {
 
-class LookAndFeel : public juce::LookAndFeel_V4
+class LookAndFeel : public LookAndFeel_V4
 {
     public:
         LookAndFeel();
 
         void drawCornerResizer (Graphics&, int w, int h, bool isMouseOver, bool isMouseDragging) override;
 
-        void fillTextEditorBackground (Graphics&, int, int, juce::TextEditor&) override {}
-        void drawTextEditorOutline    (Graphics&, int, int, juce::TextEditor&) override {}
+        void fillTextEditorBackground (Graphics&, int, int, TextEditor&) override {}
+        void drawTextEditorOutline    (Graphics&, int, int, TextEditor&) override {}
 
         Font getTextButtonFont (TextButton&, int buttonHeight) override
         {
@@ -40,7 +42,7 @@ class LookAndFeel : public juce::LookAndFeel_V4
                            int buttonX, int buttonY, int buttonW, int buttonH,
                            ComboBox&) override;
 
-        void positionComboBoxText (ComboBox&, juce::Label&) override;
+        void positionComboBoxText (ComboBox&, Label&) override;
 
         void drawPopupMenuBackground (Graphics&, int width, int height) override;
 
@@ -61,10 +63,10 @@ class LookAndFeel : public juce::LookAndFeel_V4
                                float sliderPosProportional, float rotaryStartAngle,
                                float rotaryEndAngle, Slider&) override;
 
-        juce::Label* createSliderTextBox (Slider&) override;
+        Label* createSliderTextBox (Slider&) override;
 
-        Font getLabelFont (juce::Label& label) override;
-        void drawLabel (Graphics& g, juce::Label& label) override;
+        Font getLabelFont (Label& label) override;
+        void drawLabel (Graphics& g, Label& label) override;
 
 
     private:

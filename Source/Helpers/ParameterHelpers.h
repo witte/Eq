@@ -1,7 +1,9 @@
 #pragma once
-#include "JuceHeader.h"
+#include <juce_audio_processors/juce_audio_processors.h>
 
 #include "FrequenciesTable.h"
+
+using namespace juce;
 
 namespace witte
 {

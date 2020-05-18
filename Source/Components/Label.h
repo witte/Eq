@@ -1,6 +1,9 @@
 #pragma once
-#include "JuceHeader.h"
+#include <juce_gui_basics/juce_gui_basics.h>
+
 #include "TextEditor.h"
+
+using namespace juce;
 
 namespace witte
 {
@@ -18,7 +21,7 @@ class Label : public juce::Label
     private:
         Value& value;
         Range<double> range;
-        TextEditor* createEditorComponent() override;
+        juce::TextEditor* createEditorComponent() override;
 
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Label)

@@ -1,5 +1,7 @@
 #pragma once
-#include "JuceHeader.h"
+#include <juce_gui_basics/juce_gui_basics.h>
+
+using namespace juce;
 
 namespace witte
 {
