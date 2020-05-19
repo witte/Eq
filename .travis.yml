@@ -26,6 +26,7 @@ jobs:
         - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
         - CMAKE_ROOT_PATH="/usr/bin/"
         - BUILD_SYSTEM="-GNinja"
+        - BADGE=linux
         
         
     - name: "MacOS, Clang"
@@ -34,6 +35,7 @@ jobs:
       env: 
         - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
         - BUILD_SYSTEM="-GNinja"
+        - BADGE=osx
       before_install: brew install ninja
         
         
@@ -42,7 +44,8 @@ jobs:
       compiler: clang
       env: 
         - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-      before_install: choco install ninja
+        - BADGE=windows
+#      before_install: choco install ninja
 
 
 before_install:
