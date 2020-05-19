@@ -11,54 +11,37 @@ jobs:
       os: linux
       dist: focal
       compiler: clang
+      env: BADGE=linux BUILD_TYPE=Release BUILD_SYSTEM=-GNinja CMAKE_ROOT_PATH=/usr/bin/
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
             - cmake
-#            - ninja-build
+            - ninja-build
             - libasound2-dev
             - libxrandr-dev
             - libxinerama-dev
             - libxcursor-dev
-      env: 
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-        - CMAKE_ROOT_PATH="/usr/bin/"
-        - BUILD_SYSTEM="-GNinja"
-        - BADGE=linux
-        
         
     - name: "MacOS, Clang"
       os: osx
       compiler: clang
-      env: 
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-        - BUILD_SYSTEM="-GNinja"
-        - BADGE=osx
+      env: BADGE=osx BUILD_TYPE=Release BUILD_SYSTEM=-GNinja
       before_install: brew install ninja
         
-        
-    - name: "Windows"
+    - name: "Windows, Clang"
       os: windows
       compiler: clang
-      env: 
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-        - BADGE=windows
+      env: BADGE=windows BUILD_TYPE=Release
 #      before_install: choco install ninja
-
-
-before_install:
-  - eval "${MATRIX_EVAL}"
 
 
 before_script:
   - mkdir build
   - cd build
   - ${CMAKE_ROOT_PATH}cmake --version
-  - ${CXX} --version
-  - ${CC} --version
-  - ${CMAKE_ROOT_PATH}cmake ${BUILD_SYSTEM} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+  - ${CMAKE_ROOT_PATH}cmake ${BUILD_SYSTEM} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
 
 
 script:
