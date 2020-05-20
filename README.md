@@ -1,7 +1,5 @@
 ## Eq
-![](https://github.com/witte/Eq/workflows/linux/badge.svg)
-![](https://github.com/witte/Eq/workflows/mac/badge.svg)
-![](https://github.com/witte/Eq/workflows/windows/badge.svg)
+[![Build Status](https://travis-ci.com/witte/Eq.svg?branch=master)](https://travis-ci.com/witte/Eq)
 <div align="center"><img src="Screenshot.png"/></div>
 An equalizer plugin made with the Juce framework. My attempt at writing a simple but fully functional audio plugin, customizing Juce's LookAndFeel class and the behavior of some components. Work In Progress.
 <br>
