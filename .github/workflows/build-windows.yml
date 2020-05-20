@@ -2,7 +2,7 @@ name: windows
 
 on:
   push:
-    branches: [ master, 1-CI ]
+    branches: [ master, dev ]
 
 jobs:
   build:
