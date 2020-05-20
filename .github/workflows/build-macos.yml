@@ -1,26 +1,26 @@
-name: Build macOS
+name: mac
 
 on:
   push:
-    branches: [ 1-CI ]
-  pull_request:
     branches: [ master ]
 
 jobs:
   build:
     runs-on: macos-latest
+    
     steps:
       - uses: actions/checkout@v2
+      
       - name: prepare
         run: |
           git submodule init
           git submodule update
+      
       - name: cmake
         run: |
           cmake --version
           mkdir build
           cmake -B build .
+      
       - name: build
-        run: |
-          echo $PWD
-          cmake --build build
+        run: cmake --build build
