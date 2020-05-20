@@ -1,4 +1,4 @@
-name: Linux
+name: Build Linux
 
 on:
   push:
@@ -8,12 +8,10 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
-    - name: install-packages
+    - name: prepare
       run: |
         sudo apt install libasound2-dev libxrandr-dev libxinerama-dev libxcursor-dev
         git submodule init
