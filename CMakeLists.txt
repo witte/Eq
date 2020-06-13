@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-project(EqPlugin VERSION 1.0.0)
+
+set(PLUGIN_NAME Eq)
+set(PLUGIN_DATA ${PLUGIN_NAME}Data)
+
+project(${PLUGIN_NAME} VERSION 1.0.0)
 
 add_subdirectory(JUCE)
 
-juce_add_plugin(Eq
+juce_add_plugin(${PLUGIN_NAME}
     COMPANY_NAME "witte"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
@@ -18,7 +22,7 @@ juce_add_plugin(Eq
     FORMATS AU VST3
     PRODUCT_NAME "Eq")
 
-target_sources(Eq PRIVATE
+target_sources(${PLUGIN_NAME} PRIVATE
     Source/Components/BandEditor.cpp
     Source/Components/Label.cpp
     Source/Components/SpectrumAnalyzer.cpp
@@ -27,26 +31,24 @@ target_sources(Eq PRIVATE
     Source/EqEditor.cpp
     Source/EqProcessor.cpp)
 
-target_compile_definitions(Eq PUBLIC
+target_compile_definitions(${PLUGIN_NAME} PUBLIC
     JUCE_DISPLAY_SPLASH_SCREEN=0
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0)
 
-juce_add_binary_data(EqData SOURCES
+juce_add_binary_data(${PLUGIN_DATA} SOURCES
     Source/LookAndFeel/fontaudio.ttf
     Source/LookAndFeel/OpenSansCondensed-Bold.ttf
     Source/LookAndFeel/OpenSansCondensed-Light.ttf
     Source/LookAndFeel/texture.png)
 
+set_target_properties(${PLUGIN_NAME} ${PLUGIN_DATA} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-set_target_properties(Eq EqData PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-target_link_libraries(Eq PRIVATE
-    EqData
+target_link_libraries(${PLUGIN_NAME} PRIVATE
+    ${PLUGIN_DATA}
     juce::juce_audio_processors
     juce::juce_audio_utils
     juce::juce_audio_devices
     juce::juce_gui_basics
     juce::juce_dsp)
-
