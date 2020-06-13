@@ -2,6 +2,7 @@
 #include "EqProcessor.h"
 #include "Components/BandEditor.h"
 #include "Components/SpectrumAnalyzer.h"
+#include "Components/XYPad.h"
 #include "LookAndFeel/LookAndFeel.h"
 #include <BinaryData.h>
 
@@ -26,6 +27,7 @@ class EqAudioProcessorEditor : public AudioProcessorEditor
         Image background {ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)};
 
         witte::SpectrumAnalyzer analyzer;
+        witte::XYPad xyPad;
 
         witte::BandEditor band1;
         witte::BandEditor band2;

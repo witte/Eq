@@ -5,7 +5,8 @@ namespace witte
 
 EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor {&p}, processor {p}, tree {vts},
-      analyzer {processor, tree},
+      analyzer {processor},
+      xyPad {processor, tree},
       band1 {tree, 1},
       band2 {tree, 2},
       band3 {tree, 3},
@@ -20,6 +21,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     outputGain.setTextBoxStyle (Slider::TextBoxLeft, false, 62, 22);
 
     addAndMakeVisible (analyzer);
+    addAndMakeVisible (xyPad);
     addAndMakeVisible (band1);
     addAndMakeVisible (band2);
     addAndMakeVisible (band3);
@@ -72,6 +74,7 @@ void EqAudioProcessorEditor::resized()
     bands.performLayout (bounds.removeFromBottom (bandsHeight).reduced ((bounds.getWidth() - bandsWidth) * 0.5f, 1));
 
     analyzer.setBounds (bounds);
+    xyPad.setBounds (bounds);
 }
 
 }

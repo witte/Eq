@@ -10,11 +10,11 @@ using namespace juce;
 namespace witte
 {
 
-class SpectrumAnalyzer : public Component, private Timer
+class XYPad : public Component
 {
     public:
-        SpectrumAnalyzer (EqAudioProcessor&);
-        ~SpectrumAnalyzer() override;
+        XYPad (EqAudioProcessor&, AudioProcessorValueTreeState&);
+        ~XYPad() override;
 
         void paint (Graphics&) override;
         void resized() override;
@@ -22,38 +22,13 @@ class SpectrumAnalyzer : public Component, private Timer
 
     private:
         EqAudioProcessor& processor;
+        AudioProcessorValueTreeState& tree;
 
         Colour baseColor {uint8 (1), uint8 (28), uint8 (39)};
 
-        dsp::FFT fftInput  {12};
-        dsp::FFT fftOutput {12};
-
-        dsp::WindowingFunction<float> hannWindow {size_t (fftInput.getSize()), dsp::WindowingFunction<float>::hann};
-
-        AudioBuffer<float> fftBufferInput  { 1, fftInput.getSize()  * 2 };
-        AudioBuffer<float> fftBufferOutput { 1, fftOutput.getSize() * 2 };
-
-        AudioBuffer<float> avgInput  { 5, fftInput.getSize() / 2 };
-        AudioBuffer<float> avgOutput { 5, fftOutput.getSize() / 2 };
-        int avgInputPtr  = 1;
-        int avgOutputPtr = 1;
-
-        Path inP;
-        Path outP;
-        CriticalSection pathCreationLock;
-
-        struct fftPoint
-        {
-            int firstBinIndex = 0;
-            int lastBinIndex = 120;
-
-            int x;
-        };
-        int fftPointsSize = 0;
-        std::vector<fftPoint> fftPoints;
-
-        float getFftPointLevel (const float* buffer, const fftPoint& point);
-
+        Path frequencyCurvePath;
+        Path bandsPositionsPath;
+        CriticalSection freqPathCreationLock;
 
         std::array<float, 7> gains = { -12.0f, -24.0f, -36.0f, -48.0f, -60.0f, -72.0f, -84.0f };
         std::array<float, 4> bandGains = { 24.0f, 12.0f, -12.0f, -24.0f };
@@ -64,8 +39,14 @@ class SpectrumAnalyzer : public Component, private Timer
                                         2000.0f, 3000.0f, 4000.0f, 5000.0f, 6000.0f, 7000.0f, 8000.0f, 9000.0f,
                                        20000.0f };
 
+        int movingBand {-1};
+        int hoveringBand {-1};
+        std::array<Rectangle<float>, 5> plotAreas {{}};
+
         std::vector<double> frequencies;
         std::vector<Point<float>> frequenciesPoints;
+        std::array<std::vector<double>, 5> magnitudes;
+        std::vector<double> magnitudesOut;
 
 
         static constexpr float maxdB =  6.0f;
@@ -88,22 +69,20 @@ class SpectrumAnalyzer : public Component, private Timer
             return jmap (Decibels::gainToDecibels (gain, mindB), mindB, maxdB, bottom, top);
         }
 
+        void mouseDown (const MouseEvent& event) override;
         void mouseMove (const MouseEvent& event) override;
+        void mouseDrag (const MouseEvent& event) override;
+        void mouseUp   (const MouseEvent&) override;
 
         Font openSansBold;
 
-        bool isEmpty = true;
+        void drawFrequencyCurve();
+        Image foregroundImage {Image::ARGB, 768 * 2, 482 * 2, true};
 
-        void drawNextFrame();
-        Image backgroundImage {Image::ARGB, 768 * 2, 482 * 2, true};
+        void drawForegroundImage();
 
-        void drawSpectrumCurves (Graphics& g, float width, float height);
-        void drawBackgroundImage();
 
-        void timerCallback() override;
-    
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumAnalyzer)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (XYPad)
 };
 
 }
