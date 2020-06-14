@@ -1,6 +1,5 @@
 #include "SpectrumAnalyzer.h"
 #include <juce_audio_processors/juce_audio_processors.h>
-#include <BinaryData.h>
 
 namespace witte
 {
@@ -8,9 +7,6 @@ namespace witte
 SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {eqProcessor}
 {
     setOpaque (true);
-
-    auto typefaceBold = Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedBold_ttf, BinaryData::OpenSansCondensedBold_ttfSize);
-    openSansBold = Font (typefaceBold);
 
     avgInput.clear();
     avgOutput.clear();
@@ -24,10 +20,6 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {
     }
 
     startTimerHz (30);
-}
-
-SpectrumAnalyzer::~SpectrumAnalyzer()
-{
 }
 
 float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& point)
@@ -44,18 +36,61 @@ float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& p
 
 void SpectrumAnalyzer::paint (Graphics& g)
 {
+    g.drawImageAt (markers.getImage(), 0, 0);
+
     const auto bounds = getLocalBounds().toFloat();
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
 
-    g.drawImageAt (backgroundImage, 0, 0);
+    const auto* fftDataInput  = avgInput.getReadPointer (0);
+    const auto* fftDataOutput = avgOutput.getReadPointer (0);
 
-    drawSpectrumCurves (g, width, height);
+    ScopedLock lockedForReading (pathCreationLock);
+    inP.clear();
+    outP.clear();
+
+    {
+        fftPoint& point = fftPoints[0];
+        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+
+        inP.startNewSubPath  (point.x, y);
+        outP.startNewSubPath (point.x, y);
+    }
+
+    for (int i = 0; i < fftPointsSize; ++i)
+    {
+        fftPoint& point = fftPoints[i];
+        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+
+        inP.lineTo  (point.x, y);
+        outP.lineTo (point.x, y);
+    }
+
+    for (int i = fftPointsSize - 1; i >= 0; --i)
+    {
+        fftPoint& point = fftPoints[i];
+        int y = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+
+        outP.lineTo (point.x, y);
+    }
+
+    outP.closeSubPath();
+
+    inP.lineTo (width, height);
+    inP.lineTo (0.0f, height);
+    inP.closeSubPath();
+
+    g.setColour (Colours::yellowgreen.withAlpha (0.42f));
+    g.fillPath (outP);
+
+    g.setColour (baseColor.brighter (0.18f).withAlpha (uint8 (182)));
+    g.fillPath (inP);
 }
 
 void SpectrumAnalyzer::resized()
 {
-    auto widthFactor = getLocalBounds().getWidth() / 10.0f;
+    const auto bounds = getLocalBounds();
+    auto widthFactor = bounds.getWidth() / 10.0f;
     auto sampleRate = float (processor.getSampleRate());
     auto fftSize = fftInput.getSize();
 
@@ -84,12 +119,8 @@ void SpectrumAnalyzer::resized()
         ++fftPointsSize;
         lastX = x;
     }
-    
-    drawBackgroundImage();
-}
 
-void SpectrumAnalyzer::mouseMove (const MouseEvent&)
-{
+    markers.setSize(bounds.getWidth(), bounds.getHeight());
 }
 
 void SpectrumAnalyzer::drawNextFrame()
@@ -141,95 +172,13 @@ void SpectrumAnalyzer::drawNextFrame()
     }
 }
 
-void SpectrumAnalyzer::drawSpectrumCurves (Graphics& g, float width, float height)
-{
-    ScopedLock lockedForReading (pathCreationLock);
-
-    const auto* fftDataInput  = avgInput.getReadPointer (0);
-    const auto* fftDataOutput = avgOutput.getReadPointer (0);
-
-    inP.clear();
-    outP.clear();
-
-    {
-        fftPoint& point = fftPoints[0];
-        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
-
-        inP.startNewSubPath  (point.x, y);
-        outP.startNewSubPath (point.x, y);
-    }
-
-    for (int i = 0; i < fftPointsSize; ++i)
-    {
-        fftPoint& point = fftPoints[i];
-        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
-
-        inP.lineTo  (point.x, y);
-        outP.lineTo (point.x, y);
-    }
-
-    for (int i = fftPointsSize - 1; i >= 0; --i)
-    {
-        fftPoint& point = fftPoints[i];
-        int y = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
-
-        outP.lineTo (point.x, y);
-    }
-
-    outP.closeSubPath();
-
-    inP.lineTo (width, height);
-    inP.lineTo (0.0f, height);
-    inP.closeSubPath();
-
-    g.setColour (Colours::yellowgreen.withAlpha (0.42f));
-    g.fillPath (outP);
-
-    g.setColour (baseColor.brighter (0.18f).withAlpha (uint8 (182)));
-    g.fillPath (inP);
-
-}
-
-void SpectrumAnalyzer::drawBackgroundImage()
-{
-    const auto bounds = getLocalBounds().toFloat();
-    const auto width  = bounds.getWidth();
-    const auto height = bounds.getHeight();
-
-    Graphics g {backgroundImage};
-    g.fillAll (baseColor);
-
-    g.setColour (baseColor.brighter (0.01f));
-    g.drawHorizontalLine (int (height * 0.5f), 0, width);
-
-    for (auto& bandGain : bandGains)
-    {
-        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
-        g.drawHorizontalLine (pos, 0, width);
-    }
-
-    for (auto& freq : freqsB)
-    {
-        int pos = roundToInt (getPositionForFrequency (freq) * width);
-        g.drawVerticalLine (pos, 0, height);
-    }
-
-    g.setColour (baseColor.brighter (0.032f));
-    for (auto& freq : freqsA)
-    {
-        int pos = roundToInt (getPositionForFrequency (freq) * width);
-        g.drawVerticalLine (pos, 0, height);
-    }
-}
-
 void SpectrumAnalyzer::timerCallback()
 {
-    if (processor.nextFFTBlockReady.load())
-    {
-        drawNextFrame();
-        processor.nextFFTBlockReady.store (false);
-        repaint();
-    }
+    if (!processor.nextFFTBlockReady.load()) return;
+
+    drawNextFrame();
+    processor.nextFFTBlockReady.store (false);
+    repaint();
 }
 
 }

@@ -52,8 +52,7 @@ void XYPad::paint (Graphics& g)
     {
         ScopedLock lockedForReading (freqPathCreationLock);
 
-//        g.setColour (Colour {0xff4ea5ac});
-        g.setColour (Colour {0xffff0000});
+        g.setColour (Colour {0xff4ea5ac});
         g.fillPath (frequencyCurvePath);
         g.fillPath (bandsPositionsPath);
     }
