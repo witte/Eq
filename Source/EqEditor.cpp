@@ -6,7 +6,14 @@ namespace witte
 EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor {&p}, processor {p}, tree {vts},
       analyzer {processor},
-      xyPad {processor, tree},
+      xyPad {//processor, tree,
+            {
+                { tree.getParameter("1Freq"), tree.getParameter("1Gain") },
+                { tree.getParameter("2Freq"), tree.getParameter("2Gain") },
+                { tree.getParameter("3Freq"), tree.getParameter("3Gain") },
+                { tree.getParameter("4Freq"), tree.getParameter("4Gain") },
+                { tree.getParameter("5Freq"), tree.getParameter("5Gain") },
+            }},
       band1 {tree, 1},
       band2 {tree, 2},
       band3 {tree, 3},
