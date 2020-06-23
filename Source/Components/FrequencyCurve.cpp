@@ -49,7 +49,7 @@ void FrequencyCurve::paint (Graphics& g)
     {
         ScopedLock lockedForReading (freqPathCreationLock);
 
-        g.setColour (Colour {0x4fffa5ac});
+        g.setColour (Colour {0xff4ea5ac});
         g.fillPath (frequencyCurvePath);
     }
 

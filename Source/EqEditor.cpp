@@ -4,16 +4,27 @@ namespace witte
 {
 
 EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProcessorValueTreeState& vts)
-    : AudioProcessorEditor {&p}, processor {p}, tree {vts},
+    : AudioProcessorEditor {&p},
+      processor {p},
+      tree {vts},
       analyzer {processor},
-      xyPad {//processor, tree,
-            {
-                { tree.getParameter("1Freq"), tree.getParameter("1Gain") },
-                { tree.getParameter("2Freq"), tree.getParameter("2Gain") },
-                { tree.getParameter("3Freq"), tree.getParameter("3Gain") },
-                { tree.getParameter("4Freq"), tree.getParameter("4Gain") },
-                { tree.getParameter("5Freq"), tree.getParameter("5Gain") },
-            }},
+      frequencyCurve {p,
+      {
+          tree.getParameter("1On"), tree.getParameter("1Type"), tree.getParameter("1Freq"), tree.getParameter("1Gain"), tree.getParameter("1Q"),
+          tree.getParameter("2On"), tree.getParameter("2Type"), tree.getParameter("2Freq"), tree.getParameter("2Gain"), tree.getParameter("2Q"),
+          tree.getParameter("3On"), tree.getParameter("3Type"), tree.getParameter("3Freq"), tree.getParameter("3Gain"), tree.getParameter("3Q"),
+          tree.getParameter("4On"), tree.getParameter("4Type"), tree.getParameter("4Freq"), tree.getParameter("4Gain"), tree.getParameter("4Q"),
+          tree.getParameter("5On"), tree.getParameter("5Type"), tree.getParameter("5Freq"), tree.getParameter("5Gain"), tree.getParameter("5Q"),
+          tree.getParameter("OutGain")
+      }},
+      xyPad
+      {{
+          { tree.getParameter("1Freq"), tree.getParameter("1Gain") },
+          { tree.getParameter("2Freq"), tree.getParameter("2Gain") },
+          { tree.getParameter("3Freq"), tree.getParameter("3Gain") },
+          { tree.getParameter("4Freq"), tree.getParameter("4Gain") },
+          { tree.getParameter("5Freq"), tree.getParameter("5Gain") },
+      }},
       band1 {tree, 1},
       band2 {tree, 2},
       band3 {tree, 3},
@@ -28,6 +39,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     outputGain.setTextBoxStyle (Slider::TextBoxLeft, false, 62, 22);
 
     addAndMakeVisible (analyzer);
+    addAndMakeVisible (frequencyCurve);
     addAndMakeVisible (xyPad);
     addAndMakeVisible (band1);
     addAndMakeVisible (band2);
@@ -81,6 +93,7 @@ void EqAudioProcessorEditor::resized()
     bands.performLayout (bounds.removeFromBottom (bandsHeight).reduced ((bounds.getWidth() - bandsWidth) * 0.5f, 1));
 
     analyzer.setBounds (bounds);
+    frequencyCurve.setBounds (bounds);
     xyPad.setBounds (bounds);
 }
 
