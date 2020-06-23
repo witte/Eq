@@ -16,8 +16,6 @@ class XYPad : public Component
         void paint (Graphics&) override;
         void resized() override;
 
-        float handleRadius = 12.0f;
-
 
     private:
         class XYPadHandle
@@ -62,7 +60,9 @@ class XYPad : public Component
         XYPadHandle* draggingPad {nullptr};
 
 
-        Colour baseColor {0xff011523};
+        constexpr static float handleRadius = 2.5f;
+        constexpr static float hoveredHandleRadius = handleRadius * 5.0f;
+        const Colour baseColor {0xff011523};
 
         Path bandsPositionsPath;
         CriticalSection freqPathCreationLock;

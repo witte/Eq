@@ -28,7 +28,7 @@ void XYPad::paint (Graphics& g)
         bandsPositionsPath.addEllipse(x - handleRadius, y - handleRadius, handleRadius * 2.0f, handleRadius * 2.0f);
     }
 
-    g.setColour (Colour {0x4fffa5ac});
+    g.setColour (Colour {0xff4ea5ac});
     g.fillPath (bandsPositionsPath);
 
     if (draggingPad != nullptr)
@@ -36,7 +36,8 @@ void XYPad::paint (Graphics& g)
         g.setColour (Colours::rebeccapurple.withAlpha (0.5f));
 
         auto[x, y] = draggingPad->getPos();
-        g.fillEllipse (x - handleRadius, y - handleRadius, handleRadius * 2.0f, handleRadius * 2.0f);
+        g.fillEllipse (x - hoveredHandleRadius,    y - hoveredHandleRadius,
+                       hoveredHandleRadius * 2.0f, hoveredHandleRadius * 2.0f);
     }
 }
 
@@ -61,7 +62,7 @@ void XYPad::mouseMove (const MouseEvent& event)
 {
     for (auto& prmAttachment : prmHandles)
     {
-        if (prmAttachment->getPos().getDistanceFrom (event.getPosition().toFloat()) < handleRadius)
+        if (prmAttachment->getPos().getDistanceFrom (event.getPosition().toFloat()) < hoveredHandleRadius)
         {
             draggingPad = prmAttachment.get();
             repaint();
