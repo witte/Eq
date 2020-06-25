@@ -15,7 +15,7 @@ A simple but fully functional equalizer plugin made with the Juce framework, cus
 <br>
 
 ## Dependencies
-Juce: https://github.com/WeAreROLI/JUCE ('juce6' branch, already included as a submodule)
+Juce: https://github.com/juce-framework/JUCE ('juce6' branch, already included as a submodule)
 <br>
 <br>
 
