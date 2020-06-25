@@ -6,8 +6,6 @@ namespace witte
 
 SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {eqProcessor}
 {
-    setOpaque (true);
-
     avgInput.clear();
     avgOutput.clear();
 
@@ -36,8 +34,6 @@ float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& p
 
 void SpectrumAnalyzer::paint (Graphics& g)
 {
-    g.drawImageAt (markers.getImage(), 0, 0);
-
     const auto bounds = getLocalBounds().toFloat();
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
@@ -119,8 +115,6 @@ void SpectrumAnalyzer::resized()
         ++fftPointsSize;
         lastX = x;
     }
-
-    markers.setSize(bounds.getWidth(), bounds.getHeight());
 }
 
 void SpectrumAnalyzer::drawNextFrame()

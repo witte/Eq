@@ -1,6 +1,5 @@
 #include "FrequencyCurve.h"
 #include <juce_audio_processors/juce_audio_processors.h>
-#include <BinaryData.h>
 #include "../Helpers/ParameterHelpers.h"
 
 namespace witte
@@ -15,10 +14,6 @@ FrequencyCurve::FrequencyCurve (EqAudioProcessor& eqProcessor, std::initializer_
     {
         attachments.push_back (std::make_unique<ParameterAttachment>(*parameter, prmChangedCallback));
     }
-
-    auto typefaceBold = Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedBold_ttf, BinaryData::OpenSansCondensedBold_ttfSize);
-    openSansBold = Font (typefaceBold);
-
 
     frequencies.resize (600);
     for (size_t i = 0; i < frequencies.size(); ++i)
@@ -46,20 +41,15 @@ FrequencyCurve::~FrequencyCurve()
 
 void FrequencyCurve::paint (Graphics& g)
 {
-    {
-        ScopedLock lockedForReading (freqPathCreationLock);
+    ScopedLock lockedForReading (freqPathCreationLock);
 
-        g.setColour (Colour {0xff4ea5ac});
-        g.fillPath (frequencyCurvePath);
-    }
-
-    g.drawImageAt (foregroundImage, 0, 0);
+    g.setColour (Colour {0xff4ea5ac});
+    g.fillPath (frequencyCurvePath);
 }
 
 void FrequencyCurve::resized()
 {
     drawFrequencyCurve();
-    drawForegroundImage();
 }
 
 void FrequencyCurve::drawFrequencyCurve()
@@ -93,7 +83,7 @@ void FrequencyCurve::drawFrequencyCurve()
 
     for (size_t i = 1; i < frequencies.size(); ++i)
     {
-        float xx = getPositionForFrequency (frequencies [i]) * width;
+        float xx = freqToProportion (frequencies [i]) * width;
         float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
         float yy = jmap (gain, -26.0f, 26.0f, height, 0.0f);
 
@@ -107,50 +97,6 @@ void FrequencyCurve::drawFrequencyCurve()
     }
 
     frequencyCurvePath.closeSubPath();
-}
-
-void FrequencyCurve::drawForegroundImage()
-{
-    const auto bounds = getLocalBounds().toFloat();
-    const auto width  = bounds.getWidth();
-    const auto height = bounds.getHeight();
-
-    foregroundImage.clear (foregroundImage.getBounds());
-
-    Graphics g {foregroundImage};
-    g.setColour (baseColor.brighter (1.2f));
-
-    for (auto& bandGain : bandGains)
-    {
-        int pos = roundToInt (jmap (bandGain, -26.0f, 26.0f, height, 0.0f));
-        g.drawText (String {bandGain}, width - 44, pos - 14, 42, 28, Justification::centredRight);
-    }
-
-    for (auto& gain : gains)
-    {
-        int pos = roundToInt (jmap (gain + 6.0f, mindB, maxdB, height, 0.0f));
-        g.drawText (String { std::abs (gain)}, 2, pos - 14, 42, 28, Justification::centredLeft);
-    }
-
-    g.setFont (openSansBold);
-    g.setFont (15.0f);
-    g.setColour (baseColor.brighter (2.8f));
-    for (auto& freq : freqsA)
-    {
-        int pos = roundToInt (getPositionForFrequency (freq) * width);
-        String str;
-        if (freq >= 1000)
-        {
-            str << (freq / 1000);
-            str << "k";
-        }
-        else
-        {
-            str << freq;
-        }
-
-        g.drawText (str, pos - 21, (height * 0.5f) - 14, 42, 28, Justification::centred);
-    }
 }
 
 }

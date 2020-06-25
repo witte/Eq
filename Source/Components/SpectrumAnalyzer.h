@@ -4,7 +4,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "../EqProcessor.h"
-#include "SpectrumBgMarkers.h"
 
 using namespace juce;
 
@@ -23,10 +22,6 @@ class SpectrumAnalyzer : public Component, private Timer
     private:
         EqAudioProcessor& processor;
 
-        witte::SpectrumBgMarkers markers;
-
-        Colour baseColor {uint8 (1), uint8 (28), uint8 (39)};
-
         dsp::FFT fftInput  {12};
         dsp::FFT fftOutput {12};
 
@@ -39,6 +34,8 @@ class SpectrumAnalyzer : public Component, private Timer
         AudioBuffer<float> avgOutput { 5, fftOutput.getSize() / 2 };
         int avgInputPtr  = 1;
         int avgOutputPtr = 1;
+
+        Colour baseColor {uint8 (1), uint8 (28), uint8 (39)};
 
         Path inP;
         Path outP;

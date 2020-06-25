@@ -1,26 +1,29 @@
 #pragma once
 #include <array>
-#include <juce_gui_basics/juce_gui_basics.h>
+#include "juce_gui_basics/juce_gui_basics.h"
 
 using namespace juce;
 
 namespace witte
 {
 
-class SpectrumBgMarkers
+class Frame : public Component
 {
     public:
-        SpectrumBgMarkers () {}
+        Frame (int maxWidth, int maxHeight);
 
-        void setSize(int newWidth, int newHeight);
-        Image& getImage();
+        void paint (Graphics &g) override;
+        void paintOverChildren (Graphics &g) override;
+
+        void resized() override;
 
 
     private:
-        int width  = 768 * 2; // twice the initial Eq's size
-        int height = 482 * 2;
+        Image spectrumBackground;
+        Image spectrumForeground;
 
         Colour baseColor {0xff011523};
+        Font openSansBold;
 
         constexpr static std::array<float, 7> gains = { -12.0f, -24.0f, -36.0f, -48.0f, -60.0f, -72.0f, -84.0f };
         constexpr static std::array<float, 4> bandGains = { 24.0f, 12.0f, -12.0f, -24.0f };
@@ -31,14 +34,19 @@ class SpectrumBgMarkers
                                                          2000.0f, 3000.0f, 4000.0f, 5000.0f, 6000.0f, 7000.0f, 8000.0f, 9000.0f,
                                                         20000.0f };
 
-        static float getPositionForFrequency (float freq)
-        {
-            return (std::log (freq / 20.0f) / std::log (2.0f)) / 10.0f;
-        }
+        static constexpr float maxdB =  6.0f;
+        static constexpr float mindB = -84.0f;
 
-        Image image {Image::ARGB, width, height, true};
+        static constexpr float maxBanddB =  24.0f;
+        static constexpr float minBanddB = -24.0f;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumBgMarkers)
+        static float getPositionForFrequency (float freq);
+
+        void drawSpectrumBackground();
+        void drawSpectrumForeground();
+
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Frame)
 };
 
 }

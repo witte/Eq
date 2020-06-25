@@ -24,10 +24,10 @@ juce_add_plugin(${PLUGIN_NAME}
 
 target_sources(${PLUGIN_NAME} PRIVATE
     Source/Components/BandEditor.cpp
+    Source/Components/Frame.cpp
     Source/Components/FrequencyCurve.cpp
     Source/Components/Label.cpp
     Source/Components/SpectrumAnalyzer.cpp
-    Source/Components/SpectrumBgMarkers.cpp
     Source/Components/TextEditor.cpp
     Source/Components/XYPad.cpp
     Source/LookAndFeel/LookAndFeel.cpp

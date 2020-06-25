@@ -1,4 +1,5 @@
 #include "EqEditor.h"
+#include <BinaryData.h>
 
 namespace witte
 {
@@ -7,6 +8,8 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     : AudioProcessorEditor {&p},
       processor {p},
       tree {vts},
+      background {ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)},
+      frame {defaultWidth * 2, defaultHeight * 2},
       analyzer {processor},
       frequencyCurve {p,
       {
@@ -38,9 +41,10 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     outputGain.setSliderStyle (Slider::SliderStyle::LinearVertical);
     outputGain.setTextBoxStyle (Slider::TextBoxLeft, false, 62, 22);
 
-    addAndMakeVisible (analyzer);
-    addAndMakeVisible (frequencyCurve);
-    addAndMakeVisible (xyPad);
+    addAndMakeVisible (frame);
+        frame.addAndMakeVisible (analyzer);
+        frame.addAndMakeVisible (frequencyCurve);
+        frame.addAndMakeVisible (xyPad);
     addAndMakeVisible (band1);
     addAndMakeVisible (band2);
     addAndMakeVisible (band3);
@@ -52,10 +56,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     setResizable (true, true);
     setSize (size.x, size.y);
 
-    int defaultW = 768;
-    int defaultH = 482;
-
-    setResizeLimits (defaultW / 2, defaultH / 2, defaultW * 2, defaultH * 2);
+    setResizeLimits (defaultWidth / 2, defaultHeight / 2, defaultWidth * 2, defaultHeight * 2);
 
     setLookAndFeel (&lookAndFeel);
 
@@ -92,9 +93,10 @@ void EqAudioProcessorEditor::resized()
     bands.items.add (FlexItem (outputGain).withWidth (bandsWidth * 0.1f).withMargin (4));
     bands.performLayout (bounds.removeFromBottom (bandsHeight).reduced ((bounds.getWidth() - bandsWidth) * 0.5f, 1));
 
-    analyzer.setBounds (bounds);
-    frequencyCurve.setBounds (bounds);
-    xyPad.setBounds (bounds);
+    frame.setBounds(bounds);
+        analyzer.setBounds (bounds);
+        frequencyCurve.setBounds (bounds);
+        xyPad.setBounds (bounds);
 }
 
 }

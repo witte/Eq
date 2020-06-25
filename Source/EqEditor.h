@@ -1,11 +1,11 @@
 #pragma once
 #include "EqProcessor.h"
 #include "Components/BandEditor.h"
+#include "Components/Frame.h"
 #include "Components/SpectrumAnalyzer.h"
 #include "Components/XYPad.h"
 #include "Components/FrequencyCurve.h"
 #include "LookAndFeel/LookAndFeel.h"
-#include <BinaryData.h>
 
 namespace witte
 {
@@ -25,8 +25,13 @@ class EqAudioProcessorEditor : public AudioProcessorEditor
         AudioProcessorValueTreeState& tree;
         witte::LookAndFeel lookAndFeel;
 
-        Image background {ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)};
+        constexpr static int defaultWidth = 768;
+        constexpr static int defaultHeight = 482;
 
+        Colour baseColor {0xff011523};
+        Image background;
+
+        witte::Frame frame;
         witte::SpectrumAnalyzer analyzer;
         witte::FrequencyCurve frequencyCurve;
         witte::XYPad xyPad;
