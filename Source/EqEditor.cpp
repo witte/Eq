@@ -52,10 +52,9 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     addAndMakeVisible (band5);
     addAndMakeVisible (outputGain);
 
-    auto size = processor.getSavedEditorSize();
     setResizable (true, true);
+    auto size = processor.getSavedEditorSize();
     setSize (size.x, size.y);
-
     setResizeLimits (defaultWidth / 2, defaultHeight / 2, defaultWidth * 2, defaultHeight * 2);
 
     setLookAndFeel (&lookAndFeel);
@@ -72,8 +71,8 @@ EqAudioProcessorEditor::~EqAudioProcessorEditor()
 void EqAudioProcessorEditor::paint (Graphics& g)
 {
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-    g.setTiledImageFill (background, 0, 0, 0.4f);
-    g.fillAll();
+    g.setTiledImageFill (background, 0, 0, 0.6f);
+    g.fillRect (0, frame.getBottom(), getWidth(), getHeight() - frame.getBottom());
 }
 
 void EqAudioProcessorEditor::resized()
@@ -93,7 +92,7 @@ void EqAudioProcessorEditor::resized()
     bands.items.add (FlexItem (outputGain).withWidth (bandsWidth * 0.1f).withMargin (4));
     bands.performLayout (bounds.removeFromBottom (bandsHeight).reduced ((bounds.getWidth() - bandsWidth) * 0.5f, 1));
 
-    frame.setBounds(bounds);
+    frame.setBounds (bounds);
         analyzer.setBounds (bounds);
         frequencyCurve.setBounds (bounds);
         xyPad.setBounds (bounds);

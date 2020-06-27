@@ -12,8 +12,8 @@ class Frame : public Component
     public:
         Frame (int maxWidth, int maxHeight);
 
-        void paint (Graphics &g) override;
-        void paintOverChildren (Graphics &g) override;
+        void paint (Graphics& g) override;
+        void paintOverChildren (Graphics& g) override;
 
         void resized() override;
 
