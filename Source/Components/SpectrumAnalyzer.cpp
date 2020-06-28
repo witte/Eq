@@ -6,6 +6,8 @@ namespace witte
 
 SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {eqProcessor}
 {
+    setPaintingIsUnclipped (true);
+
     avgInput.clear();
     avgOutput.clear();
 

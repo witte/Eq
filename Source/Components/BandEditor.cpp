@@ -17,6 +17,8 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
     attGain {tree, getPrmName (bandNumber, "Gain"), gain},
     attQ    {tree, getPrmName (bandNumber, "Q"   ), q}
 {
+    setPaintingIsUnclipped (true);
+
     freq.setSliderStyle  (Slider::RotaryVerticalDrag);
     gain.setSliderStyle  (Slider::RotaryVerticalDrag);
     q   .setSliderStyle  (Slider::RotaryVerticalDrag);

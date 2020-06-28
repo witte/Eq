@@ -33,15 +33,6 @@ class Frame : public Component
                                                           200.0f,  300.0f,  400.0f,  500.0f,  600.0f,  700.0f,  800.0f,  900.0f,
                                                          2000.0f, 3000.0f, 4000.0f, 5000.0f, 6000.0f, 7000.0f, 8000.0f, 9000.0f,
                                                         20000.0f };
-
-        static constexpr float maxdB =  6.0f;
-        static constexpr float mindB = -84.0f;
-
-        static constexpr float maxBanddB =  24.0f;
-        static constexpr float minBanddB = -24.0f;
-
-        static float getPositionForFrequency (float freq);
-
         void drawSpectrumBackground();
         void drawSpectrumForeground();
 

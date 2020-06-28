@@ -1,64 +1,55 @@
 #pragma once
 #include <cmath>
-
 #include <juce_audio_processors/juce_audio_processors.h>
-
-#include "FrequenciesTable.h"
+#include "UnitConversions.h"
 
 using namespace juce;
 
 namespace witte
 {
 
-static inline bool qFuzzyCompare (float p1, float p2)
+static std::unique_ptr<AudioParameterBool> makePrmBool
+(
+    const String& parameterID,
+    const String& name,
+    const bool defaultValue,
+    const String& label = String()
+)
 {
-    return (std::abs (p1 - p2) * 100000.f <= std::min (std::abs (p1), std::abs (p2)));
+    return std::make_unique<AudioParameterBool> (parameterID, name, defaultValue, label);
 }
 
-static std::unique_ptr<AudioParameterBool> makePrmBool (const String& parameterID,
-                                                        const String& name,
-                                                        const bool defaultValue,
-                                                        const String& label = String())
+static std::unique_ptr<AudioParameterChoice> makePrmChoice
+(
+    const String& parameterID,
+    const String& name,
+    const StringArray& choices,
+    int defaultItemIndex,
+    const String& label = String()
+)
 {
-    return std::make_unique<AudioParameterBool> (parameterID, TRANS (name), defaultValue, TRANS (label));
+    return std::make_unique<AudioParameterChoice> (parameterID, name, choices, defaultItemIndex, label);
 }
 
-static std::unique_ptr<AudioParameterChoice> makePrmChoice (const String& parameterID,
-                                                            const String& name,
-                                                            const StringArray& choices,
-                                                            int defaultItemIndex,
-                                                            const String& label = String())
+static std::unique_ptr<RangedAudioParameter> makePrmFreq
+(
+    const String& parameterID,
+    const String& name,
+    const float   defaultValue = 500.0f,
+    const String& label = {}
+)
 {
-    return std::make_unique<AudioParameterChoice> (parameterID, TRANS (name), choices, defaultItemIndex, label);
-}
-
-static float proportionToFreq(float proportion)
-{
-    return 20.0f * std::pow (2.0f, proportion * 10.0f);
-}
-
-static float freqToProportion(float freq)
-{
-    return (std::log (freq / 20.0f) / std::log (2.0f)) / 10.0f;
-}
-
-static std::unique_ptr<RangedAudioParameter> makePrmFreq (const String& parameterID,
-                                                          const String& name,
-                                                          const float   defaultValue = 500.0f,
-                                                          const String& label = {})
-{
-
     NormalisableRange<float> range { 20.0f, 20000.0f,
-                                     [] (float, float, float proportion) { return proportionToFreq (proportion); },
-                                     [] (float, float, float value)      { return freqToProportion (value); } };
+                                     [] (float, float, float proportion) { return units::proportionToFreq (proportion); },
+                                     [] (float, float, float value)      { return units::freqToProportion (value); } };
     
     return std::make_unique<AudioParameterFloat>
     (
         parameterID,
-        TRANS (name),
+        name,
         range,
         defaultValue,
-        TRANS (label),
+        label,
         AudioProcessorParameter::genericParameter,
         [] (float value, int)
         {
@@ -71,52 +62,49 @@ static std::unique_ptr<RangedAudioParameter> makePrmFreq (const String& paramete
     );
 }
 
-static std::unique_ptr<RangedAudioParameter> makePrmDb (const String& parameterID,
-                                                        const String& name,
-                                                        const float   defaultValue = 0.0f,
-                                                        const String& label = {},
-                                                        const AudioProcessorParameter::Category category = AudioProcessorParameter::genericParameter)
+static std::unique_ptr<RangedAudioParameter> makePrmDb
+(
+    const String& parameterID,
+    const String& name,
+    const float   defaultValue = 0.0f,
+    const String& label = {},
+    const AudioProcessorParameter::Category category = AudioProcessorParameter::genericParameter
+)
 {
     return std::make_unique<AudioParameterFloat>
     (
           parameterID,
-          TRANS (name),
+          name,
           NormalisableRange<float> { -24.0f, 24.0f, 0.01f },
           defaultValue,
-          TRANS (label),
+          label,
           category,
           [] (float value, int) { return String (value, 2) + " dB"; },
           [] (String text)      { return text.getFloatValue(); }
     );
 }
 
-static std::unique_ptr<RangedAudioParameter> makePrmFloat (const String& parameterID,
-                                                           const String& name,
-                                                           const float   minValue,
-                                                           const float   maxValue,
-                                                           const float   skew,
-                                                           const float   defaultValue,
-                                                           const String& label = {},
-                                                           AudioProcessorParameter::Category category = AudioProcessorParameter::genericParameter,
-                                                           std::function<String (float value, int maximumStringLength)> stringFromValue = nullptr,
-                                                           std::function<float (const String& text)> valueFromString = nullptr)
+static std::unique_ptr<RangedAudioParameter> makePrmFloat
+(
+    const String& parameterID,
+    const String& name,
+    const float   minValue,
+    const float   maxValue,
+    const float   skew,
+    const float   defaultValue,
+    const String& label = {},
+    AudioProcessorParameter::Category category = AudioProcessorParameter::genericParameter,
+    std::function<String (float value, int)>  stringFromValue = [] (float value, int)   { return String (value, 2); },
+    std::function<float (const String& text)> valueFromString = [] (const String& text) { return text.getFloatValue(); }
+)
 {
-    if (stringFromValue == nullptr)
-    {
-        stringFromValue = [] (float value, int) { return String (value, 2); };
-    }
-    if (valueFromString == nullptr)
-    {
-        valueFromString = [] (const String& text) { return text.getFloatValue(); };
-    }
-
     return std::make_unique<AudioParameterFloat>
     (
         parameterID,
-        TRANS (name),
+        name,
         NormalisableRange<float> { minValue, maxValue, 0.01f, skew },
         defaultValue,
-        TRANS (label),
+        label,
         category,
         stringFromValue,
         valueFromString

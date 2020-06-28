@@ -36,6 +36,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
       attOutputGain {vts, "OutGain", outputGain}
 {
     setOpaque (true);
+    setPaintingIsUnclipped (true);
     setWantsKeyboardFocus (true);
 
     outputGain.setSliderStyle (Slider::SliderStyle::LinearVertical);
@@ -70,7 +71,8 @@ EqAudioProcessorEditor::~EqAudioProcessorEditor()
 
 void EqAudioProcessorEditor::paint (Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.setColour(getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillRect (0, frame.getBottom(), getWidth(), getHeight() - frame.getBottom());
     g.setTiledImageFill (background, 0, 0, 0.6f);
     g.fillRect (0, frame.getBottom(), getWidth(), getHeight() - frame.getBottom());
 }

@@ -1,6 +1,6 @@
 #include "FrequencyCurve.h"
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "../Helpers/ParameterHelpers.h"
+#include "../Helpers/UnitConversions.h"
 
 namespace witte
 {
@@ -78,14 +78,13 @@ void FrequencyCurve::drawFrequencyCurve()
 
     float outputGain = *processor.prmOutputGain;
     frequencyCurvePath.clear();
-    frequencyCurvePath.startNewSubPath (0.0f,
-            jmap (float (Decibels::gainToDecibels (magnitudesOut [0]) + outputGain), -26.0f, 26.0f, height, 0.0f));
+    frequencyCurvePath.startNewSubPath (0.0f, units::gainToProportion (Decibels::decibelsToGain (magnitudesOut [0]) + outputGain) * height);
 
     for (size_t i = 1; i < frequencies.size(); ++i)
     {
-        float xx = freqToProportion (frequencies [i]) * width;
+        float xx = units::freqToProportion (frequencies [i]) * width;
         float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
-        float yy = jmap (gain, -26.0f, 26.0f, height, 0.0f);
+        float yy = units::gainToProportion (gain) * height;
 
         frequencyCurvePath.lineTo (xx, yy - 0.5f);
         frequenciesPoints[i] = {xx, yy + 0.5f};

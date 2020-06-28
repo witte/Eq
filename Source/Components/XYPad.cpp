@@ -9,7 +9,7 @@ XYPad::XYPad (std::initializer_list<std::pair<RangedAudioParameter*, RangedAudio
 
     for (auto& parameterPair : parameters)
     {
-        prmHandles.push_back(std::make_unique<XYPadHandle>(*this, parameterPair.first, parameterPair.second));
+        prmHandles.push_back (std::make_unique<XYPadHandle> (*this, parameterPair.first, parameterPair.second));
     }
 }
 
@@ -25,7 +25,7 @@ void XYPad::paint (Graphics& g)
     {
         auto[x, y] = prmAttachment->getPos();
 
-        bandsPositionsPath.addEllipse(x - handleRadius, y - handleRadius, handleRadius * 2.0f, handleRadius * 2.0f);
+        bandsPositionsPath.addEllipse (x - handleRadius, y - handleRadius, handleRadius * 2.0f, handleRadius * 2.0f);
     }
 
     g.setColour (Colour {0xff4ea5ac});
@@ -82,8 +82,8 @@ void XYPad::mouseDrag (const MouseEvent& event)
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
 
-    draggingPad->getX()->setValueNotifyingHost(event.position.getX() / width);
-    draggingPad->getY()->setValueNotifyingHost(1 - (event.position.getY() / height));
+    draggingPad->getX()->setValueNotifyingHost (event.position.getX() / width);
+    draggingPad->getY()->setValueNotifyingHost (1 - (event.position.getY() / height));
 
     repaint();
 }
