@@ -78,7 +78,7 @@ void SpectrumAnalyzer::paint (Graphics& g)
     inP.lineTo (0.0f, height);
     inP.closeSubPath();
 
-    g.setColour (Colours::yellowgreen.withAlpha (0.42f));
+    g.setColour (Colour {0x6b9acd32});
     g.fillPath (outP);
 
     g.setColour (baseColor.brighter (0.18f).withAlpha (uint8 (182)));

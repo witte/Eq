@@ -7,21 +7,21 @@ namespace witte
 
 LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4 ()
 {
-    setColour (ResizableWindow::backgroundColourId, {11, 75, 93});
+    setColour (ResizableWindow::backgroundColourId,      Colour {0xff0b4b5d});
 
-    setColour (Slider::rotarySliderFillColourId, {29, 39, 49});
-    setColour (Slider::rotarySliderOutlineColourId, {217, 179, 16});
+    setColour (Slider::rotarySliderFillColourId,         Colour {0xff1d2731});
+    setColour (Slider::rotarySliderOutlineColourId,      Colour {0xffd9b310});
 
-    setColour (TextEditor::backgroundColourId, {51, 100, 114});
+    setColour (TextEditor::backgroundColourId,           Colour {0xff336472});
 
-    setColour (PopupMenu::backgroundColourId, {11, 75, 93});
-    setColour (PopupMenu::highlightedBackgroundColourId, Colour (11, 75, 93).darker (0.6f));
-    setColour (PopupMenu::highlightedTextColourId, Colours::white.darker (3.2f));
-    setColour (PopupMenu::textColourId, Colours::white.darker (0.2f));
+    setColour (PopupMenu::backgroundColourId,            Colour {0xff0b4b5d});
+    setColour (PopupMenu::highlightedBackgroundColourId, Colour {0xff062e3a});
+    setColour (PopupMenu::highlightedTextColourId,       Colour {0xff3d3d3d});
+    setColour (PopupMenu::textColourId,                  Colour {0xffd4d4d4});
 
-    setColour (ToggleButton::textColourId, Colours::white.darker (0.2f));
+    setColour (ToggleButton::textColourId,               Colour {0xffd4d4d4});
 
-    fontDefault = {Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedLight_ttf, BinaryData::OpenSansCondensedLight_ttfSize)};
+    fontDefault = Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedLight_ttf, BinaryData::OpenSansCondensedLight_ttfSize);
     LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface (fontDefault.getTypeface());
 
     fontAudio = Typeface::createSystemTypefaceFor (BinaryData::fontaudio_ttf, BinaryData::fontaudio_ttfSize);
@@ -29,7 +29,7 @@ LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4 ()
 
 void LookAndFeel::drawCornerResizer (Graphics& g, int w, int h, bool isMouseOver, bool isMouseDragging)
 {
-    g.setColour ((isMouseOver || isMouseDragging) ? Colour {static_cast<uint8> (50), 140, 193, 0.5f} : Colour {static_cast<uint8> (29), 39, 49, 0.42f});
+    g.setColour (Colour {(isMouseOver || isMouseDragging)? 0x80328cc1 : 0x681d2731});
 
     const float lineThickness = std::min (w, h) * 0.14f;
 
@@ -49,11 +49,10 @@ void LookAndFeel::drawButtonBackground (Graphics& g, Button&, const Colour&,
     g.fillAll (Colours::white.withAlpha (uint8 (100 + (shouldDrawButtonAsDown * 10) + (shouldDrawButtonAsHighlighted * 10))));
 }
 
-void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button,
-                       bool shouldDrawButtonAsHighlighted, bool)
+void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button, bool shouldDrawButtonAsHighlighted, bool)
 {
     if (shouldDrawButtonAsHighlighted || button.hasKeyboardFocus (true))
-        g.fillAll (Colours::white.withAlpha (uint8 (12)));
+        g.fillAll (Colour {0x0cffffff});
 
     if (! button.isEnabled())
         g.setOpacity (0.5f);
@@ -71,7 +70,7 @@ void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button,
 void LookAndFeel::drawComboBox (Graphics& g, int, int, bool isButtonDown, int, int, int, int, ComboBox& box)
 {
     if (isButtonDown || box.hasKeyboardFocus (true))
-        g.fillAll (Colours::white.withAlpha (uint8 (12)));
+        g.fillAll (Colour {0x0cffffff});
 }
 
 void LookAndFeel::positionComboBoxText (ComboBox& box, juce::Label& label)
@@ -154,7 +153,7 @@ void LookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int he
 
     if (slider.hasKeyboardFocus (true))
     {
-        g.fillAll (Colours::white.withAlpha (0.04f));
+        g.fillAll (Colour {0x0affffff});
 
         fill = fill.brighter (0.01f);
         outline = outline.brighter (0.4f);
@@ -175,8 +174,7 @@ void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int he
 {
     auto outline = findColour (Slider::rotarySliderOutlineColourId);
     auto fill    = findColour (Slider::rotarySliderFillColourId);
-    auto text    = Colours::white.darker (0.2f);
-
+    auto text    = Colour {0xffd4d4d4};
     auto toAngle = rotaryStartAngle + sliderPosProportional * (rotaryEndAngle - rotaryStartAngle);
 
     if (!slider.isEnabled())
@@ -187,7 +185,7 @@ void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int he
     }
     else if (slider.hasKeyboardFocus (true))
     {
-        g.setColour (Colours::white.withAlpha (0.04f));
+        g.setColour (Colour {0x0affffff});
         g.fillAll();
 
         fill = fill.brighter (0.01f);
@@ -269,11 +267,8 @@ void LookAndFeel::drawLabel (Graphics& g, juce::Label& label)
 {
     if (label.isBeingEdited()) return;
 
-    auto color = Colours::white.darker (0.2f);
-    if (!label.isEnabled()) color = color.darker (0.8f);
-
     g.setFont (getLabelFont (label));
-    g.setColour (color);
+    g.setColour (Colour {label.isEnabled()? 0xffd4d4d4 : 0xff757575});
     g.drawText (label.getText(), label.getLocalBounds(), label.getJustificationType(), false);
 }
 

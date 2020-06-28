@@ -22,7 +22,7 @@ class Frame : public Component
         Image spectrumBackground;
         Image spectrumForeground;
 
-        Colour baseColor {0xff011523};
+        Colour baseColor {0xff112533};
         Font openSansBold;
 
         constexpr static std::array<float, 7> gains = { -12.0f, -24.0f, -36.0f, -48.0f, -60.0f, -72.0f, -84.0f };

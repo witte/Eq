@@ -84,7 +84,7 @@ void BandEditor::resized()
 
 void BandEditor::paint (Graphics& g)
 {
-    g.setColour (Colours::black.withAlpha (uint8 (42)));
+    g.setColour (Colour {0x2a000000});
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 6);
 }
 

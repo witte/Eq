@@ -17,30 +17,25 @@ static float freqToProportion (float freq)
     return (std::log (freq / 20.0f) / std::log (2.0f)) / 10.0f;
 }
 
-template <typename Type>
-constexpr Type jmax (Type a, Type b) { return a < b ? b : a; }
+static float jmax (float a, float b) { return a < b ? b : a; }
 
-
-template <typename Type>
-static Type jmap (Type sourceValue, Type sourceRangeMin, Type sourceRangeMax, Type targetRangeMin, Type targetRangeMax)
+static float jmap (float sourceValue, float sourceRangeMin, float sourceRangeMax, float targetRangeMin, float targetRangeMax)
 {
     return targetRangeMin + ((targetRangeMax - targetRangeMin) * (sourceValue - sourceRangeMin)) / (sourceRangeMax - sourceRangeMin);
 }
 
-template <typename Type>
-static Type gainToDecibels (Type gain, Type minusInfinityDb = Type (-80.0f))
+static constexpr float maxdB =   6.0f;
+static constexpr float mindB = -84.0f;
+
+static float gainToDecibels (float gain)
 {
-    return gain > Type() ? jmax (minusInfinityDb, static_cast<Type> (std::log10 (gain)) * Type (20.0))
-                         : minusInfinityDb;
+    return gain > float() ? jmax (mindB, static_cast<float> (std::log10 (gain)) * 20.0f) : mindB;
 }
 
 static float gainToProportion (float gain)
 {
-    return jmap (float (gain), -24.0f, 24.0f, 1.0f, 0.0f);
+    return jmap (gain, -24.0f, 24.0f, 1.0f, 0.0f);
 }
-
-static constexpr float maxdB =  6.0f;
-static constexpr float mindB = -84.0f;
 
 static float spectrumGainToProportion (float gain)
 {

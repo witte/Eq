@@ -33,7 +33,7 @@ void XYPad::paint (Graphics& g)
 
     if (draggingPad != nullptr)
     {
-        g.setColour (Colours::rebeccapurple.withAlpha (0.5f));
+        g.setColour (Colour {0x80663399});
 
         auto[x, y] = draggingPad->getPos();
         g.fillEllipse (x - hoveredHandleRadius,    y - hoveredHandleRadius,

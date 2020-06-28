@@ -35,7 +35,7 @@ class SpectrumAnalyzer : public Component, private Timer
         int avgInputPtr  = 1;
         int avgOutputPtr = 1;
 
-        Colour baseColor {uint8 (1), uint8 (28), uint8 (39)};
+        Colour baseColor {0xff011c27};
 
         Path inP;
         Path outP;

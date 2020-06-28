@@ -39,7 +39,7 @@ void Frame::drawSpectrumBackground()
     g.setColour (baseColor);
     g.fillRect (bounds);
 
-    g.setColour (baseColor.brighter (0.024f));
+    g.setColour (baseColor.brighter (0.036f));
     g.drawHorizontalLine (int (height * 0.5f), 0, width);
 
     for (auto& bandGain : bandGains)
@@ -54,7 +54,7 @@ void Frame::drawSpectrumBackground()
         g.drawVerticalLine (pos, 0, height);
     }
 
-    g.setColour (baseColor.brighter (0.072f));
+    g.setColour (baseColor.brighter (0.082f));
     for (auto& freq : freqsA)
     {
         int pos = roundToInt (units::freqToProportion (freq) * width);
