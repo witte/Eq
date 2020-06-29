@@ -20,9 +20,8 @@ class BandEditor : public Component
     private:
         AudioProcessorValueTreeState& tree;
 
-        ToggleButton on {String::fromUTF8 (u8"\uf16b")};
-        ComboBox     type;
-        PopupMenu    contextMenu;
+        ToggleButton on {"0"};
+        ComboBox type;
         Slider freq;
         Slider gain;
         Slider q   ;

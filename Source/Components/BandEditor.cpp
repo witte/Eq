@@ -37,11 +37,12 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
     addAndMakeVisible (gain);
     addAndMakeVisible (q);
 
-    type.addItem (String::fromUTF8 (u8"\uf132"), 1);
-    type.addItem (String::fromUTF8 (u8"\uf138"), 2);
-    type.addItem (String::fromUTF8 (u8"\uf130"), 3);
-    type.addItem (String::fromUTF8 (u8"\uf137"), 4);
-    type.addItem (String::fromUTF8 (u8"\uf133"), 5);
+    type.addItem ("1", 1);
+    type.addItem ("2", 2);
+    type.addItem ("3", 3);
+    type.addItem ("4", 4);
+    type.addItem ("5", 5);
+
 
     auto* lastType = tree.getRawParameterValue (getPrmName (bandNumber, "Type"));
     type.setSelectedId (int (*lastType + 1.0f));

@@ -62,7 +62,7 @@ void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button, bool shou
 
     g.setColour (textColor);
     g.setFont (fontAudio);
-    g.setFont (button.getHeight() * 0.72f);
+    g.setFont (button.getHeight() * 0.58f);
 
     g.drawText (button.getButtonText(), button.getLocalBounds(), Justification::centred, false);
 }
@@ -133,7 +133,7 @@ void LookAndFeel::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
     }
 
     auto font = fontAudio;
-    font.setHeight (area.getHeight() * 0.86);
+    font.setHeight (area.getHeight() * 0.68);
     g.setFont (font);
 
     g.setColour (textColour);
