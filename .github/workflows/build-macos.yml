@@ -2,7 +2,7 @@ name: mac
 
 on:
   push:
-    branches: [ master, dev ]
+    branches: [ main, dev ]
 
 jobs:
   build:
@@ -18,7 +18,6 @@ jobs:
       
       - name: cmake
         run: |
-          cmake --version
           mkdir build
           cmake -B build .
       
