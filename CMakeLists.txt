@@ -48,6 +48,12 @@ juce_add_binary_data(${PLUGIN_DATA} SOURCES
 
 set_target_properties(${PLUGIN_NAME} ${PLUGIN_DATA} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+if (UNIX)
+    target_compile_options(${PLUGIN_NAME} PUBLIC -Wall -Wextra -pedantic -Werror)
+else()
+    target_compile_options(${PLUGIN_NAME} PUBLIC /W4 /WX)
+endif()
+
 target_link_libraries(${PLUGIN_NAME} PRIVATE
     ${PLUGIN_DATA}
     juce::juce_audio_processors

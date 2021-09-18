@@ -52,7 +52,7 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
             fftOrder  = 11,
             fftSize   = 1 << fftOrder,
         };
-        std::atomic<bool> nextFFTBlockReady = false;
+        std::atomic<bool> nextFFTBlockReady {false};
 
         AbstractFifo abstractFifoInput {1};
         AudioBuffer<float> audioFifoInput;
@@ -60,7 +60,7 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         AbstractFifo abstractFifoOutput {1};
         AudioBuffer<float> audioFifoOutput;
 
-        std::atomic<bool> frequenciesCurveChanged = false;
+        std::atomic<bool> frequenciesCurveChanged {false};
 
         struct Band : public AudioProcessorValueTreeState::Listener
         {
@@ -132,7 +132,7 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
 
         std::array<Band, 5> bands;
 
-        std::atomic<bool> copyToFifo = false;
+        std::atomic<bool> copyToFifo {false};
         void pushNextSampleToFifo (const AudioBuffer<float>& buffer, int startChannel, int numChannels,
                                    AbstractFifo& absFifo, AudioBuffer<float>& fifo);
 
