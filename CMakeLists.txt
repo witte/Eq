@@ -51,6 +51,7 @@ set_target_properties(${PLUGIN_NAME} ${PLUGIN_DATA} PROPERTIES POSITION_INDEPEND
 if (UNIX)
     target_compile_options(${PLUGIN_NAME} PUBLIC -Wall -Wextra -pedantic -Werror)
 else()
+    add_definitions("/wd4244") # disable "possible loss of data" warning/error
     target_compile_options(${PLUGIN_NAME} PUBLIC /W4 /WX)
 endif()
 

@@ -78,7 +78,7 @@ void FrequencyCurve::drawFrequencyCurve()
 
     float outputGain = *processor.prmOutputGain;
     frequencyCurvePath.clear();
-    frequencyCurvePath.startNewSubPath (0.0f, units::gainToProportion (Decibels::decibelsToGain (magnitudesOut [0]) + outputGain) * height);
+    frequencyCurvePath.startNewSubPath (0.0f, units::gainToProportion (Decibels::decibelsToGain (magnitudesOut [0]) + outputGain) * float (height));
 
     for (size_t i = 1; i < frequencies.size(); ++i)
     {

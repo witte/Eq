@@ -8,7 +8,7 @@ using namespace juce;
 namespace witte
 {
 
-static std::unique_ptr<AudioParameterBool> makePrmBool
+inline std::unique_ptr<AudioParameterBool> makePrmBool
 (
     const String& parameterID,
     const String& name,
@@ -19,7 +19,7 @@ static std::unique_ptr<AudioParameterBool> makePrmBool
     return std::make_unique<AudioParameterBool> (parameterID, name, defaultValue, label);
 }
 
-static std::unique_ptr<AudioParameterChoice> makePrmChoice
+inline std::unique_ptr<AudioParameterChoice> makePrmChoice
 (
     const String& parameterID,
     const String& name,
@@ -31,7 +31,7 @@ static std::unique_ptr<AudioParameterChoice> makePrmChoice
     return std::make_unique<AudioParameterChoice> (parameterID, name, choices, defaultItemIndex, label);
 }
 
-static std::unique_ptr<RangedAudioParameter> makePrmFreq
+inline std::unique_ptr<RangedAudioParameter> makePrmFreq
 (
     const String& parameterID,
     const String& name,
@@ -62,7 +62,7 @@ static std::unique_ptr<RangedAudioParameter> makePrmFreq
     );
 }
 
-static std::unique_ptr<RangedAudioParameter> makePrmDb
+inline std::unique_ptr<RangedAudioParameter> makePrmDb
 (
     const String& parameterID,
     const String& name,
@@ -84,7 +84,7 @@ static std::unique_ptr<RangedAudioParameter> makePrmDb
     );
 }
 
-static std::unique_ptr<RangedAudioParameter> makePrmFloat
+inline std::unique_ptr<RangedAudioParameter> makePrmFloat
 (
     const String& parameterID,
     const String& name,

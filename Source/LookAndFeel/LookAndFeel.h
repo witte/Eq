@@ -19,7 +19,7 @@ class LookAndFeel : public LookAndFeel_V4
         Font getTextButtonFont (TextButton&, int buttonHeight) override
         {
             Font font (fontAudio);
-            font.setHeight (int (buttonHeight * 0.58));
+            font.setHeight (int (buttonHeight * 0.58f));
 
             return font;
         }
@@ -27,7 +27,7 @@ class LookAndFeel : public LookAndFeel_V4
         Font getComboBoxFont (ComboBox& box) override
         {
             Font font (fontAudio);
-            font.setHeight (box.getHeight() * 0.82);
+            font.setHeight (box.getHeight() * 0.82f);
 
             return font;
         }

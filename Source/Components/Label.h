@@ -16,7 +16,7 @@ class Label : public juce::Label
         bool keyPressed (const KeyPress& key) override;
 
     protected:
-        void editorShown (juce::TextEditor*) override;
+        void editorShown (juce::TextEditor* labelEditor) override;
 
     private:
         Value& value;

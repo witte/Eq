@@ -93,7 +93,7 @@ void EqAudioProcessor::pushNextSampleToFifo (const AudioBuffer<float>& buffer, i
 
     absFifo.finishedWrite (block1 + block2);
     nextFFTBlockReady.store (true);
-};
+}
 
 void EqAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
@@ -118,8 +118,8 @@ void EqAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             editorSize.setX (editor.getProperty (IDs::sizeX, 68));
             editorSize.setY (editor.getProperty (IDs::sizeY, 12));
 
-            if (auto* activeEditor = getActiveEditor())
-                activeEditor->setSize (editorSize.x, editorSize.y);
+            if (auto* ed = getActiveEditor())
+                ed->setSize (editorSize.x, editorSize.y);
         }
     }
 }

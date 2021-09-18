@@ -83,7 +83,7 @@ void EqAudioProcessorEditor::resized()
     processor.setSavedEditorSize ({ bounds.getWidth(), bounds.getHeight() });
 
     float bandsWidth = std::clamp (bounds.getHeight() * 1.16f, 384.0f, std::min (632.0f, float (bounds.getWidth())));
-    float bandsHeight = bandsWidth * 0.24f;
+    int bandsHeight = roundToInt (bandsWidth * 0.24f);
 
     FlexBox bands;
     bands.items.add (FlexItem (band1).withFlex (1.0f).withMargin (1));
@@ -92,7 +92,9 @@ void EqAudioProcessorEditor::resized()
     bands.items.add (FlexItem (band4).withFlex (1.0f).withMargin (1));
     bands.items.add (FlexItem (band5).withFlex (1.0f).withMargin (1));
     bands.items.add (FlexItem (outputGain).withWidth (bandsWidth * 0.1f).withMargin (4));
-    bands.performLayout (bounds.removeFromBottom (bandsHeight).reduced ((bounds.getWidth() - bandsWidth) * 0.5f, 1));
+
+    bands.performLayout (bounds.removeFromBottom (bandsHeight)
+                               .reduced (roundToInt ((bounds.getWidth() - bandsWidth) * 0.5f), 1));
 
     frame.setBounds (bounds);
         analyzer.setBounds (bounds);

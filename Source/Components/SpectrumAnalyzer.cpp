@@ -49,27 +49,27 @@ void SpectrumAnalyzer::paint (Graphics& g)
 
     {
         fftPoint& point = fftPoints[0];
-        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        float y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
-        inP.startNewSubPath  (point.x, y);
-        outP.startNewSubPath (point.x, y);
+        inP.startNewSubPath  (float (point.x), y);
+        outP.startNewSubPath (float (point.x), y);
     }
 
     for (int i = 0; i < fftPointsSize; ++i)
     {
         fftPoint& point = fftPoints[i];
-        int y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        float y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
-        inP.lineTo  (point.x, y);
-        outP.lineTo (point.x, y);
+        inP.lineTo  (float (point.x), y);
+        outP.lineTo (float (point.x), y);
     }
 
     for (int i = fftPointsSize - 1; i >= 0; --i)
     {
         fftPoint& point = fftPoints[i];
-        int y = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        float y = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
-        outP.lineTo (point.x, y);
+        outP.lineTo (float (point.x), y);
     }
 
     outP.closeSubPath();
@@ -109,7 +109,7 @@ void SpectrumAnalyzer::resized()
             ++i;
 
             auto pos = std::log ( ((sampleRate * i) / fftSize) / 20.f) / std::log (2.0f);
-            x = (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0;
+            x = roundToInt ( (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0);
         }
         
         point.lastBinIndex = i - 1;

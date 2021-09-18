@@ -133,7 +133,7 @@ void LookAndFeel::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
     }
 
     auto font = fontAudio;
-    font.setHeight (area.getHeight() * 0.68);
+    font.setHeight (area.getHeight() * 0.68f);
     g.setFont (font);
 
     g.setColour (textColour);
@@ -164,8 +164,8 @@ void LookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int he
 
     g.setColour (outline);
 
-    Rectangle<float> rect = slider.isHorizontal()? Rectangle<float> (x, y, sliderPos - x, height)
-                                                 : Rectangle<float> (x, sliderPos, width, y + (height - sliderPos));
+    Rectangle<float> rect = slider.isHorizontal()? Rectangle<float> (float (x), float (y), float (sliderPos - x), float (height))
+                                                 : Rectangle<float> (float (x), float (sliderPos), float (width), float (y + (height - sliderPos)));
     g.fillRect (rect.reduced (slider.isHorizontal()? height * 0.2f : width * 0.2f).toNearestIntEdges());
 }
 
@@ -193,9 +193,10 @@ void LookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int he
     }
 
     g.setColour (fill);
-    g.fillEllipse (x, y, width, height);
+    g.fillEllipse (float (x), float (y), float (width), float (height));
 
-    auto arcBounds = Rectangle<float> (x, y, width, height).reduced (height * 0.12f);
+    auto arcBounds = Rectangle<float> (float (x), float (y), float (width), float (height))
+                        .reduced (height * 0.12f);
 
     Path valueArc;
     valueArc.addArc (arcBounds.getX(),     arcBounds.getY(),
@@ -222,15 +223,15 @@ Font LookAndFeel::getLabelFont (juce::Label& label)
 Slider::SliderLayout LookAndFeel::getSliderLayout (Slider& slider)
 {
     auto bounds = slider.getLocalBounds();
-    float w = bounds.getWidth();
+    float w = float (bounds.getWidth());
 
     Slider::SliderLayout layout;
 
     if (slider.isVertical())
     {
-        layout.textBoxBounds = bounds.removeFromBottom (w * 0.44f);
-        bounds.removeFromTop (w * 0.18f);
-        layout.sliderBounds = bounds.reduced (w * 0.42f, 0.0f);
+        layout.textBoxBounds = bounds.removeFromBottom (int (w * 0.44f));
+        bounds.removeFromTop (int (w * 0.18f));
+        layout.sliderBounds = bounds.reduced (int (w * 0.42f), 0);
     }
     else if (slider.isHorizontal())
     {
@@ -238,10 +239,9 @@ Slider::SliderLayout LookAndFeel::getSliderLayout (Slider& slider)
     }
     else if (slider.isRotary())
     {
-        float x = bounds.getX();
-        float y = bounds.getY();
-        float w = bounds.getWidth();
-        float h = bounds.getHeight();
+        float x = float (bounds.getX());
+        float y = float (bounds.getY());
+        float h = float (bounds.getHeight());
         float ratio = h * 3.0f;
 
         if (ratio < w)
@@ -256,8 +256,8 @@ Slider::SliderLayout LookAndFeel::getSliderLayout (Slider& slider)
             h = ratio;
         }
 
-        layout.textBoxBounds = Rectangle<int> (x, y, w, h).reduced (1);
-        layout.sliderBounds  = layout.textBoxBounds.removeFromRight (h);
+        layout.textBoxBounds = Rectangle<int> (int (x), int(y), int (w), int (h)).reduced (1);
+        layout.sliderBounds  = layout.textBoxBounds.removeFromRight (int (h));
     }
 
     return layout;

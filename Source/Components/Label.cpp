@@ -13,9 +13,9 @@ Label::Label (Value& _value, Range<double> _range) : value {_value}, range {_ran
 
 juce::TextEditor* Label::createEditorComponent()
 {
-    auto* editor = new witte::TextEditor (value, range);
+    auto* labelEditor = new witte::TextEditor (value, range);
 
-    return editor;
+    return labelEditor;
 }
 
 bool Label::keyPressed (const KeyPress& key)
@@ -46,9 +46,9 @@ bool Label::keyPressed (const KeyPress& key)
     return juce::Label::keyPressed (key);
 }
 
-void Label::editorShown (juce::TextEditor* editor)
+void Label::editorShown (juce::TextEditor* labelEditor)
 {
-    auto& ed = dynamic_cast<witte::TextEditor&> (*editor);
+    auto& ed = dynamic_cast<witte::TextEditor&> (*labelEditor);
 
     ed.clearCharacters();
 

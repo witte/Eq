@@ -40,7 +40,7 @@ void Frame::drawSpectrumBackground()
     g.fillRect (bounds);
 
     g.setColour (baseColor.brighter (0.036f));
-    g.drawHorizontalLine (int (height * 0.5f), 0, width);
+    g.drawHorizontalLine (int (height * 0.5f), 0.0f, float (width));
 
     for (auto& bandGain : bandGains)
     {

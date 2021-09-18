@@ -52,26 +52,26 @@ String TextEditor::filterNewText (juce::TextEditor&, const String& newInput)
         return {};
     }
 
-    String value = getText();
+    String currentValue = getText();
 
-    if (value.contains (".") && newInput.contains (".") && getHighlightedRegion().isEmpty()) return {};
+    if (currentValue.contains (".") && newInput.contains (".") && getHighlightedRegion().isEmpty()) return {};
 
     int pos = getCaretPosition();
     if (newInput.contains ("-"))
     {
-        bool hasMinus = value.contains ("-");
+        bool hasMinus = currentValue.contains ("-");
         int posShift = hasMinus? -1 : 1;
 
         lastSelectionStart = getHighlightedRegion().getStart() + posShift;
         lastSelectionEnd   = getHighlightedRegion().getEnd()   + posShift;
 
-        setText (hasMinus? value.replace ("-", "") : "-" + value);
+        setText (hasMinus? currentValue.replace ("-", "") : "-" + currentValue);
 
         return {};
     }
     else
     {
-        if (value.contains ("-") && pos == 0) lastSelectionStart = 1;
+        if (currentValue.contains ("-") && pos == 0) lastSelectionStart = 1;
     }
 
     return newInput;
