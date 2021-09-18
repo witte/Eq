@@ -67,9 +67,6 @@ class XYPad : public Component
         Path bandsPositionsPath;
         CriticalSection freqPathCreationLock;
 
-        int movingBand {-1};
-        int hoveringBand {-1};
-
         void mouseDown (const MouseEvent& event) override;
         void mouseMove (const MouseEvent& event) override;
         void mouseDrag (const MouseEvent& event) override;

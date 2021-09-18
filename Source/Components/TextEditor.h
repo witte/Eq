@@ -25,7 +25,6 @@ class TextEditor : public juce::TextEditor,
         Value& value;
         Range<double>& range;
         String filterString {"-.0123456789"};
-        int decimals {0};
 
         void valueChanged (Value&) override;
 
