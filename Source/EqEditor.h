@@ -7,29 +7,30 @@
 #include "Components/FrequencyCurve.h"
 #include "LookAndFeel/LookAndFeel.h"
 
+
 namespace witte
 {
 
-class EqAudioProcessorEditor : public AudioProcessorEditor
+class EqAudioProcessorEditor : public juce::AudioProcessorEditor
 {
     public:
-        EqAudioProcessorEditor (EqAudioProcessor&, AudioProcessorValueTreeState&);
+        EqAudioProcessorEditor (EqAudioProcessor&, juce::AudioProcessorValueTreeState&);
         ~EqAudioProcessorEditor() override;
 
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
 
 
     private:
         EqAudioProcessor& processor;
-        AudioProcessorValueTreeState& tree;
+        juce::AudioProcessorValueTreeState& tree;
         witte::LookAndFeel lookAndFeel;
 
         constexpr static int defaultWidth = 768;
         constexpr static int defaultHeight = 482;
 
-        Colour baseColor {0xff011523};
-        Image background;
+        juce::Colour baseColor {0xff011523};
+        juce::Image background;
 
         witte::Frame frame;
         witte::SpectrumAnalyzer analyzer;
@@ -42,8 +43,8 @@ class EqAudioProcessorEditor : public AudioProcessorEditor
         witte::BandEditor band4;
         witte::BandEditor band5;
 
-        Slider outputGain;
-        AudioProcessorValueTreeState::SliderAttachment attOutputGain;
+        juce::Slider outputGain;
+        juce::AudioProcessorValueTreeState::SliderAttachment attOutputGain;
 
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqAudioProcessorEditor)

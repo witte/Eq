@@ -4,14 +4,13 @@
 
 #include "Helpers/ParameterHelpers.h"
 
-using namespace juce;
 
-class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeState::Listener
+class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
     public:
         EqAudioProcessor();
 
-        const String getName()          const override { return JucePlugin_Name; }
+        const juce::String getName()          const override { return JucePlugin_Name; }
 
         bool   hasEditor()              const override { return true;  }
         bool   acceptsMidi()            const override { return false; }
@@ -22,8 +21,8 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         void   setCurrentProgram (int)        override {               }
         double getTailLengthSeconds()   const override { return 0.0;   }
 
-        const String getProgramName    (int)                override { return {}; }
-        void         changeProgramName (int, const String&) override {}
+        const juce::String getProgramName    (int)                      override { return {}; }
+        void               changeProgramName (int, const juce::String&) override {}
 
         bool isBusesLayoutSupported (const BusesLayout& layouts) const override
         {
@@ -31,19 +30,19 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         }
 
         void prepareToPlay (double _sampleRate, int samplesPerBlock) override;
-        void processBlock (AudioBuffer<float>&, MidiBuffer&)         override;
+        void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&)   override;
         void releaseResources()                                      override {}
 
-        void getStateInformation (MemoryBlock& destData)             override;
+        void getStateInformation (juce::MemoryBlock& destData)       override;
         void setStateInformation (const void* data, int sizeInBytes) override;
 
-        AudioProcessorEditor* createEditor()                         override;
+        juce::AudioProcessorEditor* createEditor()                   override;
 
-        Point<int> getSavedEditorSize() const            { return editorSize; }
-        void setSavedEditorSize (const Point<int>& size) { editorSize = size; }
+        juce::Point<int> getSavedEditorSize() const            { return editorSize; }
+        void setSavedEditorSize (const juce::Point<int>& size) { editorSize = size; }
 
         std::atomic<float>* prmOutputGain {nullptr};
-        void parameterChanged (const String&, float newValue) override;
+        void parameterChanged (const juce::String&, float newValue) override;
 
         void setCopyToFifo (bool _copyToFifo);
 
@@ -54,15 +53,15 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
         };
         std::atomic<bool> nextFFTBlockReady {false};
 
-        AbstractFifo abstractFifoInput {1};
-        AudioBuffer<float> audioFifoInput;
+        juce::AbstractFifo abstractFifoInput {1};
+        juce::AudioBuffer<float> audioFifoInput;
 
-        AbstractFifo abstractFifoOutput {1};
-        AudioBuffer<float> audioFifoOutput;
+        juce::AbstractFifo abstractFifoOutput {1};
+        juce::AudioBuffer<float> audioFifoOutput;
 
         std::atomic<bool> frequenciesCurveChanged {false};
 
-        struct Band : public AudioProcessorValueTreeState::Listener
+        struct Band : public juce::AudioProcessorValueTreeState::Listener
         {
             Band (EqAudioProcessor& eqProcessor, int index) : eqProcessor {eqProcessor}, index {index} {}
 
@@ -74,13 +73,13 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
             std::atomic<float>* prmGain {nullptr};
             std::atomic<float>* prmQ    {nullptr};
 
-            void parameterChanged (const String& parameter, float newValue) override;
+            void parameterChanged (const juce::String& parameter, float newValue) override;
 
             void updateFilter();
 
             int getIndex() { return index; }
 
-            dsp::ProcessorDuplicator<dsp::IIR::Filter<float>, dsp::IIR::Coefficients<float>> processor;
+            juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> processor;
 
             private:
                 EqAudioProcessor& eqProcessor;
@@ -91,9 +90,9 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
 
 
     private:
-        const StringArray filterTypes {"Low Cut", "Low Shelf", "Peak", "High Shelf", "High Cut"};
+        const juce::StringArray filterTypes {"Low Cut", "Low Shelf", "Peak", "High Shelf", "High Cut"};
 
-        AudioProcessorValueTreeState::ParameterLayout prmLayout
+        juce::AudioProcessorValueTreeState::ParameterLayout prmLayout
         {
             witte::makePrmBool   ("1On",   "1 On",                     false, "On"       ),
             witte::makePrmChoice ("1Type", "1 Type", filterTypes,          0, "Type"     ),
@@ -127,18 +126,18 @@ class EqAudioProcessor : public AudioProcessor, public AudioProcessorValueTreeSt
 
             witte::makePrmDb     ("OutGain", "Output Gain", 0.0f, "OutGain")
         };
-        UndoManager                  undoManager;
-        AudioProcessorValueTreeState parameters;
+        juce::UndoManager                  undoManager;
+        juce::AudioProcessorValueTreeState parameters;
 
         std::array<Band, 5> bands;
 
         std::atomic<bool> copyToFifo {false};
-        void pushNextSampleToFifo (const AudioBuffer<float>& buffer, int startChannel, int numChannels,
-                                   AbstractFifo& absFifo, AudioBuffer<float>& fifo);
+        void pushNextSampleToFifo (const juce::AudioBuffer<float>& buffer, int startChannel, int numChannels,
+                                   juce::AbstractFifo& absFifo, juce::AudioBuffer<float>& fifo);
 
         double sampleRate  {48000.0};
 
-        Point<int> editorSize = { 768, 512 };
+        juce::Point<int> editorSize = { 768, 512 };
 
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqAudioProcessor)

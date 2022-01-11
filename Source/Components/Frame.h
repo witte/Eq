@@ -2,28 +2,27 @@
 #include <array>
 #include "juce_gui_basics/juce_gui_basics.h"
 
-using namespace juce;
 
 namespace witte
 {
 
-class Frame : public Component
+class Frame : public juce::Component
 {
     public:
         Frame (int maxWidth, int maxHeight);
 
-        void paint (Graphics& g) override;
-        void paintOverChildren (Graphics& g) override;
+        void paint (juce::Graphics& g) override;
+        void paintOverChildren (juce::Graphics& g) override;
 
         void resized() override;
 
 
     private:
-        Image spectrumBackground;
-        Image spectrumForeground;
+        juce::Image spectrumBackground;
+        juce::Image spectrumForeground;
 
-        Colour baseColor {0xff112533};
-        Font openSansBold;
+        juce::Colour baseColor {0xff112533};
+        juce::Font openSansBold;
 
         constexpr static std::array<float, 7> gains = { -12.0f, -24.0f, -36.0f, -48.0f, -60.0f, -72.0f, -84.0f };
         constexpr static std::array<float, 4> bandGains = { 24.0f, 12.0f, -12.0f, -24.0f };

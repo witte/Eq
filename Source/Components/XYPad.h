@@ -2,18 +2,17 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-using namespace juce;
 
 namespace witte
 {
 
-class XYPad : public Component
+class XYPad : public juce::Component
 {
     public:
-        XYPad (std::initializer_list<std::pair<RangedAudioParameter*, RangedAudioParameter*>> parameters);
+        XYPad (std::initializer_list<std::pair<juce::RangedAudioParameter*, juce::RangedAudioParameter*>> parameters);
         ~XYPad() override;
 
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
 
 
@@ -21,19 +20,19 @@ class XYPad : public Component
         class XYPadHandle
         {
             public:
-                XYPadHandle (XYPad& _pad, RangedAudioParameter* _parameterX, RangedAudioParameter* _parameterY) : pad {_pad}
+                XYPadHandle (XYPad& _pad, juce::RangedAudioParameter* _parameterX, juce::RangedAudioParameter* _parameterY) : pad {_pad}
                 {
                     parameterX = _parameterX;
                     parameterY = _parameterY;
 
-                    attachmentX = std::make_unique<ParameterAttachment>(*parameterX, prmChangedCallback);
-                    attachmentY = std::make_unique<ParameterAttachment>(*parameterY, prmChangedCallback);
+                    attachmentX = std::make_unique<juce::ParameterAttachment>(*parameterX, prmChangedCallback);
+                    attachmentY = std::make_unique<juce::ParameterAttachment>(*parameterY, prmChangedCallback);
                 }
 
-                Point<float>& getPos() { return pos; }
+                juce::Point<float>& getPos() { return pos; }
 
-                RangedAudioParameter* getX() { return parameterX; }
-                RangedAudioParameter* getY() { return parameterY; }
+                juce::RangedAudioParameter* getX() { return parameterX; }
+                juce::RangedAudioParameter* getY() { return parameterY; }
 
 
             private:
@@ -47,13 +46,13 @@ class XYPad : public Component
 
                 XYPad& pad;
 
-                Point<float> pos;
+                juce::Point<float> pos;
 
-                RangedAudioParameter* parameterX {nullptr};
-                RangedAudioParameter* parameterY {nullptr};
+                juce::RangedAudioParameter* parameterX {nullptr};
+                juce::RangedAudioParameter* parameterY {nullptr};
 
-                std::unique_ptr<ParameterAttachment> attachmentX {nullptr};
-                std::unique_ptr<ParameterAttachment> attachmentY {nullptr};
+                std::unique_ptr<juce::ParameterAttachment> attachmentX {nullptr};
+                std::unique_ptr<juce::ParameterAttachment> attachmentY {nullptr};
         };
 
         std::vector<std::unique_ptr<XYPadHandle>> prmHandles;
@@ -62,15 +61,15 @@ class XYPad : public Component
 
         constexpr static float handleRadius = 2.5f;
         constexpr static float hoveredHandleRadius = handleRadius * 5.0f;
-        const Colour baseColor {0xff011523};
+        const juce::Colour baseColor {0xff011523};
 
-        Path bandsPositionsPath;
-        CriticalSection freqPathCreationLock;
+        juce::Path bandsPositionsPath;
+        juce::CriticalSection freqPathCreationLock;
 
-        void mouseDown (const MouseEvent& event) override;
-        void mouseMove (const MouseEvent& event) override;
-        void mouseDrag (const MouseEvent& event) override;
-        void mouseUp   (const MouseEvent&) override;
+        void mouseDown (const juce::MouseEvent& event) override;
+        void mouseMove (const juce::MouseEvent& event) override;
+        void mouseDrag (const juce::MouseEvent& event) override;
+        void mouseUp   (const juce::MouseEvent&) override;
 
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (XYPad)

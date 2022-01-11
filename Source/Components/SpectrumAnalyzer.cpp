@@ -14,7 +14,7 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {
     fftPoints.resize (processor.fftSize);
 
     {
-        ScopedLock lockedForWriting (pathCreationLock);
+        juce::ScopedLock lockedForWriting (pathCreationLock);
         inP.preallocateSpace  (processor.fftSize * 2);
         outP.preallocateSpace (processor.fftSize * 2);
     }
@@ -31,10 +31,10 @@ float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& p
         if (buffer[i] > level) level = buffer[i];
     }
 
-    return Decibels::gainToDecibels (level, mindB);
+    return juce::Decibels::gainToDecibels (level, mindB);
 }
 
-void SpectrumAnalyzer::paint (Graphics& g)
+void SpectrumAnalyzer::paint (juce::Graphics& g)
 {
     const auto bounds = getLocalBounds().toFloat();
     const auto width  = bounds.getWidth();
@@ -43,13 +43,13 @@ void SpectrumAnalyzer::paint (Graphics& g)
     const auto* fftDataInput  = avgInput.getReadPointer (0);
     const auto* fftDataOutput = avgOutput.getReadPointer (0);
 
-    ScopedLock lockedForReading (pathCreationLock);
+    juce::ScopedLock lockedForReading (pathCreationLock);
     inP.clear();
     outP.clear();
 
     {
         fftPoint& point = fftPoints[0];
-        float y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        float y = juce::jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
         inP.startNewSubPath  (float (point.x), y);
         outP.startNewSubPath (float (point.x), y);
@@ -58,7 +58,7 @@ void SpectrumAnalyzer::paint (Graphics& g)
     for (int i = 0; i < fftPointsSize; ++i)
     {
         fftPoint& point = fftPoints[i];
-        float y = jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        float y = juce::jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
         inP.lineTo  (float (point.x), y);
         outP.lineTo (float (point.x), y);
@@ -67,7 +67,7 @@ void SpectrumAnalyzer::paint (Graphics& g)
     for (int i = fftPointsSize - 1; i >= 0; --i)
     {
         fftPoint& point = fftPoints[i];
-        float y = jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        float y = juce::jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
         outP.lineTo (float (point.x), y);
     }
@@ -78,10 +78,10 @@ void SpectrumAnalyzer::paint (Graphics& g)
     inP.lineTo (0.0f, height);
     inP.closeSubPath();
 
-    g.setColour (Colour {0x6b9acd32});
+    g.setColour (juce::Colour {0x6b9acd32});
     g.fillPath (outP);
 
-    g.setColour (baseColor.brighter (0.18f).withAlpha (uint8 (182)));
+    g.setColour (baseColor.brighter (0.18f).withAlpha (juce::uint8 (182)));
     g.fillPath (inP);
 }
 
@@ -109,7 +109,7 @@ void SpectrumAnalyzer::resized()
             ++i;
 
             auto pos = std::log ( ((sampleRate * i) / fftSize) / 20.f) / std::log (2.0f);
-            x = roundToInt ( (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0);
+            x = juce::roundToInt ( (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0);
         }
         
         point.lastBinIndex = i - 1;
@@ -136,7 +136,7 @@ void SpectrumAnalyzer::drawNextFrame()
         hannWindow.multiplyWithWindowingTable (fftBufferInput.getWritePointer (0), size_t (fftInput.getSize()));
         fftInput.performFrequencyOnlyForwardTransform (fftBufferInput.getWritePointer (0));
 
-        ScopedLock lockedForWriting (pathCreationLock);
+        juce::ScopedLock lockedForWriting (pathCreationLock);
         avgInput.addFrom  (0,           0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples(), -1.0f);
         avgInput.copyFrom (avgInputPtr, 0, fftBufferInput.getReadPointer (0),     avgInput.getNumSamples(), 1.0f / (avgInput.getNumSamples() * (avgInput.getNumChannels() - 1)));
         avgInput.addFrom  (0,           0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples());
@@ -159,7 +159,7 @@ void SpectrumAnalyzer::drawNextFrame()
         hannWindow.multiplyWithWindowingTable (fftBufferOutput.getWritePointer (0), size_t (fftOutput.getSize()));
         fftOutput.performFrequencyOnlyForwardTransform (fftBufferOutput.getWritePointer (0));
 
-        ScopedLock lockedForWriting (pathCreationLock);
+        juce::ScopedLock lockedForWriting (pathCreationLock);
         avgOutput.addFrom  (0,            0, avgOutput.getReadPointer (avgOutputPtr), avgOutput.getNumSamples(), -1.0f);
         avgOutput.copyFrom (avgOutputPtr, 0, fftBufferOutput.getReadPointer (0),      avgOutput.getNumSamples(), 1.0f / (avgOutput.getNumSamples() * (avgOutput.getNumChannels() - 1)));
         avgOutput.addFrom  (0,            0, avgOutput.getReadPointer (avgOutputPtr), avgOutput.getNumSamples());

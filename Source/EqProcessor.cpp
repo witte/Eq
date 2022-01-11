@@ -3,9 +3,9 @@
 
 namespace IDs
 {
-    const String editor {"editor"};
-    const String sizeX  {"size-x"};
-    const String sizeY  {"size-y"};
+    const juce::String editor {"editor"};
+    const juce::String sizeX  {"size-x"};
+    const juce::String sizeY  {"size-y"};
 }
 
 EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", std::move (prmLayout)),
@@ -15,11 +15,11 @@ EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", st
     {
         Band& band = bands[i - 1];
 
-        String on   {i}; on   << "On";
-        String type {i}; type << "Type";
-        String freq {i}; freq << "Freq";
-        String gain {i}; gain << "Gain";
-        String q    {i}; q    << "Q";
+        juce::String on   {i}; on   << "On";
+        juce::String type {i}; type << "Type";
+        juce::String freq {i}; freq << "Freq";
+        juce::String gain {i}; gain << "Gain";
+        juce::String q    {i}; q    << "Q";
 
         band.prmOn   = parameters.getRawParameterValue (on);
         band.prmType = parameters.getRawParameterValue (type);
@@ -44,10 +44,10 @@ void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
 {
     sampleRate = _sampleRate;
     
-    dsp::ProcessSpec spec;
+    juce::dsp::ProcessSpec spec;
     spec.sampleRate = _sampleRate;
-    spec.maximumBlockSize = uint32 (samplesPerBlock);
-    spec.numChannels = uint32 (getTotalNumOutputChannels ());
+    spec.maximumBlockSize = juce::uint32 (samplesPerBlock);
+    spec.numChannels = juce::uint32 (getTotalNumOutputChannels ());
 
     for (auto& band : bands)
     {
@@ -56,10 +56,10 @@ void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
     }
 }
 
-void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiMessages*/)
+void EqAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& /*midiMessages*/)
 {
-    dsp::AudioBlock<float> ioBuffer (buffer);
-    dsp::ProcessContextReplacing<float> context  (ioBuffer);
+    juce::dsp::AudioBlock<float> ioBuffer (buffer);
+    juce::dsp::ProcessContextReplacing<float> context (ioBuffer);
 
     if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
 
@@ -68,13 +68,13 @@ void EqAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*m
         if (band.active) band.processor.process (context);
     }
 
-    buffer.applyGain (Decibels::decibelsToGain (prmOutputGain->load()));
+    buffer.applyGain (juce::Decibels::decibelsToGain (prmOutputGain->load()));
 
     if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
 }
 
-void EqAudioProcessor::pushNextSampleToFifo (const AudioBuffer<float>& buffer, int startChannel, int numChannels,
-                                             AbstractFifo& absFifo, AudioBuffer<float>& fifo)
+void EqAudioProcessor::pushNextSampleToFifo (const juce::AudioBuffer<float>& buffer, int startChannel, int numChannels,
+                                             juce::AbstractFifo& absFifo, juce::AudioBuffer<float>& fifo)
 {
     if (absFifo.getFreeSpace() < buffer.getNumSamples()) return;
 
@@ -95,19 +95,19 @@ void EqAudioProcessor::pushNextSampleToFifo (const AudioBuffer<float>& buffer, i
     nextFFTBlockReady.store (true);
 }
 
-void EqAudioProcessor::getStateInformation (MemoryBlock& destData)
+void EqAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto editor = parameters.state.getOrCreateChildWithName (IDs::editor, nullptr);
     editor.setProperty (IDs::sizeX, editorSize.x, nullptr);
     editor.setProperty (IDs::sizeY, editorSize.y, nullptr);
 
-    MemoryOutputStream stream (destData, false);
+    juce::MemoryOutputStream stream (destData, false);
     parameters.state.writeToStream (stream);
 }
 
 void EqAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    ValueTree tree = ValueTree::readFromData (data, size_t (sizeInBytes));
+    juce::ValueTree tree = juce::ValueTree::readFromData (data, size_t (sizeInBytes));
     if (tree.isValid())
     {
         parameters.state = tree;
@@ -124,9 +124,9 @@ void EqAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     }
 }
 
-AudioProcessorEditor* EqAudioProcessor::createEditor() { return new witte::EqAudioProcessorEditor (*this, parameters); }
+juce::AudioProcessorEditor* EqAudioProcessor::createEditor() { return new witte::EqAudioProcessorEditor (*this, parameters); }
 
-void EqAudioProcessor::parameterChanged (const String&, float newValue)
+void EqAudioProcessor::parameterChanged (const juce::String&, float newValue)
 {
     *prmOutputGain = newValue;
     frequenciesCurveChanged.store (true);
@@ -152,11 +152,11 @@ void EqAudioProcessor::setCopyToFifo (bool _copyToFifo)
     copyToFifo.store (_copyToFifo);
 }
 
-AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new EqAudioProcessor(); }
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new EqAudioProcessor(); }
 
-void EqAudioProcessor::Band::parameterChanged (const String& parameter, float newValue)
+void EqAudioProcessor::Band::parameterChanged (const juce::String& parameter, float newValue)
 {
-    String str = parameter.substring (1, parameter.length());
+    juce::String str = parameter.substring (1, parameter.length());
 
          if (str == "On"  ) *prmOn   = newValue;
     else if (str == "Type") *prmType = newValue;
@@ -174,19 +174,19 @@ void EqAudioProcessor::Band::updateFilter()
 {
     switch (int (*prmType))
     {
-        case 0: *processor.state = *dsp::IIR::Coefficients<float>::makeHighPass (eqProcessor.sampleRate,
+        case 0: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass (eqProcessor.sampleRate,
                                    *prmFreq, *prmQ);
             break;
-        case 1: *processor.state = *dsp::IIR::Coefficients<float>::makeLowShelf (eqProcessor.sampleRate,
-                                   *prmFreq, *prmQ, Decibels::decibelsToGain (prmGain->load()));
+        case 1: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf (eqProcessor.sampleRate,
+                                   *prmFreq, *prmQ, juce::Decibels::decibelsToGain (prmGain->load()));
             break;
-        case 2: *processor.state = *dsp::IIR::Coefficients<float>::makePeakFilter (eqProcessor.sampleRate,
-                                   *prmFreq, *prmQ, Decibels::decibelsToGain (prmGain->load()));
+        case 2: *processor.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter (eqProcessor.sampleRate,
+                                   *prmFreq, *prmQ, juce::Decibels::decibelsToGain (prmGain->load()));
             break;
-        case 3: *processor.state = *dsp::IIR::Coefficients<float>::makeHighShelf (eqProcessor.sampleRate,
-                                   *prmFreq, *prmQ, Decibels::decibelsToGain (prmGain->load()));
+        case 3: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf (eqProcessor.sampleRate,
+                                   *prmFreq, *prmQ, juce::Decibels::decibelsToGain (prmGain->load()));
             break;
-        case 4: *processor.state = *dsp::IIR::Coefficients<float>::makeLowPass (eqProcessor.sampleRate,
+        case 4: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass (eqProcessor.sampleRate,
                                    *prmFreq, *prmQ);
             break;
     }

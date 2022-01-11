@@ -6,19 +6,19 @@ namespace witte
 {
 
 Frame::Frame (int maxWidth, int maxHeight)
-  : spectrumBackground {Image::PixelFormat::ARGB, maxWidth, maxHeight, true},
-    spectrumForeground {Image::PixelFormat::ARGB, maxWidth, maxHeight, true},
-    openSansBold {Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedBold_ttf, BinaryData::OpenSansCondensedBold_ttfSize)}
+  : spectrumBackground {juce::Image::PixelFormat::ARGB, maxWidth, maxHeight, true},
+    spectrumForeground {juce::Image::PixelFormat::ARGB, maxWidth, maxHeight, true},
+    openSansBold {juce::Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedBold_ttf, BinaryData::OpenSansCondensedBold_ttfSize)}
 {
     setOpaque (true);
 }
 
-void Frame::paint (Graphics& g)
+void Frame::paint (juce::Graphics& g)
 {
     g.drawImageAt (spectrumBackground, 0, 0);
 }
 
-void Frame::paintOverChildren (Graphics& g)
+void Frame::paintOverChildren (juce::Graphics& g)
 {
     g.drawImageAt (spectrumForeground, 0, 0);
 }
@@ -35,7 +35,7 @@ void Frame::drawSpectrumBackground()
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
 
-    Graphics g {spectrumBackground};
+    juce::Graphics g {spectrumBackground};
     g.setColour (baseColor);
     g.fillRect (bounds);
 
@@ -50,14 +50,14 @@ void Frame::drawSpectrumBackground()
 
     for (auto& freq : freqsB)
     {
-        int pos = roundToInt (units::freqToProportion (freq) * width);
+        int pos = juce::roundToInt (units::freqToProportion (freq) * width);
         g.drawVerticalLine (pos, 0, height);
     }
 
     g.setColour (baseColor.brighter (0.082f));
     for (auto& freq : freqsA)
     {
-        int pos = roundToInt (units::freqToProportion (freq) * width);
+        int pos = juce::roundToInt (units::freqToProportion (freq) * width);
         g.drawVerticalLine (pos, 0, height);
     }
 }
@@ -70,20 +70,20 @@ void Frame::drawSpectrumForeground()
 
     spectrumForeground.clear (spectrumForeground.getBounds());
 
-    Graphics g {spectrumForeground};
+    juce::Graphics g {spectrumForeground};
     g.setColour (baseColor.brighter (0.4f));
     g.setFont (openSansBold);
 
     for (auto& bandGain : bandGains)
     {
-        int pos = roundToInt (units::gainToProportion (bandGain) * height);
-        g.drawText (String {bandGain}, width - 44, pos - 14, 42, 28, Justification::centredRight);
+        int pos = juce::roundToInt (units::gainToProportion (bandGain) * height);
+        g.drawText (juce::String {bandGain}, width - 44, pos - 14, 42, 28, juce::Justification::centredRight);
     }
 
     for (auto& gain : gains)
     {
-        int pos = roundToInt (units::spectrumGainToProportion (gain) * height);
-        g.drawText (String { std::abs (gain)}, 2, pos - 14, 42, 28, Justification::centredLeft);
+        int pos = juce::roundToInt (units::spectrumGainToProportion (gain) * height);
+        g.drawText (juce::String { std::abs (gain)}, 2, pos - 14, 42, 28, juce::Justification::centredLeft);
     }
 
     g.setFont (openSansBold);
@@ -91,8 +91,8 @@ void Frame::drawSpectrumForeground()
     g.setColour (baseColor.brighter (2.8f));
     for (auto& freq : freqsA)
     {
-        int pos = roundToInt (units::freqToProportion (freq) * width);
-        String str;
+        int pos = juce::roundToInt (units::freqToProportion (freq) * width);
+        juce::String str;
         if (freq >= 1000)
         {
             str << (freq / 1000);
@@ -103,7 +103,7 @@ void Frame::drawSpectrumForeground()
             str << freq;
         }
 
-        g.drawText (str, pos - 21, (height * 0.5f) - 14, 42, 28, Justification::centred);
+        g.drawText (str, pos - 21, (height * 0.5f) - 14, 42, 28, juce::Justification::centred);
     }
 }
 

@@ -4,11 +4,11 @@
 namespace witte
 {
 
-Label::Label (Value& _value, Range<double> _range) : value {_value}, range {_range}
+Label::Label (juce::Value& _value, juce::Range<double> _range) : value {_value}, range {_range}
 {
     juce::Label();
 
-    setJustificationType (Justification::centred);
+    setJustificationType (juce::Justification::centred);
 }
 
 juce::TextEditor* Label::createEditorComponent()
@@ -18,11 +18,11 @@ juce::TextEditor* Label::createEditorComponent()
     return labelEditor;
 }
 
-bool Label::keyPressed (const KeyPress& key)
+bool Label::keyPressed (const juce::KeyPress& key)
 {
     int code = key.getKeyCode();
 
-    if (code == KeyPress::returnKey)
+    if (code == juce::KeyPress::returnKey)
     {
         showEditor();
 
@@ -30,8 +30,8 @@ bool Label::keyPressed (const KeyPress& key)
     }
     else
     {
-        String allowedCharacters {range.getStart() < 0.0? "-.0123456789" : ".0123456789"};
-        String keyChar;
+        juce::String allowedCharacters {range.getStart() < 0.0? "-.0123456789" : ".0123456789"};
+        juce::String keyChar;
         keyChar << key.getTextCharacter();
 
         if (allowedCharacters.contains (keyChar))
@@ -52,7 +52,7 @@ void Label::editorShown (juce::TextEditor* labelEditor)
 
     ed.clearCharacters();
 
-    String str = ed.getText();
+    juce::String str = ed.getText();
     ed.setHighlightedRegion ({str.contains ("-")? 1 : 0, str.length()});
 }
 

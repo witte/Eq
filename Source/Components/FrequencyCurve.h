@@ -5,18 +5,17 @@
 
 #include "../EqProcessor.h"
 
-using namespace juce;
 
 namespace witte
 {
 
-class FrequencyCurve : public Component
+class FrequencyCurve : public juce::Component
 {
     public:
-        FrequencyCurve (EqAudioProcessor&, std::initializer_list<RangedAudioParameter*> parameters);
+        FrequencyCurve (EqAudioProcessor&, std::initializer_list<juce::RangedAudioParameter*> parameters);
         ~FrequencyCurve() override;
 
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
 
 
@@ -24,15 +23,15 @@ class FrequencyCurve : public Component
         EqAudioProcessor& processor;
 
         std::function<void(float)> prmChangedCallback = [&] (float) { drawFrequencyCurve(); repaint(); };
-        std::vector<std::unique_ptr<ParameterAttachment>> attachments;
+        std::vector<std::unique_ptr<juce::ParameterAttachment>> attachments;
 
-        Colour baseColor {0xff011523};
+        juce::Colour baseColor {0xff011523};
 
-        Path frequencyCurvePath;
-        CriticalSection freqPathCreationLock;
+        juce::Path frequencyCurvePath;
+        juce::CriticalSection freqPathCreationLock;
 
         std::vector<double> frequencies;
-        std::vector<Point<float>> frequenciesPoints;
+        std::vector<juce::Point<float>> frequenciesPoints;
         std::array<std::vector<double>, 5> magnitudes;
         std::vector<double> magnitudesOut;
         void drawFrequencyCurve();

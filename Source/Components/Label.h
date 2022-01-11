@@ -3,7 +3,6 @@
 
 #include "TextEditor.h"
 
-using namespace juce;
 
 namespace witte
 {
@@ -11,16 +10,16 @@ namespace witte
 class Label : public juce::Label
 {
     public:
-        Label (Value& _value, Range<double> _range);
+        Label (juce::Value& _value, juce::Range<double> _range);
 
-        bool keyPressed (const KeyPress& key) override;
+        bool keyPressed (const juce::KeyPress& key) override;
 
     protected:
         void editorShown (juce::TextEditor* labelEditor) override;
 
     private:
-        Value& value;
-        Range<double> range;
+        juce::Value& value;
+        juce::Range<double> range;
         juce::TextEditor* createEditorComponent() override;
 
 

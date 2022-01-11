@@ -5,41 +5,40 @@
 
 #include "../EqProcessor.h"
 
-using namespace juce;
 
 namespace witte
 {
 
-class SpectrumAnalyzer : public Component, private Timer
+class SpectrumAnalyzer : public juce::Component, private juce::Timer
 {
     public:
         SpectrumAnalyzer (EqAudioProcessor&);
 
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
 
 
     private:
         EqAudioProcessor& processor;
 
-        dsp::FFT fftInput  {12};
-        dsp::FFT fftOutput {12};
+        juce::dsp::FFT fftInput  {12};
+        juce::dsp::FFT fftOutput {12};
 
-        dsp::WindowingFunction<float> hannWindow {size_t (fftInput.getSize()), dsp::WindowingFunction<float>::hann};
+        juce::dsp::WindowingFunction<float> hannWindow {size_t (fftInput.getSize()), juce::dsp::WindowingFunction<float>::hann};
 
-        AudioBuffer<float> fftBufferInput  { 1, fftInput.getSize()  * 2 };
-        AudioBuffer<float> fftBufferOutput { 1, fftOutput.getSize() * 2 };
+        juce::AudioBuffer<float> fftBufferInput  { 1, fftInput.getSize()  * 2 };
+        juce::AudioBuffer<float> fftBufferOutput { 1, fftOutput.getSize() * 2 };
 
-        AudioBuffer<float> avgInput  { 5, fftInput.getSize() / 2 };
-        AudioBuffer<float> avgOutput { 5, fftOutput.getSize() / 2 };
+        juce::AudioBuffer<float> avgInput  { 5, fftInput.getSize() / 2 };
+        juce::AudioBuffer<float> avgOutput { 5, fftOutput.getSize() / 2 };
         int avgInputPtr  = 1;
         int avgOutputPtr = 1;
 
-        Colour baseColor {0xff011c27};
+        juce::Colour baseColor {0xff011c27};
 
-        Path inP;
-        Path outP;
-        CriticalSection pathCreationLock;
+        juce::Path inP;
+        juce::Path outP;
+        juce::CriticalSection pathCreationLock;
 
         struct fftPoint
         {

@@ -1,20 +1,19 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 
-using namespace juce;
 
 namespace witte
 {
 
 class TextEditor : public juce::TextEditor,
                    public juce::TextEditor::InputFilter,
-                   private Value::Listener
+                   private juce::Value::Listener
 {
     public:
-        TextEditor (Value& _value, Range<double>& _range);
+        TextEditor (juce::Value& _value, juce::Range<double>& _range);
         ~TextEditor() override;
 
-        String filterNewText (juce::TextEditor& ed, const String& newInput) override;
+        juce::String filterNewText (juce::TextEditor& ed, const juce::String& newInput) override;
 
         void resized() override;
 
@@ -22,11 +21,11 @@ class TextEditor : public juce::TextEditor,
 
 
     private:
-        Value& value;
-        Range<double>& range;
-        String filterString {"-.0123456789"};
+        juce::Value& value;
+        juce::Range<double>& range;
+        juce::String filterString {"-.0123456789"};
 
-        void valueChanged (Value&) override;
+        void valueChanged (juce::Value&) override;
 
         int lastSelectionStart {-1};
         int lastSelectionEnd   {-1};

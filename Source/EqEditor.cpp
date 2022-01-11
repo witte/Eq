@@ -5,11 +5,11 @@
 namespace witte
 {
 
-EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProcessorValueTreeState& vts)
+EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor {&p},
       processor {p},
       tree {vts},
-      background {ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)},
+      background {juce::ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)},
       frame {defaultWidth * 2, defaultHeight * 2},
       analyzer {processor},
       frequencyCurve {p,
@@ -40,8 +40,8 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, AudioProces
     setPaintingIsUnclipped (true);
     setWantsKeyboardFocus (true);
 
-    outputGain.setSliderStyle (Slider::SliderStyle::LinearVertical);
-    outputGain.setTextBoxStyle (Slider::TextBoxLeft, false, 62, 22);
+    outputGain.setSliderStyle (juce::Slider::SliderStyle::LinearVertical);
+    outputGain.setTextBoxStyle (juce::Slider::TextBoxLeft, false, 62, 22);
 
     addAndMakeVisible (frame);
         frame.addAndMakeVisible (analyzer);
@@ -70,11 +70,11 @@ EqAudioProcessorEditor::~EqAudioProcessorEditor()
     processor.setCopyToFifo (false);
 }
 
-void EqAudioProcessorEditor::paint (Graphics& g)
+void EqAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.fillAll(Colour {0xff000000});
+    g.fillAll(juce::Colour {0xff000000});
 
-    g.setColour(getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.setColour(getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     g.fillRect (0, frame.getBottom(), getWidth(), getHeight() - frame.getBottom());
     g.setTiledImageFill (background, 0, 0, 0.6f);
     g.fillRect (0, frame.getBottom(), getWidth(), getHeight() - frame.getBottom());
@@ -86,18 +86,18 @@ void EqAudioProcessorEditor::resized()
     processor.setSavedEditorSize ({ bounds.getWidth(), bounds.getHeight() });
 
     float bandsWidth = std::clamp (bounds.getHeight() * 1.16f, 384.0f, std::min (632.0f, float (bounds.getWidth())));
-    int bandsHeight = roundToInt (bandsWidth * 0.24f);
+    int bandsHeight = juce::roundToInt (bandsWidth * 0.24f);
 
-    FlexBox bands;
-    bands.items.add (FlexItem (band1).withFlex (1.0f).withMargin (1));
-    bands.items.add (FlexItem (band2).withFlex (1.0f).withMargin (1));
-    bands.items.add (FlexItem (band3).withFlex (1.0f).withMargin (1));
-    bands.items.add (FlexItem (band4).withFlex (1.0f).withMargin (1));
-    bands.items.add (FlexItem (band5).withFlex (1.0f).withMargin (1));
-    bands.items.add (FlexItem (outputGain).withWidth (bandsWidth * 0.1f).withMargin (4));
+    juce::FlexBox bands;
+    bands.items.add (juce::FlexItem (band1).withFlex (1.0f).withMargin (1));
+    bands.items.add (juce::FlexItem (band2).withFlex (1.0f).withMargin (1));
+    bands.items.add (juce::FlexItem (band3).withFlex (1.0f).withMargin (1));
+    bands.items.add (juce::FlexItem (band4).withFlex (1.0f).withMargin (1));
+    bands.items.add (juce::FlexItem (band5).withFlex (1.0f).withMargin (1));
+    bands.items.add (juce::FlexItem (outputGain).withWidth (bandsWidth * 0.1f).withMargin (4));
 
     bands.performLayout (bounds.removeFromBottom (bandsHeight)
-                               .reduced (roundToInt ((bounds.getWidth() - bandsWidth) * 0.5f), 1));
+                               .reduced (juce::roundToInt ((bounds.getWidth() - bandsWidth) * 0.5f), 1));
 
     frame.setBounds (bounds);
         analyzer.setBounds (bounds);

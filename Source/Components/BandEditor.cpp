@@ -3,14 +3,14 @@
 namespace witte
 {
 
-static String getPrmName (int bandNumber, const String& paramName)
+static juce::String getPrmName (int bandNumber, const juce::String& paramName)
 {
-    String str (bandNumber);
+    juce::String str (bandNumber);
     str << paramName;
     return  str;
 }
 
-BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : tree {_tree},
+BandEditor::BandEditor (juce::AudioProcessorValueTreeState& _tree, int bandNumber) : tree {_tree},
     attOn   {tree, getPrmName (bandNumber, "On"  ), on},
     attType {tree, getPrmName (bandNumber, "Type"), type},
     attFreq {tree, getPrmName (bandNumber, "Freq"), freq},
@@ -19,13 +19,13 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
 {
     setPaintingIsUnclipped (true);
 
-    freq.setSliderStyle  (Slider::RotaryVerticalDrag);
-    gain.setSliderStyle  (Slider::RotaryVerticalDrag);
-    q   .setSliderStyle  (Slider::RotaryVerticalDrag);
+    freq.setSliderStyle  (juce::Slider::RotaryVerticalDrag);
+    gain.setSliderStyle  (juce::Slider::RotaryVerticalDrag);
+    q   .setSliderStyle  (juce::Slider::RotaryVerticalDrag);
 
-    freq.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 28);
-    gain.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 28);
-    q   .setTextBoxStyle (Slider::TextBoxLeft, false, 60, 28);
+    freq.setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 28);
+    gain.setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 28);
+    q   .setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 28);
 
     freq.setMouseDragSensitivity (520);
     gain.setMouseDragSensitivity (520);
@@ -46,7 +46,7 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
 
     auto* lastType = tree.getRawParameterValue (getPrmName (bandNumber, "Type"));
     type.setSelectedId (int (*lastType + 1.0f));
-    type.setJustificationType (Justification::centred);
+    type.setJustificationType (juce::Justification::centred);
     type.onChange = [&] ()
     {
         gain.setEnabled (on.getToggleState() && type.getSelectedId() != 1 && type.getSelectedId() != 5);
@@ -68,24 +68,24 @@ BandEditor::BandEditor (AudioProcessorValueTreeState& _tree, int bandNumber) : t
 
 void BandEditor::resized()
 {
-    FlexBox row;
-    row.items.add (FlexItem (type).withFlex (1.8f));
-    row.items.add (FlexItem (on)  .withFlex (1.0f));
+    juce::FlexBox row;
+    row.items.add (juce::FlexItem (type).withFlex (1.8f));
+    row.items.add (juce::FlexItem (on)  .withFlex (1.0f));
 
-    FlexBox band;
-    band.flexDirection = FlexBox::Direction::column;
+    juce::FlexBox band;
+    band.flexDirection = juce::FlexBox::Direction::column;
 
-    band.items.add (FlexItem (row) .withFlex (0.58f));
-    band.items.add (FlexItem (freq).withFlex (1.0f));
-    band.items.add (FlexItem (gain).withFlex (1.0f));
-    band.items.add (FlexItem (q)   .withFlex (1.0f));
+    band.items.add (juce::FlexItem (row) .withFlex (0.58f));
+    band.items.add (juce::FlexItem (freq).withFlex (1.0f));
+    band.items.add (juce::FlexItem (gain).withFlex (1.0f));
+    band.items.add (juce::FlexItem (q)   .withFlex (1.0f));
 
     band.performLayout (getLocalBounds().reduced (3));
 }
 
-void BandEditor::paint (Graphics& g)
+void BandEditor::paint (juce::Graphics& g)
 {
-    g.setColour (Colour {0x2a000000});
+    g.setColour (juce::Colour {0x2a000000});
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 6);
 }
 

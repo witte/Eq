@@ -2,35 +2,34 @@
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
-using namespace juce;
 
 namespace witte
 {
 
-class BandEditor : public Component
+class BandEditor : public juce::Component
 {
     public:
-        BandEditor (AudioProcessorValueTreeState&, int);
+        BandEditor (juce::AudioProcessorValueTreeState&, int);
 
         void resized() override;
 
-        void paint (Graphics& g) override;
+        void paint (juce::Graphics& g) override;
 
 
     private:
-        AudioProcessorValueTreeState& tree;
+        juce::AudioProcessorValueTreeState& tree;
 
-        ToggleButton on {"0"};
-        ComboBox type;
-        Slider freq;
-        Slider gain;
-        Slider q   ;
+        juce::ToggleButton on {"0"};
+        juce::ComboBox type;
+        juce::Slider freq;
+        juce::Slider gain;
+        juce::Slider q   ;
 
-        AudioProcessorValueTreeState::ButtonAttachment   attOn;
-        AudioProcessorValueTreeState::ComboBoxAttachment attType;
-        AudioProcessorValueTreeState::SliderAttachment   attFreq;
-        AudioProcessorValueTreeState::SliderAttachment   attGain;
-        AudioProcessorValueTreeState::SliderAttachment   attQ;
+        juce::AudioProcessorValueTreeState::ButtonAttachment   attOn;
+        juce::AudioProcessorValueTreeState::ComboBoxAttachment attType;
+        juce::AudioProcessorValueTreeState::SliderAttachment   attFreq;
+        juce::AudioProcessorValueTreeState::SliderAttachment   attGain;
+        juce::AudioProcessorValueTreeState::SliderAttachment   attQ;
 
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandEditor)

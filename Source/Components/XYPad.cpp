@@ -3,7 +3,7 @@
 namespace witte
 {
 
-XYPad::XYPad (std::initializer_list<std::pair<RangedAudioParameter*, RangedAudioParameter*>> parameters)
+XYPad::XYPad (std::initializer_list<std::pair<juce::RangedAudioParameter*, juce::RangedAudioParameter*>> parameters)
 {
     setPaintingIsUnclipped (true);
 
@@ -17,7 +17,7 @@ XYPad::~XYPad()
 {
 }
 
-void XYPad::paint (Graphics& g)
+void XYPad::paint (juce::Graphics& g)
 {
     bandsPositionsPath.clear();
 
@@ -28,12 +28,12 @@ void XYPad::paint (Graphics& g)
         bandsPositionsPath.addEllipse (x - handleRadius, y - handleRadius, handleRadius * 2.0f, handleRadius * 2.0f);
     }
 
-    g.setColour (Colour {0xff4ea5ac});
+    g.setColour (juce::Colour {0xff4ea5ac});
     g.fillPath (bandsPositionsPath);
 
     if (draggingPad != nullptr)
     {
-        g.setColour (Colour {0x80663399});
+        g.setColour (juce::Colour {0x80663399});
 
         auto[x, y] = draggingPad->getPos();
         g.fillEllipse (x - hoveredHandleRadius,    y - hoveredHandleRadius,
@@ -50,7 +50,7 @@ void XYPad::resized()
     }
 }
 
-void XYPad::mouseDown (const MouseEvent&)
+void XYPad::mouseDown (const juce::MouseEvent&)
 {
     if (draggingPad == nullptr) return;
 
@@ -58,7 +58,7 @@ void XYPad::mouseDown (const MouseEvent&)
     draggingPad->getY()->beginChangeGesture();
 }
 
-void XYPad::mouseMove (const MouseEvent& event)
+void XYPad::mouseMove (const juce::MouseEvent& event)
 {
     for (auto& prmAttachment : prmHandles)
     {
@@ -81,7 +81,7 @@ void XYPad::mouseMove (const MouseEvent& event)
     }
 }
 
-void XYPad::mouseDrag (const MouseEvent& event)
+void XYPad::mouseDrag (const juce::MouseEvent& event)
 {
     if (draggingPad == nullptr) return;
 
@@ -95,7 +95,7 @@ void XYPad::mouseDrag (const MouseEvent& event)
     repaint();
 }
 
-void XYPad::mouseUp (const MouseEvent&)
+void XYPad::mouseUp (const juce::MouseEvent&)
 {
     if (draggingPad == nullptr) return;
 

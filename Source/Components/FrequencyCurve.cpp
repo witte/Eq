@@ -5,14 +5,14 @@
 namespace witte
 {
 
-FrequencyCurve::FrequencyCurve (EqAudioProcessor& eqProcessor, std::initializer_list<RangedAudioParameter*> parameters) :
+FrequencyCurve::FrequencyCurve (EqAudioProcessor &eqProcessor, std::initializer_list<juce::RangedAudioParameter *> parameters) :
     processor {eqProcessor}
 {
     setPaintingIsUnclipped (true);
 
     for (auto& parameter : parameters)
     {
-        attachments.push_back (std::make_unique<ParameterAttachment>(*parameter, prmChangedCallback));
+        attachments.push_back (std::make_unique<juce::ParameterAttachment>(*parameter, prmChangedCallback));
     }
 
     frequencies.resize (600);
@@ -30,7 +30,7 @@ FrequencyCurve::FrequencyCurve (EqAudioProcessor& eqProcessor, std::initializer_
 
     magnitudesOut.resize (frequencies.size(), 1.0);
 
-    ScopedLock lockedForWriting (freqPathCreationLock);
+    juce::ScopedLock lockedForWriting (freqPathCreationLock);
     frequencyCurvePath.clear();
     frequencyCurvePath.preallocateSpace (8 + int (frequencies.size()) * 3);
 }
@@ -39,11 +39,11 @@ FrequencyCurve::~FrequencyCurve()
 {
 }
 
-void FrequencyCurve::paint (Graphics& g)
+void FrequencyCurve::paint (juce::Graphics &g)
 {
-    ScopedLock lockedForReading (freqPathCreationLock);
+    juce::ScopedLock lockedForReading (freqPathCreationLock);
 
-    g.setColour (Colour {0xff4ea5ac});
+    g.setColour (juce::Colour {0xff4ea5ac});
     g.fillPath (frequencyCurvePath);
 }
 
@@ -60,7 +60,7 @@ void FrequencyCurve::drawFrequencyCurve()
 
     std::fill (magnitudesOut.begin(), magnitudesOut.end(), 1.0);
 
-    ScopedLock lockedForWriting (freqPathCreationLock);
+    juce::ScopedLock lockedForWriting (freqPathCreationLock);
 
     for (int i = 0; i < 5; ++i)
     {
@@ -73,17 +73,17 @@ void FrequencyCurve::drawFrequencyCurve()
                                                              magnitudesBand.data(),
                                                              frequencies.size(), processor.getSampleRate());
 
-        FloatVectorOperations::multiply (magnitudesOut.data(), magnitudesBand.data(), int (magnitudesOut.size()));
+        juce::FloatVectorOperations::multiply (magnitudesOut.data(), magnitudesBand.data(), int (magnitudesOut.size()));
     }
 
     float outputGain = *processor.prmOutputGain;
     frequencyCurvePath.clear();
-    frequencyCurvePath.startNewSubPath (0.0f, units::gainToProportion (Decibels::decibelsToGain (magnitudesOut [0]) + outputGain) * float (height));
+    frequencyCurvePath.startNewSubPath (0.0f, units::gainToProportion (juce::Decibels::decibelsToGain (magnitudesOut [0]) + outputGain) * float (height));
 
     for (size_t i = 1; i < frequencies.size(); ++i)
     {
         float xx = units::freqToProportion (frequencies [i]) * width;
-        float gain = Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
+        float gain = juce::Decibels::gainToDecibels (magnitudesOut [i]) + outputGain;
         float yy = units::gainToProportion (gain) * height;
 
         frequencyCurvePath.lineTo (xx, yy - 0.5f);
