@@ -64,6 +64,9 @@ void XYPad::mouseMove (const MouseEvent& event)
     {
         if (prmAttachment->getPos().getDistanceFrom (event.getPosition().toFloat()) < hoveredHandleRadius)
         {
+            if (draggingPad != nullptr)
+                return;
+
             draggingPad = prmAttachment.get();
             repaint();
 
@@ -71,7 +74,11 @@ void XYPad::mouseMove (const MouseEvent& event)
         }
     }
 
-    draggingPad = nullptr;
+    if (draggingPad != nullptr)
+    {
+        draggingPad = nullptr;
+        repaint();
+    }
 }
 
 void XYPad::mouseDrag (const MouseEvent& event)

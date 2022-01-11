@@ -1,6 +1,7 @@
 #include "EqEditor.h"
 #include <BinaryData.h>
 
+
 namespace witte
 {
 
@@ -71,6 +72,8 @@ EqAudioProcessorEditor::~EqAudioProcessorEditor()
 
 void EqAudioProcessorEditor::paint (Graphics& g)
 {
+    g.fillAll(Colour {0xff000000});
+
     g.setColour(getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     g.fillRect (0, frame.getBottom(), getWidth(), getHeight() - frame.getBottom());
     g.setTiledImageFill (background, 0, 0, 0.6f);

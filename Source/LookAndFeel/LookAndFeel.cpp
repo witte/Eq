@@ -22,7 +22,7 @@ LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4 ()
     setColour (ToggleButton::textColourId,               Colour {0xffd4d4d4});
 
     fontDefault = Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedLight_ttf, BinaryData::OpenSansCondensedLight_ttfSize);
-    LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface (fontDefault.getTypeface());
+    LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface (fontDefault.getTypefacePtr());
 
     fontAudio = Typeface::createSystemTypefaceFor (BinaryData::fontaudio_ttf, BinaryData::fontaudio_ttfSize);
 }

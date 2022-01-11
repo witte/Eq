@@ -35,6 +35,7 @@ target_sources(${PLUGIN_NAME} PRIVATE
     Source/EqProcessor.cpp)
 
 target_compile_definitions(${PLUGIN_NAME} PUBLIC
+#    JUCE_ENABLE_REPAINT_DEBUGGING=1
     JUCE_DISPLAY_SPLASH_SCREEN=0
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
