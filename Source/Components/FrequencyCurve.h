@@ -1,18 +1,16 @@
 #pragma once
-#include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_dsp/juce_dsp.h>
 #include <juce_gui_basics/juce_gui_basics.h>
-
 #include "../EqProcessor.h"
 
 
 namespace witte
 {
 
-class FrequencyCurve : public juce::Component
+class FrequencyCurve : public juce::Component,
+                       public juce::AudioProcessorValueTreeState::Listener
 {
     public:
-        FrequencyCurve (EqAudioProcessor&, std::initializer_list<juce::RangedAudioParameter*> parameters);
+        FrequencyCurve (EqAudioProcessor&);
         ~FrequencyCurve() override;
 
         void paint (juce::Graphics&) override;
@@ -22,13 +20,13 @@ class FrequencyCurve : public juce::Component
     private:
         EqAudioProcessor& processor;
 
-        std::function<void(float)> prmChangedCallback = [&] (float) { drawFrequencyCurve(); repaint(); };
-        std::vector<std::unique_ptr<juce::ParameterAttachment>> attachments;
+        void parameterChanged (const juce::String&, float) override;
+
+        std::mutex mutex;
 
         juce::Colour baseColor {0xff011523};
 
         juce::Path frequencyCurvePath;
-        juce::CriticalSection freqPathCreationLock;
 
         std::vector<double> frequencies;
         std::vector<juce::Point<float>> frequenciesPoints;

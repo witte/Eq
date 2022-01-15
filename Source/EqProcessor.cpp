@@ -1,6 +1,7 @@
 #include "EqProcessor.h"
 #include "EqEditor.h"
 
+
 namespace IDs
 {
     const juce::String editor {"editor"};
@@ -8,7 +9,9 @@ namespace IDs
     const juce::String sizeY  {"size-y"};
 }
 
-EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", std::move (prmLayout)),
+EqAudioProcessor::EqAudioProcessor() :
+    idOutputGain {"OutGain"},
+    parameters (*this, &undoManager, "Eq", std::move (prmLayout)),
     bands { Band {*this, 1}, Band {*this, 2}, Band {*this, 3}, Band {*this, 4}, Band {*this, 5} }
 {
     for (unsigned long i = 1; i <= 5; ++i)
@@ -36,8 +39,8 @@ EqAudioProcessor::EqAudioProcessor() : parameters (*this, &undoManager, "Eq", st
         parameters.addParameterListener (q,    &band);
     }
 
-    prmOutputGain = parameters.getRawParameterValue ("OutGain");
-    parameters.addParameterListener ("OutGain", this);
+    prmOutputGain = parameters.getRawParameterValue (idOutputGain);
+    parameters.addParameterListener (idOutputGain, this);
 }
 
 void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
@@ -129,7 +132,6 @@ juce::AudioProcessorEditor* EqAudioProcessor::createEditor() { return new witte:
 void EqAudioProcessor::parameterChanged (const juce::String&, float newValue)
 {
     *prmOutputGain = newValue;
-    frequenciesCurveChanged.store (true);
 }
 
 void EqAudioProcessor::setCopyToFifo (bool _copyToFifo)
@@ -167,7 +169,6 @@ void EqAudioProcessor::Band::parameterChanged (const juce::String& parameter, fl
     if (str != "On") updateFilter();
 
     active = *prmOn > 0.5f && (*prmGain == 0.0f? (*prmType == 0.0f || *prmType == 4.0f) : true);
-    eqProcessor.frequenciesCurveChanged.store (true);
 }
 
 void EqAudioProcessor::Band::updateFilter()

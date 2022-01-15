@@ -1,6 +1,5 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
-
 #include "TextEditor.h"
 
 
@@ -14,8 +13,10 @@ class Label : public juce::Label
 
         bool keyPressed (const juce::KeyPress& key) override;
 
+
     protected:
         void editorShown (juce::TextEditor* labelEditor) override;
+
 
     private:
         juce::Value& value;

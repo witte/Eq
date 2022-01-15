@@ -12,15 +12,7 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, juce::Audio
       background {juce::ImageCache::getFromMemory (BinaryData::texture_png, BinaryData::texture_pngSize)},
       frame {defaultWidth * 2, defaultHeight * 2},
       analyzer {processor},
-      frequencyCurve {p,
-      {
-          tree.getParameter("1On"), tree.getParameter("1Type"), tree.getParameter("1Freq"), tree.getParameter("1Gain"), tree.getParameter("1Q"),
-          tree.getParameter("2On"), tree.getParameter("2Type"), tree.getParameter("2Freq"), tree.getParameter("2Gain"), tree.getParameter("2Q"),
-          tree.getParameter("3On"), tree.getParameter("3Type"), tree.getParameter("3Freq"), tree.getParameter("3Gain"), tree.getParameter("3Q"),
-          tree.getParameter("4On"), tree.getParameter("4Type"), tree.getParameter("4Freq"), tree.getParameter("4Gain"), tree.getParameter("4Q"),
-          tree.getParameter("5On"), tree.getParameter("5Type"), tree.getParameter("5Freq"), tree.getParameter("5Gain"), tree.getParameter("5Q"),
-          tree.getParameter("OutGain")
-      }},
+      frequencyCurve {p},
       xyPad
       {{
           { tree.getParameter("1Freq"), tree.getParameter("1Gain") },

@@ -1,19 +1,16 @@
 #include "FrequencyCurve.h"
-#include <juce_audio_processors/juce_audio_processors.h>
 #include "../Helpers/UnitConversions.h"
+
 
 namespace witte
 {
 
-FrequencyCurve::FrequencyCurve (EqAudioProcessor &eqProcessor, std::initializer_list<juce::RangedAudioParameter *> parameters) :
+FrequencyCurve::FrequencyCurve (EqAudioProcessor& eqProcessor) :
     processor {eqProcessor}
 {
     setPaintingIsUnclipped (true);
 
-    for (auto& parameter : parameters)
-    {
-        attachments.push_back (std::make_unique<juce::ParameterAttachment>(*parameter, prmChangedCallback));
-    }
+    std::unique_lock<std::mutex> lock(mutex);
 
     frequencies.resize (600);
     for (size_t i = 0; i < frequencies.size(); ++i)
@@ -30,18 +27,38 @@ FrequencyCurve::FrequencyCurve (EqAudioProcessor &eqProcessor, std::initializer_
 
     magnitudesOut.resize (frequencies.size(), 1.0);
 
-    juce::ScopedLock lockedForWriting (freqPathCreationLock);
     frequencyCurvePath.clear();
     frequencyCurvePath.preallocateSpace (8 + int (frequencies.size()) * 3);
+
+    for (auto& band : eqProcessor.getBands())
+    {
+        processor.getVTS().addParameterListener(band.idOn,   this);
+        processor.getVTS().addParameterListener(band.idType, this);
+        processor.getVTS().addParameterListener(band.idFreq, this);
+        processor.getVTS().addParameterListener(band.idGain, this);
+        processor.getVTS().addParameterListener(band.idQ,    this);
+    }
+
+    processor.getVTS().addParameterListener(eqProcessor.idOutputGain, this);
 }
 
 FrequencyCurve::~FrequencyCurve()
 {
+    for (auto& band : processor.getBands())
+    {
+        processor.getVTS().removeParameterListener(band.idOn,   this);
+        processor.getVTS().removeParameterListener(band.idType, this);
+        processor.getVTS().removeParameterListener(band.idFreq, this);
+        processor.getVTS().removeParameterListener(band.idGain, this);
+        processor.getVTS().removeParameterListener(band.idQ,    this);
+    }
+
+    processor.getVTS().removeParameterListener(processor.idOutputGain, this);
 }
 
 void FrequencyCurve::paint (juce::Graphics &g)
 {
-    juce::ScopedLock lockedForReading (freqPathCreationLock);
+    std::unique_lock<std::mutex> lock(mutex);
 
     g.setColour (juce::Colour {0xff4ea5ac});
     g.fillPath (frequencyCurvePath);
@@ -52,15 +69,21 @@ void FrequencyCurve::resized()
     drawFrequencyCurve();
 }
 
+void FrequencyCurve::parameterChanged(const juce::String&, float)
+{
+    drawFrequencyCurve();
+    repaint();
+}
+
 void FrequencyCurve::drawFrequencyCurve()
 {
+    std::unique_lock<std::mutex> lock(mutex);
+
     const auto bounds = getLocalBounds().toFloat();
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
 
     std::fill (magnitudesOut.begin(), magnitudesOut.end(), 1.0);
-
-    juce::ScopedLock lockedForWriting (freqPathCreationLock);
 
     for (int i = 0; i < 5; ++i)
     {

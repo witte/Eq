@@ -1,7 +1,6 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
-
 #include "Helpers/ParameterHelpers.h"
 
 
@@ -10,7 +9,9 @@ class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcesso
     public:
         EqAudioProcessor();
 
-        const juce::String getName()          const override { return JucePlugin_Name; }
+        const juce::Identifier idOutputGain;
+
+        const juce::String getName()    const override { return JucePlugin_Name; }
 
         bool   hasEditor()              const override { return true;  }
         bool   acceptsMidi()            const override { return false; }
@@ -59,13 +60,23 @@ class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcesso
         juce::AbstractFifo abstractFifoOutput {1};
         juce::AudioBuffer<float> audioFifoOutput;
 
-        std::atomic<bool> frequenciesCurveChanged {false};
-
         struct Band : public juce::AudioProcessorValueTreeState::Listener
         {
-            Band (EqAudioProcessor& eqProcessor, int index) : eqProcessor {eqProcessor}, index {index} {}
+            Band (EqAudioProcessor& eqProcessor, int index) :
+                idOn   {std::to_string(index) + "On"},
+                idType {std::to_string(index) + "Type"},
+                idFreq {std::to_string(index) + "Freq"},
+                idGain {std::to_string(index) + "Gain"},
+                idQ    {std::to_string(index) + "Q"},
+                eqProcessor {eqProcessor}, index {index} {}
 
             bool active {true};
+
+            const juce::Identifier idOn;
+            const juce::Identifier idType;
+            const juce::Identifier idFreq;
+            const juce::Identifier idGain;
+            const juce::Identifier idQ;
 
             std::atomic<float>* prmOn   {nullptr};
             std::atomic<float>* prmType {nullptr};
@@ -87,6 +98,8 @@ class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcesso
         };
 
         std::array<Band, 5>& getBands() { return bands; }
+
+        juce::AudioProcessorValueTreeState& getVTS() { return parameters; }
 
 
     private:
