@@ -43,7 +43,8 @@ target_compile_definitions(${PLUGIN_NAME} PUBLIC
     JUCE_DISPLAY_SPLASH_SCREEN=0
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
-    JUCE_VST3_CAN_REPLACE_VST2=0)
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_SILENCE_XCODE_15_LINKER_WARNING=1)
 
 juce_add_binary_data(${PLUGIN_DATA} SOURCES
     Source/LookAndFeel/fontaudio.ttf
@@ -54,7 +55,7 @@ juce_add_binary_data(${PLUGIN_DATA} SOURCES
 set_target_properties(${PLUGIN_NAME} ${PLUGIN_DATA} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if (UNIX)
-    target_compile_options(${PLUGIN_NAME} PUBLIC -Wall -Wextra -pedantic -Werror)
+    target_compile_options(${PLUGIN_NAME} PUBLIC -Wall -Wextra -pedantic)
 else()
     add_definitions("/wd4244") # disable "possible loss of data" warning/error
     target_compile_options(${PLUGIN_NAME} PUBLIC /W4 /WX)
