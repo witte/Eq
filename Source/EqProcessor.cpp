@@ -10,7 +10,6 @@ namespace IDs
 }
 
 EqAudioProcessor::EqAudioProcessor() :
-    idOutputGain {"OutGain"},
     parameters (*this, &undoManager, "Eq", std::move (prmLayout)),
     bands { Band {*this, 1}, Band {*this, 2}, Band {*this, 3}, Band {*this, 4}, Band {*this, 5} }
 {
@@ -61,8 +60,8 @@ void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
 
 void EqAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& /*midiMessages*/)
 {
-    juce::dsp::AudioBlock<float> ioBuffer (buffer);
-    juce::dsp::ProcessContextReplacing<float> context (ioBuffer);
+    juce::dsp::AudioBlock<float> ioBuffer{buffer};
+    juce::dsp::ProcessContextReplacing context{ioBuffer};
 
     if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
 
@@ -81,7 +80,10 @@ void EqAudioProcessor::pushNextSampleToFifo (const juce::AudioBuffer<float>& buf
 {
     if (absFifo.getFreeSpace() < buffer.getNumSamples()) return;
 
-    int start1, block1, start2, block2;
+    int start1;
+    int block1;
+    int start2;
+    int block2;
     absFifo.prepareToWrite (buffer.getNumSamples(), start1, block1, start2, block2);
     fifo.copyFrom (0, start1, buffer.getReadPointer (startChannel), block1);
 

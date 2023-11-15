@@ -9,7 +9,7 @@ class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcesso
     public:
         EqAudioProcessor();
 
-        const juce::Identifier idOutputGain;
+        const juce::Identifier idOutputGain {"OutGain"};
 
         const juce::String getName()    const override { return JucePlugin_Name; }
 
@@ -88,7 +88,8 @@ class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcesso
 
             void updateFilter();
 
-            int getIndex() { return index; }
+            [[nodiscard]]
+            int getIndex() const { return index; }
 
             juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> processor;
 
