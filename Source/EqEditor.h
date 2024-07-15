@@ -11,7 +11,8 @@
 namespace witte
 {
 
-class EqAudioProcessorEditor : public juce::AudioProcessorEditor
+
+class EqAudioProcessorEditor final : public juce::AudioProcessorEditor
 {
     public:
         EqAudioProcessorEditor (EqAudioProcessor&, juce::AudioProcessorValueTreeState&);
@@ -49,5 +50,6 @@ class EqAudioProcessorEditor : public juce::AudioProcessorEditor
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqAudioProcessorEditor)
 };
+
 
 }

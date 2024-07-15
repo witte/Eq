@@ -7,6 +7,7 @@
 namespace witte
 {
 
+
 inline std::unique_ptr<juce::AudioParameterBool> makePrmBool
 (
     const juce::String& parameterID,
@@ -39,8 +40,8 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmFreq
 )
 {
     juce::NormalisableRange<float> range { 20.0f, 20000.0f,
-                                           [] (float, float, float proportion) { return units::proportionToFreq (proportion); },
-                                           [] (float, float, float value)      { return units::freqToProportion (value); } };
+                                           [] (float, float, const float proportion) { return units::proportionToFreq (proportion); },
+                                           [] (float, float, const float value)      { return units::freqToProportion (value); } };
     
     return std::make_unique<juce::AudioParameterFloat>
     (
@@ -50,13 +51,14 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmFreq
         defaultValue,
         label,
         juce::AudioProcessorParameter::genericParameter,
-        [] (float value, int)
+        [] (const float value, int)
         {
-                 if (value <   100.0f) return juce::String {value,           1} +  " Hz";
-            else if (value <  1000.0f) return juce::String {value,           0} +  " Hz";
-            else if (value < 10000.0f) return juce::String {value / 1000.0f, 2} + " kHz";
-            else if (value < 20000.0f) return juce::String {value / 1000.0f, 1} + " kHz";
-            else                       return juce::String {                    "20 kHz"};
+            if (value <   100.0f) return juce::String {value,           1} +  " Hz";
+            if (value <  1000.0f) return juce::String {value,           0} +  " Hz";
+            if (value < 10000.0f) return juce::String {value / 1000.0f, 2} + " kHz";
+            if (value < 20000.0f) return juce::String {value / 1000.0f, 1} + " kHz";
+
+            return juce::String { "20 kHz"};
         }
     );
 }
@@ -78,8 +80,8 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmDb
           defaultValue,
           label,
           category,
-          [] (float value, int)  { return juce::String (value, 2) + " dB"; },
-          [] (juce::String text) { return text.getFloatValue(); }
+          [] (const float value, int)  { return juce::String (value, 2) + " dB"; },
+          [] (const juce::String& text) { return text.getFloatValue(); }
     );
 }
 
@@ -91,22 +93,19 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmFloat
     const float         maxValue,
     const float         skew,
     const float         defaultValue,
-    const juce::String& label = {},
-    juce::AudioProcessorParameter::Category category = juce::AudioProcessorParameter::genericParameter,
-    std::function<juce::String (float value, int)>  stringFromValue = [] (float value, int)   { return juce::String (value, 2); },
-    std::function<float (const juce::String& text)> valueFromString = [] (const juce::String& text) { return text.getFloatValue(); }
+    const juce::String& label = {}
 )
 {
     return std::make_unique<juce::AudioParameterFloat>
     (
         parameterID,
         name,
-        juce::NormalisableRange<float> { minValue, maxValue, 0.01f, skew },
+        juce::NormalisableRange { minValue, maxValue, 0.01f, skew },
         defaultValue,
         label,
-        category,
-        stringFromValue,
-        valueFromString
+        juce::AudioProcessorParameter::genericParameter,
+        [] (const float value, int)   { return juce::String (value, 2); },
+        [] (const juce::String& text) { return text.getFloatValue(); }
     );
 }
 

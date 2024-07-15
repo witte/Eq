@@ -1,11 +1,13 @@
 #pragma once
+#include <BinaryData.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
 
 namespace witte
 {
 
-class LookAndFeel : public juce::LookAndFeel_V4
+
+class LookAndFeel final : public juce::LookAndFeel_V4
 {
     public:
         LookAndFeel();
@@ -69,8 +71,10 @@ class LookAndFeel : public juce::LookAndFeel_V4
 
 
     private:
-        juce::Font fontDefault;
-        juce::Font fontAudio;
+        juce::Font fontDefault{ juce::FontOptions{ juce::Typeface::createSystemTypefaceFor
+            (BinaryData::OpenSansCondensedLight_ttf, BinaryData::OpenSansCondensedLight_ttfSize)} };
+        juce::Font fontAudio{ juce::FontOptions{ juce::Typeface::createSystemTypefaceFor
+            (BinaryData::fontaudio_ttf, BinaryData::fontaudio_ttfSize) } };
 
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookAndFeel)

@@ -42,14 +42,12 @@ EqAudioProcessor::EqAudioProcessor() :
     parameters.addParameterListener (idOutputGain, this);
 }
 
-void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
+void EqAudioProcessor::prepareToPlay (const double _sampleRate, const int samplesPerBlock)
 {
     sampleRate = _sampleRate;
     
-    juce::dsp::ProcessSpec spec;
-    spec.sampleRate = _sampleRate;
-    spec.maximumBlockSize = juce::uint32 (samplesPerBlock);
-    spec.numChannels = juce::uint32 (getTotalNumOutputChannels ());
+    const juce::dsp::ProcessSpec spec { _sampleRate, static_cast<juce::uint32>(samplesPerBlock),
+        static_cast<juce::uint32>(getTotalNumOutputChannels()) };
 
     for (auto& band : bands)
     {
@@ -61,7 +59,7 @@ void EqAudioProcessor::prepareToPlay (double _sampleRate, int samplesPerBlock)
 void EqAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& /*midiMessages*/)
 {
     juce::dsp::AudioBlock<float> ioBuffer{buffer};
-    juce::dsp::ProcessContextReplacing context{ioBuffer};
+    const juce::dsp::ProcessContextReplacing context{ioBuffer};
 
     if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
 
@@ -75,8 +73,9 @@ void EqAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
 }
 
-void EqAudioProcessor::pushNextSampleToFifo (const juce::AudioBuffer<float>& buffer, int startChannel, int numChannels,
-                                             juce::AbstractFifo& absFifo, juce::AudioBuffer<float>& fifo)
+void EqAudioProcessor::pushNextSampleToFifo (const juce::AudioBuffer<float>& buffer, const int startChannel,
+                                             const int numChannels, juce::AbstractFifo& absFifo,
+                                             juce::AudioBuffer<float>& fifo)
 {
     if (absFifo.getFreeSpace() < buffer.getNumSamples()) return;
 
@@ -158,11 +157,11 @@ void EqAudioProcessor::setCopyToFifo (bool _copyToFifo)
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new EqAudioProcessor(); }
 
-void EqAudioProcessor::Band::parameterChanged (const juce::String& parameter, float newValue)
+void EqAudioProcessor::Band::parameterChanged (const juce::String& parameter, const float newValue)
 {
-    juce::String str = parameter.substring (1, parameter.length());
+    const auto str = parameter.substring (1, parameter.length());
 
-         if (str == "On"  ) *prmOn   = newValue;
+    if      (str == "On"  ) *prmOn   = newValue;
     else if (str == "Type") *prmType = newValue;
     else if (str == "Freq") *prmFreq = newValue;
     else if (str == "Gain") *prmGain = newValue;
@@ -173,9 +172,9 @@ void EqAudioProcessor::Band::parameterChanged (const juce::String& parameter, fl
     active = *prmOn > 0.5f && (*prmGain == 0.0f? (*prmType == 0.0f || *prmType == 4.0f) : true);
 }
 
-void EqAudioProcessor::Band::updateFilter()
+void EqAudioProcessor::Band::updateFilter() const
 {
-    switch (int (*prmType))
+    switch (static_cast<int>(*prmType))
     {
         case 0: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass (eqProcessor.sampleRate,
                                    *prmFreq, *prmQ);
@@ -191,6 +190,8 @@ void EqAudioProcessor::Band::updateFilter()
             break;
         case 4: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass (eqProcessor.sampleRate,
                                    *prmFreq, *prmQ);
+            break;
+        default:
             break;
     }
 }

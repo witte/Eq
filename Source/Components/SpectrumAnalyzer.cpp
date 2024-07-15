@@ -21,7 +21,7 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {
         outP.preallocateSpace (EqAudioProcessor::fftSize * 2);
     }
 
-    startTimerHz (30);
+    startTimerHz (20);
 }
 
 float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& point)
@@ -113,8 +113,8 @@ void SpectrumAnalyzer::resized()
         {
             ++i;
 
-            const auto pos = std::log ( sampleRate * static_cast<float> (i) / fftSize / 20.f) / std::log (2.0f);
-            x = juce::roundToInt ( (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0);
+            const auto pos = std::log ( (sampleRate * static_cast<float> (i)) / fftSize / 20.0f) / std::log (2.0f);
+            x = juce::roundToInt ( (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0.0f);
         }
         
         pointLastBinIndex = i - 1;

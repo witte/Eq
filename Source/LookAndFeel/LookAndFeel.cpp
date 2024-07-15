@@ -6,14 +6,14 @@
 namespace witte
 {
 
-LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4 ()
+LookAndFeel::LookAndFeel()
 {
     setColour (juce::ResizableWindow::backgroundColourId,      juce::Colour {0xff0b4b5d});
 
     setColour (juce::Slider::rotarySliderFillColourId,         juce::Colour {0xff1d2731});
     setColour (juce::Slider::rotarySliderOutlineColourId,      juce::Colour {0xffd9b310});
 
-    setColour (TextEditor::backgroundColourId,                 juce::Colour {0xff336472});
+    setColour (juce::TextEditor::backgroundColourId,           juce::Colour {0xff336472});
 
     setColour (juce::PopupMenu::backgroundColourId,            juce::Colour {0xff0b4b5d});
     setColour (juce::PopupMenu::highlightedBackgroundColourId, juce::Colour {0xff062e3a});
@@ -22,10 +22,7 @@ LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4 ()
 
     setColour (juce::ToggleButton::textColourId,               juce::Colour {0xffd4d4d4});
 
-    fontDefault = juce::Typeface::createSystemTypefaceFor (BinaryData::OpenSansCondensedLight_ttf, BinaryData::OpenSansCondensedLight_ttfSize);
-    LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface (fontDefault.getTypefacePtr());
-
-    fontAudio = juce::Typeface::createSystemTypefaceFor (BinaryData::fontaudio_ttf, BinaryData::fontaudio_ttfSize);
+    getDefaultLookAndFeel().setDefaultSansSerifTypeface (fontDefault.getTypefacePtr());
 }
 
 void LookAndFeel::drawCornerResizer (juce::Graphics& g, int w, int h, bool isMouseOver, bool isMouseDragging)

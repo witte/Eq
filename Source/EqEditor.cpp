@@ -5,6 +5,7 @@
 namespace witte
 {
 
+
 EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor {&p},
       processor {p},
@@ -75,10 +76,12 @@ void EqAudioProcessorEditor::paint (juce::Graphics& g)
 void EqAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
+    const auto width = static_cast<float> (bounds.getWidth());
+    const auto height = static_cast<float> (bounds.getHeight());
     processor.setSavedEditorSize ({ bounds.getWidth(), bounds.getHeight() });
 
-    float bandsWidth = std::clamp (bounds.getHeight() * 1.16f, 384.0f, std::min (632.0f, float (bounds.getWidth())));
-    int bandsHeight = juce::roundToInt (bandsWidth * 0.24f);
+    const auto bandsWidth = std::clamp (height * 1.16f, 384.0f, std::min (632.0f, width));
+    const auto bandsHeight = juce::roundToInt (bandsWidth * 0.24f);
 
     juce::FlexBox bands;
     bands.items.add (juce::FlexItem (band1).withFlex (1.0f).withMargin (1));
@@ -89,12 +92,13 @@ void EqAudioProcessorEditor::resized()
     bands.items.add (juce::FlexItem (outputGain).withWidth (bandsWidth * 0.1f).withMargin (4));
 
     bands.performLayout (bounds.removeFromBottom (bandsHeight)
-                               .reduced (juce::roundToInt ((bounds.getWidth() - bandsWidth) * 0.5f), 1));
+                               .reduced (juce::roundToInt ((width - bandsWidth) * 0.5f), 1));
 
     frame.setBounds (bounds);
         analyzer.setBounds (bounds);
         frequencyCurve.setBounds (bounds);
         xyPad.setBounds (bounds);
 }
+
 
 }
