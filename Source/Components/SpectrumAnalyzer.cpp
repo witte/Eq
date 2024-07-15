@@ -1,8 +1,10 @@
 #include "SpectrumAnalyzer.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 
+
 namespace witte
 {
+
 
 SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {eqProcessor}
 {
@@ -11,12 +13,12 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {
     avgInput.clear();
     avgOutput.clear();
 
-    fftPoints.resize (processor.fftSize);
+    fftPoints.resize (EqAudioProcessor::fftSize);
 
     {
         juce::ScopedLock lockedForWriting (pathCreationLock);
-        inP.preallocateSpace  (processor.fftSize * 2);
-        outP.preallocateSpace (processor.fftSize * 2);
+        inP.preallocateSpace  (EqAudioProcessor::fftSize * 2);
+        outP.preallocateSpace (EqAudioProcessor::fftSize * 2);
     }
 
     startTimerHz (30);
@@ -48,28 +50,30 @@ void SpectrumAnalyzer::paint (juce::Graphics& g)
     outP.clear();
 
     {
-        fftPoint& point = fftPoints[0];
-        float y = juce::jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        const fftPoint& point = fftPoints[0];
+        const float y = juce::jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
 
-        inP.startNewSubPath  (float (point.x), y);
-        outP.startNewSubPath (float (point.x), y);
+        inP.startNewSubPath  (static_cast<float> (point.x), y);
+        outP.startNewSubPath (static_cast<float> (point.x), y);
     }
 
     for (int i = 0; i < fftPointsSize; ++i)
     {
         fftPoint& point = fftPoints[i];
-        float y = juce::jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        const float y = juce::jmap (getFftPointLevel (fftDataInput, point),
+            mindB, maxdB, height, 0.0f) + 0.5f;
 
-        inP.lineTo  (float (point.x), y);
-        outP.lineTo (float (point.x), y);
+        inP.lineTo  (static_cast<float> (point.x), y);
+        outP.lineTo (static_cast<float> (point.x), y);
     }
 
     for (int i = fftPointsSize - 1; i >= 0; --i)
     {
         fftPoint& point = fftPoints[i];
-        float y = juce::jmap (getFftPointLevel (fftDataOutput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        const float y = juce::jmap (getFftPointLevel (fftDataOutput, point),
+            mindB, maxdB, height, 0.0f) + 0.5f;
 
-        outP.lineTo (float (point.x), y);
+        outP.lineTo (static_cast<float> (point.x), y);
     }
 
     outP.closeSubPath();
@@ -81,38 +85,39 @@ void SpectrumAnalyzer::paint (juce::Graphics& g)
     g.setColour (juce::Colour {0x6b9acd32});
     g.fillPath (outP);
 
-    g.setColour (baseColor.brighter (0.18f).withAlpha (juce::uint8 (182)));
+    g.setColour (baseColor.brighter (0.18f).withAlpha (static_cast<juce::uint8> (182)));
     g.fillPath (inP);
 }
 
 void SpectrumAnalyzer::resized()
 {
-    const auto bounds = getLocalBounds();
-    auto widthFactor = bounds.getWidth() / 10.0f;
-    auto sampleRate = float (processor.getSampleRate());
-    auto fftSize = fftInput.getSize();
+    const auto width = getLocalBounds().toFloat().getWidth();
+    const auto widthFactor = width / 10.0f;
+    const auto sampleRate = static_cast<float> (processor.getSampleRate());
+    const auto fftSize = static_cast<float> (fftInput.getSize());
 
     fftPointsSize = 0;
     int lastX = 0;
     fftPoints[0].firstBinIndex = 0;
 
     int i = 0;
-    while (i < processor.fftSize)
+    while (i < EqAudioProcessor::fftSize)
     {
-        fftPoint& point = fftPoints [fftPointsSize];
-        point.firstBinIndex = i;
-        point.x = lastX;
+        auto&[pointFirstBinIndex, pointLastBinIndex, pointX] = fftPoints [fftPointsSize];
+
+        pointFirstBinIndex = i;
+        pointX = lastX;
         
         int x = lastX;
-        while ((x <= lastX) && (i < processor.fftSize))
+        while (x <= lastX && i < EqAudioProcessor::fftSize)
         {
             ++i;
 
-            auto pos = std::log ( ((sampleRate * i) / fftSize) / 20.f) / std::log (2.0f);
+            const auto pos = std::log ( sampleRate * static_cast<float> (i) / fftSize / 20.f) / std::log (2.0f);
             x = juce::roundToInt ( (pos > 0.0f)? (widthFactor * pos) + 0.5f : 0);
         }
         
-        point.lastBinIndex = i - 1;
+        pointLastBinIndex = i - 1;
 
         ++fftPointsSize;
         lastX = x;
@@ -133,12 +138,12 @@ void SpectrumAnalyzer::drawNextFrame()
 
         processor.abstractFifoInput.finishedRead ((block1 + block2) / 2);
 
-        hannWindow.multiplyWithWindowingTable (fftBufferInput.getWritePointer (0), size_t (fftInput.getSize()));
+        hannWindow.multiplyWithWindowingTable (fftBufferInput.getWritePointer (0), static_cast<size_t>(fftInput.getSize()));
         fftInput.performFrequencyOnlyForwardTransform (fftBufferInput.getWritePointer (0));
 
         juce::ScopedLock lockedForWriting (pathCreationLock);
         avgInput.addFrom  (0,           0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples(), -1.0f);
-        avgInput.copyFrom (avgInputPtr, 0, fftBufferInput.getReadPointer (0),     avgInput.getNumSamples(), 1.0f / (avgInput.getNumSamples() * (avgInput.getNumChannels() - 1)));
+        avgInput.copyFrom (avgInputPtr, 0, fftBufferInput.getReadPointer (0), avgInput.getNumSamples(), 1.0f / (static_cast<float> (avgInput.getNumSamples()) * (static_cast<float> (avgInput.getNumChannels()) - 1)));
         avgInput.addFrom  (0,           0, avgInput.getReadPointer (avgInputPtr), avgInput.getNumSamples());
 
         if (++avgInputPtr == avgInput.getNumChannels()) avgInputPtr = 1;
@@ -156,12 +161,12 @@ void SpectrumAnalyzer::drawNextFrame()
 
         processor.abstractFifoOutput.finishedRead ((block1 + block2) / 2);
 
-        hannWindow.multiplyWithWindowingTable (fftBufferOutput.getWritePointer (0), size_t (fftOutput.getSize()));
+        hannWindow.multiplyWithWindowingTable (fftBufferOutput.getWritePointer (0), static_cast<size_t>(fftOutput.getSize()));
         fftOutput.performFrequencyOnlyForwardTransform (fftBufferOutput.getWritePointer (0));
 
         juce::ScopedLock lockedForWriting (pathCreationLock);
         avgOutput.addFrom  (0,            0, avgOutput.getReadPointer (avgOutputPtr), avgOutput.getNumSamples(), -1.0f);
-        avgOutput.copyFrom (avgOutputPtr, 0, fftBufferOutput.getReadPointer (0),      avgOutput.getNumSamples(), 1.0f / (avgOutput.getNumSamples() * (avgOutput.getNumChannels() - 1)));
+        avgOutput.copyFrom (avgOutputPtr, 0, fftBufferOutput.getReadPointer (0),      avgOutput.getNumSamples(), 1.0f / (static_cast<float> (avgOutput.getNumSamples()) * (static_cast<float> (avgOutput.getNumChannels()) - 1)));
         avgOutput.addFrom  (0,            0, avgOutput.getReadPointer (avgOutputPtr), avgOutput.getNumSamples());
 
         if (++avgOutputPtr == avgOutput.getNumChannels()) avgOutputPtr = 1;
@@ -176,5 +181,6 @@ void SpectrumAnalyzer::timerCallback()
     processor.nextFFTBlockReady.store (false);
     repaint();
 }
+
 
 }

@@ -1,16 +1,18 @@
 #include "BandEditor.h"
 
+
 namespace witte
 {
 
-static juce::String getPrmName (int bandNumber, const juce::String& paramName)
+
+static juce::String getPrmName (const int bandNumber, const juce::String& paramName)
 {
     juce::String str (bandNumber);
     str << paramName;
     return  str;
 }
 
-BandEditor::BandEditor (juce::AudioProcessorValueTreeState& _tree, int bandNumber) : tree {_tree},
+BandEditor::BandEditor (juce::AudioProcessorValueTreeState& _tree, const int bandNumber) : tree {_tree},
     attOn   {tree, getPrmName (bandNumber, "On"  ), on},
     attType {tree, getPrmName (bandNumber, "Type"), type},
     attFreq {tree, getPrmName (bandNumber, "Freq"), freq},
@@ -54,7 +56,7 @@ BandEditor::BandEditor (juce::AudioProcessorValueTreeState& _tree, int bandNumbe
 
     on.onStateChange = [&] ()
     {
-        bool isOn = on.getToggleState();
+        const auto isOn = on.getToggleState();
 
         type.setEnabled (isOn);
         freq.setEnabled (isOn);
@@ -88,5 +90,6 @@ void BandEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colour {0x2a000000});
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 6);
 }
+
 
 }

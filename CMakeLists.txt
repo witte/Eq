@@ -27,6 +27,7 @@ juce_add_plugin(${PLUGIN_NAME}
     PRODUCT_NAME "Eq")
 
 target_sources(${PLUGIN_NAME} PRIVATE
+    Source/Components/Utils.cpp
     Source/Components/BandEditor.cpp
     Source/Components/Frame.cpp
     Source/Components/FrequencyCurve.cpp
@@ -40,7 +41,6 @@ target_sources(${PLUGIN_NAME} PRIVATE
 
 target_compile_definitions(${PLUGIN_NAME} PUBLIC
     JUCE_ENABLE_REPAINT_DEBUGGING=0
-    JUCE_DISPLAY_SPLASH_SCREEN=0
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0

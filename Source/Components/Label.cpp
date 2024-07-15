@@ -1,46 +1,44 @@
 #include "Label.h"
 #include "TextEditor.h"
 
+
 namespace witte
 {
 
-Label::Label (juce::Value& _value, juce::Range<double> _range) : value {_value}, range {_range}
-{
-    juce::Label();
 
+Label::Label (juce::Value& _value, const juce::Range<double> _range) : value {_value}, range {_range}
+{
     setJustificationType (juce::Justification::centred);
 }
 
 juce::TextEditor* Label::createEditorComponent()
 {
-    auto* labelEditor = new witte::TextEditor (value, range);
+    // Not a leak, no worries
+    auto* labelEditor = new TextEditor (value, range);
 
     return labelEditor;
 }
 
 bool Label::keyPressed (const juce::KeyPress& key)
 {
-    int code = key.getKeyCode();
-
-    if (code == juce::KeyPress::returnKey)
+    if (const auto code = key.getKeyCode(); code == juce::KeyPress::returnKey)
     {
         showEditor();
 
         return true;
     }
-    else
+
+    if (const juce::String allowedCharacters {range.getStart() < 0.0? "-.0123456789" : ".0123456789"};
+        allowedCharacters.containsChar (key.getTextCharacter()))
     {
-        juce::String allowedCharacters {range.getStart() < 0.0? "-.0123456789" : ".0123456789"};
-        juce::String keyChar;
+        showEditor();
+
+        juce::String keyChar{key.getTextCharacter()};
         keyChar << key.getTextCharacter();
 
-        if (allowedCharacters.contains (keyChar))
-        {
-            showEditor();
-            getCurrentTextEditor()->setText (keyChar, false);
+        getCurrentTextEditor()->setText (keyChar, false);
 
-            return true;
-        }
+        return true;
     }
 
     return juce::Label::keyPressed (key);
@@ -48,12 +46,13 @@ bool Label::keyPressed (const juce::KeyPress& key)
 
 void Label::editorShown (juce::TextEditor* labelEditor)
 {
-    auto& ed = dynamic_cast<witte::TextEditor&> (*labelEditor);
+    auto& editor = dynamic_cast<TextEditor&> (*labelEditor);
 
-    ed.clearCharacters();
+    editor.clearCharacters();
 
-    juce::String str = ed.getText();
-    ed.setHighlightedRegion ({str.contains ("-")? 1 : 0, str.length()});
+    const juce::String str = editor.getText();
+    editor.setHighlightedRegion ({str.contains ("-")? 1 : 0, str.length()});
 }
+
 
 }

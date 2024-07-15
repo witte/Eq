@@ -6,7 +6,8 @@
 namespace witte
 {
 
-class BandEditor : public juce::Component
+
+class BandEditor final : public juce::Component
 {
     public:
         BandEditor (juce::AudioProcessorValueTreeState&, int);
@@ -23,7 +24,7 @@ class BandEditor : public juce::Component
         juce::ComboBox type;
         juce::Slider freq;
         juce::Slider gain;
-        juce::Slider q   ;
+        juce::Slider q;
 
         juce::AudioProcessorValueTreeState::ButtonAttachment   attOn;
         juce::AudioProcessorValueTreeState::ComboBoxAttachment attType;
@@ -34,5 +35,6 @@ class BandEditor : public juce::Component
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandEditor)
 };
+
 
 }

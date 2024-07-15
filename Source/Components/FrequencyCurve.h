@@ -6,11 +6,12 @@
 namespace witte
 {
 
-class FrequencyCurve : public juce::Component,
-                       public juce::AudioProcessorValueTreeState::Listener
+
+class FrequencyCurve final : public juce::Component,
+                             public juce::AudioProcessorValueTreeState::Listener
 {
     public:
-        FrequencyCurve (EqAudioProcessor&);
+        explicit FrequencyCurve (EqAudioProcessor&);
         ~FrequencyCurve() override;
 
         void paint (juce::Graphics&) override;
@@ -37,5 +38,6 @@ class FrequencyCurve : public juce::Component,
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrequencyCurve)
 };
+
 
 }

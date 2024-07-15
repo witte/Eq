@@ -1,9 +1,11 @@
 #include "TextEditor.h"
 
+
 namespace witte
 {
 
-TextEditor::TextEditor (juce::Value& _value, juce::Range<double>& _range) : juce::TextEditor(), value {_value}, range {_range}
+
+TextEditor::TextEditor (juce::Value& _value, juce::Range<double>& _range) : value {_value}, range {_range}
 {
     setJustification (juce::Justification::centred);
     value.addListener (this);
@@ -29,7 +31,9 @@ TextEditor::~TextEditor()
 
 void TextEditor::resized()
 {
-    applyFontToAllText (juce::Font (std::max (16.0f, getHeight() * 0.86f)), true);
+    const juce::FontOptions options {std::max (16.0f, static_cast<float>(getHeight()) * 0.86f) };
+    applyFontToAllText (juce::Font (options), true);
+
     juce::TextEditor::resized();
 }
 
@@ -52,15 +56,15 @@ juce::String TextEditor::filterNewText (juce::TextEditor&, const juce::String& n
         return {};
     }
 
-    juce::String currentValue = getText();
+    const juce::String currentValue = getText();
 
     if (currentValue.contains (".") && newInput.contains (".") && getHighlightedRegion().isEmpty()) return {};
 
-    int pos = getCaretPosition();
+    const auto pos = getCaretPosition();
     if (newInput.contains ("-"))
     {
-        bool hasMinus = currentValue.contains ("-");
-        int posShift = hasMinus? -1 : 1;
+        const auto hasMinus = currentValue.contains ("-");
+        const auto posShift = hasMinus? -1 : 1;
 
         lastSelectionStart = getHighlightedRegion().getStart() + posShift;
         lastSelectionEnd   = getHighlightedRegion().getEnd()   + posShift;
@@ -69,10 +73,8 @@ juce::String TextEditor::filterNewText (juce::TextEditor&, const juce::String& n
 
         return {};
     }
-    else
-    {
-        if (currentValue.contains ("-") && pos == 0) lastSelectionStart = 1;
-    }
+
+    if (currentValue.contains ("-") && pos == 0) lastSelectionStart = 1;
 
     return newInput;
 }
