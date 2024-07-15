@@ -4,7 +4,7 @@
 #include "Helpers/ParameterHelpers.h"
 
 
-class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
+class EqAudioProcessor final : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
     public:
         EqAudioProcessor();
@@ -60,9 +60,9 @@ class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcesso
         juce::AbstractFifo abstractFifoOutput {1};
         juce::AudioBuffer<float> audioFifoOutput;
 
-        struct Band : public juce::AudioProcessorValueTreeState::Listener
+        struct Band final : public juce::AudioProcessorValueTreeState::Listener
         {
-            Band (EqAudioProcessor& eqProcessor, int index) :
+            Band (EqAudioProcessor& eqProcessor, const int index) :
                 idOn   {std::to_string(index) + "On"},
                 idType {std::to_string(index) + "Type"},
                 idFreq {std::to_string(index) + "Freq"},
@@ -86,7 +86,7 @@ class EqAudioProcessor : public juce::AudioProcessor, public juce::AudioProcesso
 
             void parameterChanged (const juce::String& parameter, float newValue) override;
 
-            void updateFilter();
+            void updateFilter() const;
 
             [[nodiscard]]
             int getIndex() const { return index; }

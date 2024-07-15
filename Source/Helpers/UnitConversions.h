@@ -28,17 +28,17 @@ inline float jmap (const float sourceValue, const float sourceRangeMin, const fl
 constexpr float maxdB =   6.0f;
 constexpr float mindB = -84.0f;
 
-inline float gainToDecibels (float gain)
+inline float gainToDecibels (const float gain)
 {
-    return gain > float() ? jmax (mindB, static_cast<float> (std::log10 (gain)) * 20.0f) : mindB;
+    return gain > float() ? jmax (mindB, std::log10 (gain) * 20.0f) : mindB;
 }
 
-inline float gainToProportion (float gain)
+inline float gainToProportion (const float gain)
 {
     return jmap (gain, -24.0f, 24.0f, 1.0f, 0.0f);
 }
 
-inline float spectrumGainToProportion (float gain)
+inline float spectrumGainToProportion (const float gain)
 {
     return jmap (gain, mindB, maxdB, 1.0f, 0.0f);
 }
