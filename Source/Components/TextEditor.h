@@ -5,9 +5,10 @@
 namespace witte
 {
 
-class TextEditor : public juce::TextEditor,
-                   public juce::TextEditor::InputFilter,
-                   private juce::Value::Listener
+
+class TextEditor final : public juce::TextEditor,
+                         public juce::TextEditor::InputFilter,
+                         juce::Value::Listener
 {
     public:
         TextEditor (juce::Value& _value, juce::Range<double>& _range);
@@ -33,5 +34,6 @@ class TextEditor : public juce::TextEditor,
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextEditor)
 };
+
 
 }

@@ -1,27 +1,27 @@
 #include "XYPad.h"
 
+
 namespace witte
 {
+
 
 XYPad::XYPad (std::initializer_list<std::pair<juce::RangedAudioParameter*, juce::RangedAudioParameter*>> parameters)
 {
     setPaintingIsUnclipped (true);
 
-    for (auto& parameterPair : parameters)
+    for (auto& [parameterX, parameterY] : parameters)
     {
-        prmHandles.push_back (std::make_unique<XYPadHandle> (*this, parameterPair.first, parameterPair.second));
+        prmHandles.push_back (std::make_unique<XYPadHandle> (*this, parameterX, parameterY));
     }
 }
 
-XYPad::~XYPad()
-{
-}
+XYPad::~XYPad() = default;
 
 void XYPad::paint (juce::Graphics& g)
 {
     bandsPositionsPath.clear();
 
-    for (auto& prmAttachment : prmHandles)
+    for (const auto& prmAttachment : prmHandles)
     {
         auto[x, y] = prmAttachment->getPos();
 
@@ -43,7 +43,7 @@ void XYPad::paint (juce::Graphics& g)
 
 void XYPad::resized()
 {
-    for (auto& handle : prmHandles)
+    for (const auto& handle : prmHandles)
     {
         handle->getX()->sendValueChangedMessageToListeners (handle->getX()->getValue());
         handle->getY()->sendValueChangedMessageToListeners (handle->getY()->getValue());
@@ -60,7 +60,7 @@ void XYPad::mouseDown (const juce::MouseEvent&)
 
 void XYPad::mouseMove (const juce::MouseEvent& event)
 {
-    for (auto& prmAttachment : prmHandles)
+    for (const auto& prmAttachment : prmHandles)
     {
         if (prmAttachment->getPos().getDistanceFrom (event.getPosition().toFloat()) < hoveredHandleRadius)
         {
@@ -102,5 +102,6 @@ void XYPad::mouseUp (const juce::MouseEvent&)
     draggingPad->getX()->endChangeGesture();
     draggingPad->getY()->endChangeGesture();
 }
+
 
 }

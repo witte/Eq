@@ -8,10 +8,11 @@
 namespace witte
 {
 
-class SpectrumAnalyzer : public juce::Component, private juce::Timer
+
+class SpectrumAnalyzer final : public juce::Component, juce::Timer
 {
     public:
-        SpectrumAnalyzer (EqAudioProcessor&);
+        explicit SpectrumAnalyzer (EqAudioProcessor&);
 
         void paint (juce::Graphics&) override;
         void resized() override;
@@ -23,7 +24,8 @@ class SpectrumAnalyzer : public juce::Component, private juce::Timer
         juce::dsp::FFT fftInput  {12};
         juce::dsp::FFT fftOutput {12};
 
-        juce::dsp::WindowingFunction<float> hannWindow {size_t (fftInput.getSize()), juce::dsp::WindowingFunction<float>::hann};
+        juce::dsp::WindowingFunction<float> hannWindow {static_cast<size_t>(fftInput.getSize()),
+            juce::dsp::WindowingFunction<float>::hann};
 
         juce::AudioBuffer<float> fftBufferInput  { 1, fftInput.getSize()  * 2 };
         juce::AudioBuffer<float> fftBufferOutput { 1, fftOutput.getSize() * 2 };
@@ -44,12 +46,12 @@ class SpectrumAnalyzer : public juce::Component, private juce::Timer
             int firstBinIndex = 0;
             int lastBinIndex = 120;
 
-            int x;
+            int x = 0;
         };
         int fftPointsSize = 0;
         std::vector<fftPoint> fftPoints;
 
-        float getFftPointLevel (const float* buffer, const fftPoint& point);
+        static float getFftPointLevel (const float* buffer, const fftPoint& point);
 
         static constexpr float maxdB =  6.0f;
         static constexpr float mindB = -84.0f;
@@ -61,5 +63,6 @@ class SpectrumAnalyzer : public juce::Component, private juce::Timer
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumAnalyzer)
 };
+
 
 }

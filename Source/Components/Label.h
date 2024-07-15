@@ -1,12 +1,12 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "TextEditor.h"
 
 
 namespace witte
 {
 
-class Label : public juce::Label
+
+class Label final : public juce::Label
 {
     public:
         Label (juce::Value& _value, juce::Range<double> _range);
@@ -26,5 +26,6 @@ class Label : public juce::Label
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Label)
 };
+
 
 }

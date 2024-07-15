@@ -6,7 +6,8 @@
 namespace witte
 {
 
-class XYPad : public juce::Component
+
+class XYPad final : public juce::Component
 {
     public:
         XYPad (std::initializer_list<std::pair<juce::RangedAudioParameter*, juce::RangedAudioParameter*>> parameters);
@@ -31,28 +32,29 @@ class XYPad : public juce::Component
 
                 juce::Point<float>& getPos() { return pos; }
 
-                juce::RangedAudioParameter* getX() { return parameterX; }
-                juce::RangedAudioParameter* getY() { return parameterY; }
+                [[nodiscard]] juce::RangedAudioParameter* getX() const { return parameterX; }
+                [[nodiscard]] juce::RangedAudioParameter* getY() const { return parameterY; }
 
 
             private:
-                std::function<void(float)> prmChangedCallback = [&] (float)
-                {
-                    pos.setX (parameterX->getValue() * pad.getWidth());
-                    pos.setY (pad.getHeight() - (parameterY->getValue() * pad.getHeight()));
-
-                    pad.repaint();
-                };
-
                 XYPad& pad;
-
                 juce::Point<float> pos;
-
                 juce::RangedAudioParameter* parameterX {nullptr};
                 juce::RangedAudioParameter* parameterY {nullptr};
 
                 std::unique_ptr<juce::ParameterAttachment> attachmentX {nullptr};
                 std::unique_ptr<juce::ParameterAttachment> attachmentY {nullptr};
+
+                std::function<void(float)> prmChangedCallback = [&] (float)
+                {
+                    const auto padWidth  = static_cast<float> (pad.getWidth());
+                    const auto padHeight = static_cast<float> (pad.getHeight());
+
+                    pos.setX (parameterX->getValue() * padWidth);
+                    pos.setY (padHeight - (parameterY->getValue() * padHeight));
+
+                    pad.repaint();
+                };
         };
 
         std::vector<std::unique_ptr<XYPadHandle>> prmHandles;
@@ -74,5 +76,6 @@ class XYPad : public juce::Component
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (XYPad)
 };
+
 
 }

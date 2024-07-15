@@ -1,27 +1,28 @@
 #pragma once
 #include <cmath>
 
-namespace witte
+
+namespace witte::units
 {
 
-namespace units
-{
 
-inline float proportionToFreq (float proportion)
+inline float proportionToFreq (const float proportion)
 {
     return 20.0f * std::pow (2.0f, proportion * 10.0f);
 }
 
-inline float freqToProportion (float freq)
+inline float freqToProportion (const float freq)
 {
     return (std::log (freq / 20.0f) / std::log (2.0f)) / 10.0f;
 }
 
-inline float jmax (float a, float b) { return a < b ? b : a; }
+inline float jmax (const float a, const float b) { return a < b ? b : a; }
 
-inline float jmap (float sourceValue, float sourceRangeMin, float sourceRangeMax, float targetRangeMin, float targetRangeMax)
+inline float jmap (const float sourceValue, const float sourceRangeMin, const float sourceRangeMax,
+                   const float targetRangeMin, const float targetRangeMax)
 {
-    return targetRangeMin + ((targetRangeMax - targetRangeMin) * (sourceValue - sourceRangeMin)) / (sourceRangeMax - sourceRangeMin);
+    return targetRangeMin + ((targetRangeMax - targetRangeMin) * (sourceValue - sourceRangeMin)) /
+        (sourceRangeMax - sourceRangeMin);
 }
 
 constexpr float maxdB =   6.0f;
@@ -42,5 +43,5 @@ inline float spectrumGainToProportion (float gain)
     return jmap (gain, mindB, maxdB, 1.0f, 0.0f);
 }
 
-}
+
 }
