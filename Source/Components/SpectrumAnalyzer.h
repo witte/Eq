@@ -21,6 +21,8 @@ class SpectrumAnalyzer final : public juce::Component, juce::Timer
     private:
         EqAudioProcessor& processor;
 
+        int resizeDebounceInFrames = 0;
+
         juce::dsp::FFT fftInput  {12};
         juce::dsp::FFT fftOutput {12};
 
@@ -56,6 +58,7 @@ class SpectrumAnalyzer final : public juce::Component, juce::Timer
         static constexpr float maxdB =  6.0f;
         static constexpr float mindB = -84.0f;
 
+        void recalculateFftPoints();
         void drawNextFrame();
 
         void timerCallback() override;

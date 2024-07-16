@@ -48,9 +48,10 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p, juce::Audio
     addAndMakeVisible (outputGain);
 
     setResizable (true, true);
-    auto size = processor.getSavedEditorSize();
+    const auto size = processor.getSavedEditorSize();
     setSize (size.x, size.y);
-    setResizeLimits (defaultWidth / 2, defaultHeight / 2, defaultWidth * 2, defaultHeight * 2);
+    setResizeLimits (defaultWidth / 2, defaultHeight / 2,
+        defaultWidth * 2, defaultHeight * 2);
 
     setLookAndFeel (&lookAndFeel);
 
