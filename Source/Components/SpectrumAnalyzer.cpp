@@ -21,7 +21,7 @@ SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {
         outP.preallocateSpace (EqAudioProcessor::fftSize * 2);
     }
 
-    startTimerHz (20);
+    startTimerHz (30);
 }
 
 float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& point)
@@ -38,6 +38,12 @@ float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& p
 
 void SpectrumAnalyzer::paint (juce::Graphics& g)
 {
+    if (resizeDebounceInFrames > 0)
+    {
+        resizeDebounceInFrames--;
+        return;
+    }
+
     const auto bounds = getLocalBounds().toFloat();
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
@@ -51,7 +57,8 @@ void SpectrumAnalyzer::paint (juce::Graphics& g)
 
     {
         const fftPoint& point = fftPoints[0];
-        const float y = juce::jmap (getFftPointLevel (fftDataInput, point), mindB, maxdB, height, 0.0f) + 0.5f;
+        const float y = juce::jmap (getFftPointLevel (fftDataInput, point),
+            mindB, maxdB, height, 0.0f) + 0.5f;
 
         inP.startNewSubPath  (static_cast<float> (point.x), y);
         outP.startNewSubPath (static_cast<float> (point.x), y);
@@ -91,6 +98,12 @@ void SpectrumAnalyzer::paint (juce::Graphics& g)
 
 void SpectrumAnalyzer::resized()
 {
+    // When the component is being resized the firstBinIndex'es and pointLastBinIndex'es
+    // get updated: better to wait until resizing is done so we don't recalculate
+    // them needlessly
+    static constexpr int framesToWaitBeforePaintingAfterResizing = 5;
+    resizeDebounceInFrames = framesToWaitBeforePaintingAfterResizing;
+
     const auto width = getLocalBounds().toFloat().getWidth();
     const auto widthFactor = width / 10.0f;
     const auto sampleRate = static_cast<float> (processor.getSampleRate());

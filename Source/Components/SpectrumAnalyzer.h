@@ -21,6 +21,8 @@ class SpectrumAnalyzer final : public juce::Component, juce::Timer
     private:
         EqAudioProcessor& processor;
 
+        int resizeDebounceInFrames = 0;
+
         juce::dsp::FFT fftInput  {12};
         juce::dsp::FFT fftOutput {12};
 
