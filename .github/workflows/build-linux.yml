@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
       - name: prepare
         run: |
           sudo apt update
-          sudo apt install libasound2-dev libxrandr-dev libxinerama-dev libxcursor-dev libx11-dev libxext-dev libfreetype6-dev libglu1-mesa-dev xvfb ninja-build
+          sudo apt install libasound2-dev libxinerama-dev libx11-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev xvfb ninja-build
           git submodule init
           git submodule update
   
