@@ -27,6 +27,11 @@ class EqAudioProcessor final : public juce::AudioProcessor, public juce::AudioPr
 
         bool isBusesLayoutSupported (const BusesLayout& layouts) const override
         {
+            for (const auto& bus : layouts.outputBuses) {
+                if (bus.getChannelTypes().size() == 0)
+                    return false;
+            }
+
             return (layouts.getMainInputChannelSet() == layouts.getMainOutputChannelSet());
         }
 

@@ -4,6 +4,8 @@
 #include "UnitConversions.h"
 
 
+constexpr auto versionHint = 1;
+
 namespace witte
 {
 
@@ -16,7 +18,7 @@ inline std::unique_ptr<juce::AudioParameterBool> makePrmBool
     const juce::String& label = juce::String()
 )
 {
-    return std::make_unique<juce::AudioParameterBool> (parameterID, name, defaultValue, label);
+    return std::make_unique<juce::AudioParameterBool> (juce::ParameterID(parameterID, versionHint), name, defaultValue, label);
 }
 
 inline std::unique_ptr<juce::AudioParameterChoice> makePrmChoice
@@ -28,7 +30,7 @@ inline std::unique_ptr<juce::AudioParameterChoice> makePrmChoice
     const juce::String& label = juce::String()
 )
 {
-    return std::make_unique<juce::AudioParameterChoice> (parameterID, name, choices, defaultItemIndex, label);
+    return std::make_unique<juce::AudioParameterChoice> (juce::ParameterID(parameterID, versionHint), name, choices, defaultItemIndex, label);
 }
 
 inline std::unique_ptr<juce::RangedAudioParameter> makePrmFreq
@@ -45,7 +47,7 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmFreq
     
     return std::make_unique<juce::AudioParameterFloat>
     (
-        parameterID,
+        juce::ParameterID(parameterID, versionHint),
         name,
         range,
         defaultValue,
@@ -74,7 +76,7 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmDb
 {
     return std::make_unique<juce::AudioParameterFloat>
     (
-          parameterID,
+          juce::ParameterID(parameterID, versionHint),
           name,
           juce::NormalisableRange<float> { -24.0f, 24.0f, 0.01f },
           defaultValue,
@@ -98,7 +100,7 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmFloat
 {
     return std::make_unique<juce::AudioParameterFloat>
     (
-        parameterID,
+        juce::ParameterID(parameterID, versionHint),
         name,
         juce::NormalisableRange { minValue, maxValue, 0.01f, skew },
         defaultValue,

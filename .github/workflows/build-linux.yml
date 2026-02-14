@@ -16,7 +16,8 @@ jobs:
       
       - name: prepare
         run: |
-          sudo apt install libasound2-dev libxrandr-dev libxinerama-dev libxcursor-dev
+          sudo apt update
+          sudo apt install libasound2-dev libxinerama-dev libx11-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev xvfb ninja-build
           git submodule init
           git submodule update
   
