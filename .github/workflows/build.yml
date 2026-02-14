@@ -28,6 +28,11 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+
       - name: install linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -35,7 +40,7 @@ jobs:
           sudo apt install libasound2-dev libxinerama-dev libx11-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev xvfb ninja-build
 
       - name: configure
-        run: cmake -B build .
+        run: cmake --preset default
 
       - name: build
-        run: cmake --build build
+        run: cmake --build __build --config Release
