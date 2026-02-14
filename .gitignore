@@ -6,3 +6,6 @@ Thumbs.db
 .idea/*
 cmake-build-*/*
 *.user
+
+# CMake
+__build*
