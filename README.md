@@ -4,9 +4,9 @@ A simple but fully functional equalizer plugin made with the Juce framework, cus
 </div>
 <br>
 <div align="center">
-    <img src="https://github.com/witte/Eq/workflows/linux/badge.svg" />
-    <img src="https://github.com/witte/Eq/workflows/mac/badge.svg" />
-    <img src="https://github.com/witte/Eq/workflows/windows/badge.svg" />
+    <img src="https://github.com/witte/Eq/actions/workflows/build.yml/badge.svg?job=linux" />                      
+    <img src="https://github.com/witte/Eq/actions/workflows/build.yml/badge.svg?job=mac" />                        
+    <img src="https://github.com/witte/Eq/actions/workflows/build.yml/badge.svg?job=windows" />
 </div>
 <br>
 <div align="center">
@@ -15,13 +15,13 @@ A simple but fully functional equalizer plugin made with the Juce framework, cus
 <br>
 
 ## Dependencies
-Juce: https://github.com/juce-framework/JUCE ('juce6' branch, already included as a submodule)
+Juce: https://github.com/juce-framework/JUCE (version 8.0.12, already included as a submodule)
 <br>
 <br>
 
 ## Building
 ```
-git clone https://github.com/witte/Eq.git --recurse-submodules
+git clone https://github.com/witte/Eq.git --recursive
 cd Eq
 cmake -S . -B build
 cmake --build build        # Plugin will be at 'build/Eq_artefacts/VST3'
