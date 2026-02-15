@@ -46,12 +46,12 @@ bool Label::keyPressed (const juce::KeyPress& key)
 
 void Label::editorShown (juce::TextEditor* labelEditor)
 {
-    auto& editor = dynamic_cast<TextEditor&> (*labelEditor);
+    auto& textEditor = dynamic_cast<TextEditor&> (*labelEditor);
 
-    editor.clearCharacters();
+    textEditor.clearCharacters();
 
-    const juce::String str = editor.getText();
-    editor.setHighlightedRegion ({str.contains ("-")? 1 : 0, str.length()});
+    const juce::String str = textEditor.getText();
+    textEditor.setHighlightedRegion ({str.contains ("-")? 1 : 0, str.length()});
 }
 
 
