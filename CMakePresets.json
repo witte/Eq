@@ -25,6 +25,12 @@
       "name": "debug",
       "configurePreset": "default",
       "configuration": "Debug"
+    },
+    {
+      "name": "ci",
+      "configurePreset": "default",
+      "configuration": "Release",
+      "jobs": 4
     }
   ]
 }

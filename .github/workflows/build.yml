@@ -43,11 +43,11 @@ jobs:
         run: cmake --preset default
 
       - name: build
-        run: cmake --build __build --config Release
+        run: cmake --build --preset ci
 
       - name: pluginval
-        run: cmake --build __build --target pluginval_Eq --config Release
+        run: cmake --build --preset ci --target pluginval_Eq
 
       - name: auval
         if: runner.os == 'macOS'
-        run: cmake --build __build --target auval_Eq --config Release
+        run: cmake --build --preset ci --target auval_Eq
