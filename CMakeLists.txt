@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
@@ -71,3 +71,7 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
     juce::juce_dsp)
 
 include(cmake/pluginval.cmake)
+if (APPLE)
+    include(cmake/auval.cmake)
+    add_auval(${PLUGIN_NAME})
+endif ()

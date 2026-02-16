@@ -47,3 +47,7 @@ jobs:
 
       - name: pluginval
         run: cmake --build __build --target pluginval --config Release
+
+      - name: auval
+        if: runner.os == 'macOS'
+        run: cmake --build __build --target auval_Eq --config Release
