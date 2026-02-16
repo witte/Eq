@@ -29,17 +29,18 @@ add_custom_command(
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    message("WE ARE LINUX")
     set(PLUGINVAL_WRAPPER xvfb-run -a)
 else ()
     set(PLUGINVAL_WRAPPER "")
 endif ()
 
-add_custom_target(pluginval
-    COMMAND ${PLUGINVAL_WRAPPER} "${PLUGINVAL_EXE}"
-        --validate-in-process
-        --strictness-level 5
-        "$<GENEX_EVAL:$<TARGET_PROPERTY:${PLUGIN_NAME}_VST3,JUCE_PLUGIN_ARTEFACT_FILE>>"
-    DEPENDS "${PLUGINVAL_EXE}" ${PLUGIN_NAME}_VST3
-    COMMENT "Running pluginval on ${PLUGIN_NAME} VST3"
-)
+function(add_pluginval target)
+    add_custom_target(pluginval_${target}
+        COMMAND ${PLUGINVAL_WRAPPER} "${PLUGINVAL_EXE}"
+            --validate "$<GENEX_EVAL:$<TARGET_PROPERTY:${target}_VST3,JUCE_PLUGIN_ARTEFACT_FILE>>"
+            --strictness-level 5
+            --timeout-ms 60000
+        DEPENDS "${PLUGINVAL_EXE}" ${target}_VST3
+        COMMENT "Running pluginval on ${target} VST3"
+    )
+endfunction()

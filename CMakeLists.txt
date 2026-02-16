@@ -71,6 +71,7 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
     juce::juce_dsp)
 
 include(cmake/pluginval.cmake)
+add_pluginval(${PLUGIN_NAME})
 if (APPLE)
     include(cmake/auval.cmake)
     add_auval(${PLUGIN_NAME})
