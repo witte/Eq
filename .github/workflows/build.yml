@@ -44,3 +44,6 @@ jobs:
 
       - name: build
         run: cmake --build __build --config Release
+
+      - name: pluginval
+        run: cmake --build __build --target pluginval --config Release

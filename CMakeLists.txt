@@ -69,3 +69,5 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
     juce::juce_audio_devices
     juce::juce_gui_basics
     juce::juce_dsp)
+
+include(cmake/pluginval.cmake)

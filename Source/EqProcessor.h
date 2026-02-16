@@ -22,7 +22,7 @@ class EqAudioProcessor final : public juce::AudioProcessor, public juce::AudioPr
         void   setCurrentProgram (int)        override {               }
         double getTailLengthSeconds()   const override { return 0.0;   }
 
-        const juce::String getProgramName    (int)                      override { return {}; }
+        const juce::String getProgramName    (int)                      override { return "Default"; }
         void               changeProgramName (int, const juce::String&) override {}
 
         bool isBusesLayoutSupported (const BusesLayout& layouts) const override
