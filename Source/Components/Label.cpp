@@ -33,7 +33,12 @@ bool Label::keyPressed (const juce::KeyPress& key)
     {
         showEditor();
 
-        juce::String keyChar{key.getTextCharacter()};
+        const double valueAsDouble = value.getValue();
+
+        juce::String keyChar;
+        if (valueAsDouble < 0.0 && key.getTextCharacter() != '-')
+            keyChar << "-";
+
         keyChar << key.getTextCharacter();
 
         getCurrentTextEditor()->setText (keyChar, false);
@@ -46,12 +51,13 @@ bool Label::keyPressed (const juce::KeyPress& key)
 
 void Label::editorShown (juce::TextEditor* labelEditor)
 {
-    auto& textEditor = dynamic_cast<TextEditor&> (*labelEditor);
+    const double valueAsDouble = value.getValue();
+    const juce::String str(valueAsDouble, 2);
 
-    textEditor.clearCharacters();
-
-    const juce::String str = textEditor.getText();
-    textEditor.setHighlightedRegion ({str.contains ("-")? 1 : 0, str.length()});
+    auto& editor = dynamic_cast<TextEditor&> (*labelEditor);
+    editor.clearCharacters();
+    editor.setText(str);
+    editor.setHighlightedRegion ({str.contains ("-")? 1 : 0, str.length()});
 }
 
 

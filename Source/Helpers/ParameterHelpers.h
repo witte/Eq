@@ -86,7 +86,13 @@ inline std::unique_ptr<juce::RangedAudioParameter> makePrmDb
           defaultValue,
           attributes
             .withLabel(label)
-            .withStringFromValueFunction([] (const float value, int)  { return juce::String (value, 2) + " dB"; })
+            .withStringFromValueFunction([] (float value, int)
+            {
+                // Not a fan of "-0.00 dB"
+                if (std::abs(value) < 0.005f)
+                    value = 0.0f;
+               return juce::String (value, 2) + " dB";
+            })
             .withValueFromStringFunction([] (const juce::String& text) { return text.getFloatValue(); })
     );
 }
