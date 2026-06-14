@@ -15,7 +15,7 @@ An equalizer plugin made with the JUCE framework, customizing JUCE's LookAndFeel
 <br>
 
 ## Dependencies
-JUCE: https://github.com/juce-framework/JUCE (8.0.12, already included as a submodule)
+JUCE: https://github.com/juce-framework/JUCE (8.0.13, included as a submodule)
 <br>
 <br>
 
@@ -24,7 +24,7 @@ JUCE: https://github.com/juce-framework/JUCE (8.0.12, already included as a subm
 git clone https://github.com/witte/Eq.git --recursive
 cd Eq
 cmake --preset default
-cmake --build __build --config Release        # Plugin will be at '__build/Eq_artefacts/Release/VST3'
+cmake --build __build --config Release   # Plugin will be at '__build/Eq_artefacts/Release/VST3'
 ```
 <br>
 

@@ -4,17 +4,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 
-set(PLUGIN_NAME Eq)
-set(PLUGIN_DATA ${PLUGIN_NAME}Data)
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 # add_link_options(-fsanitize=thread)
 
-project(${PLUGIN_NAME} VERSION 1.0.0)
+project(Eq VERSION 1.0.0)
 
 add_subdirectory(JUCE)
 
-juce_add_plugin(${PLUGIN_NAME}
+juce_add_plugin(Eq
     COMPANY_NAME "witte"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
@@ -27,7 +25,7 @@ juce_add_plugin(${PLUGIN_NAME}
     FORMATS AU VST3
     PRODUCT_NAME "Eq")
 
-target_sources(${PLUGIN_NAME} PRIVATE
+target_sources(Eq PRIVATE
     Source/Components/Utils.cpp
     Source/Components/BandEditor.cpp
     Source/Components/Frame.cpp
@@ -40,30 +38,30 @@ target_sources(${PLUGIN_NAME} PRIVATE
     Source/EqEditor.cpp
     Source/EqProcessor.cpp)
 
-target_compile_definitions(${PLUGIN_NAME} PUBLIC
+target_compile_definitions(Eq PUBLIC
     JUCE_ENABLE_REPAINT_DEBUGGING=0
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_SILENCE_XCODE_15_LINKER_WARNING=1)
 
-juce_add_binary_data(${PLUGIN_DATA} SOURCES
+juce_add_binary_data(EqData SOURCES
     Source/LookAndFeel/fontaudio.ttf
     Source/LookAndFeel/OpenSansCondensed-Bold.ttf
     Source/LookAndFeel/OpenSansCondensed-Light.ttf
     Source/LookAndFeel/texture.png)
 
-set_target_properties(${PLUGIN_NAME} ${PLUGIN_DATA} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(Eq EqData PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if (UNIX)
-    target_compile_options(${PLUGIN_NAME} PUBLIC -Wall -Wextra -pedantic)
+    target_compile_options(Eq PUBLIC -Wall -Wextra -pedantic)
 else()
     add_definitions("/wd4244") # disable "possible loss of data" warning/error
-    target_compile_options(${PLUGIN_NAME} PUBLIC /W4)
+    target_compile_options(Eq PUBLIC /W4)
 endif()
 
-target_link_libraries(${PLUGIN_NAME} PRIVATE
-    ${PLUGIN_DATA}
+target_link_libraries(Eq PRIVATE
+    EqData
     juce::juce_audio_processors
     juce::juce_audio_utils
     juce::juce_audio_devices
@@ -71,8 +69,8 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
     juce::juce_dsp)
 
 include(cmake/pluginval.cmake)
-add_pluginval(${PLUGIN_NAME})
+add_pluginval(Eq)
 if (APPLE)
     include(cmake/auval.cmake)
-    add_auval(${PLUGIN_NAME})
+    add_auval(Eq)
 endif ()
