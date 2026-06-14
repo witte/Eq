@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
     branches:
       - '*'
@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.3
         with:
           submodules: recursive
 
@@ -37,7 +37,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install libasound2-dev libxinerama-dev libx11-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev xvfb ninja-build
+          sudo apt install libasound2-dev libxinerama-dev libx11-dev libxext-dev libfreetype-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev xvfb ninja-build
 
       - name: configure
         run: cmake --preset default

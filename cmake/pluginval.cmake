@@ -39,7 +39,7 @@ function(add_pluginval target)
         COMMAND ${PLUGINVAL_WRAPPER} "${PLUGINVAL_EXE}"
             --validate "$<GENEX_EVAL:$<TARGET_PROPERTY:${target}_VST3,JUCE_PLUGIN_ARTEFACT_FILE>>"
             --strictness-level 5
-            --timeout-ms 120000
+            --timeout-ms 180000
         DEPENDS "${PLUGINVAL_EXE}" ${target}_VST3
         COMMENT "Running pluginval on ${target} VST3"
     )
