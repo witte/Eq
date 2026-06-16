@@ -6,19 +6,19 @@ namespace witte
 {
 
 
-SpectrumAnalyzer::SpectrumAnalyzer (EqAudioProcessor& eqProcessor) : processor {eqProcessor}
+SpectrumAnalyzer::SpectrumAnalyzer (Processor& eqProcessor) : processor {eqProcessor}
 {
     setPaintingIsUnclipped (true);
 
     avgInput.clear();
     avgOutput.clear();
 
-    fftPoints.resize (EqAudioProcessor::fftSize);
+    fftPoints.resize (Processor::fftSize);
 
     {
         juce::ScopedLock lockedForWriting (pathCreationLock);
-        inP.preallocateSpace  (EqAudioProcessor::fftSize * 2);
-        outP.preallocateSpace (EqAudioProcessor::fftSize * 2);
+        inP.preallocateSpace  (Processor::fftSize * 2);
+        outP.preallocateSpace (Processor::fftSize * 2);
     }
 
     startTimerHz (30);
@@ -114,7 +114,7 @@ void SpectrumAnalyzer::recalculateFftPoints()
     fftPoints[0].firstBinIndex = 0;
 
     int i = 0;
-    while (i < EqAudioProcessor::fftSize)
+    while (i < Processor::fftSize)
     {
         auto&[pointFirstBinIndex, pointLastBinIndex, pointX] = fftPoints [fftPointsSize];
 
@@ -122,7 +122,7 @@ void SpectrumAnalyzer::recalculateFftPoints()
         pointX = lastX;
 
         int x = lastX;
-        while (x <= lastX && i < EqAudioProcessor::fftSize)
+        while (x <= lastX && i < Processor::fftSize)
         {
             ++i;
 

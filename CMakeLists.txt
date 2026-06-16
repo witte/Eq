@@ -35,8 +35,9 @@ target_sources(Eq PRIVATE
     Source/Components/TextEditor.cpp
     Source/Components/XYPad.cpp
     Source/LookAndFeel/LookAndFeel.cpp
-    Source/EqEditor.cpp
-    Source/EqProcessor.cpp)
+    Source/Editor.cpp
+    Source/Band.cpp
+    Source/Processor.cpp)
 
 target_compile_definitions(Eq PUBLIC
     JUCE_ENABLE_REPAINT_DEBUGGING=0
@@ -67,6 +68,7 @@ target_link_libraries(Eq PRIVATE
     juce::juce_audio_devices
     juce::juce_gui_basics
     juce::juce_dsp)
+
 
 include(cmake/pluginval.cmake)
 add_pluginval(Eq)

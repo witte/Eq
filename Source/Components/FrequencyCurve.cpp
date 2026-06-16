@@ -6,7 +6,7 @@ namespace witte
 {
 
 
-FrequencyCurve::FrequencyCurve (EqAudioProcessor& eqProcessor) : processor {eqProcessor}
+FrequencyCurve::FrequencyCurve (Processor& eqProcessor) : processor {eqProcessor}
 {
     setPaintingIsUnclipped (true);
 

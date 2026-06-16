@@ -1,7 +1,6 @@
 #pragma once
+#include "../Processor.h"
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "../EqProcessor.h"
-
 
 namespace witte
 {
@@ -11,7 +10,7 @@ class FrequencyCurve final : public juce::Component,
                              public juce::AudioProcessorValueTreeState::Listener
 {
     public:
-        explicit FrequencyCurve (EqAudioProcessor&);
+        explicit FrequencyCurve (Processor&);
         ~FrequencyCurve() override;
 
         void paint (juce::Graphics&) override;
@@ -19,7 +18,7 @@ class FrequencyCurve final : public juce::Component,
 
 
     private:
-        EqAudioProcessor& processor;
+        Processor& processor;
 
         void parameterChanged (const juce::String&, float) override;
 
