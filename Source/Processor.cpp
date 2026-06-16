@@ -10,7 +10,7 @@ namespace IDs
 }
 
 Processor::Processor() :
-    parameters (*this, &undoManager, "Eq", std::move (prmLayout)),
+    vts (*this, nullptr, "Eq", std::move (prmLayout)),
     bands { Band {*this, 1}, Band {*this, 2}, Band {*this, 3}, Band {*this, 4}, Band {*this, 5} }
 {
     for (unsigned long i = 1; i <= 5; ++i)
@@ -23,36 +23,36 @@ Processor::Processor() :
         juce::String gain {i}; gain << "Gain";
         juce::String q    {i}; q    << "Q";
 
-        band.prmOn   = parameters.getRawParameterValue (on);
-        band.prmType = parameters.getRawParameterValue (type);
-        band.prmFreq = parameters.getRawParameterValue (freq);
-        band.prmGain = parameters.getRawParameterValue (gain);
-        band.prmQ    = parameters.getRawParameterValue (q);
+        band.prmOn   = vts.getRawParameterValue (on);
+        band.prmType = vts.getRawParameterValue (type);
+        band.prmFreq = vts.getRawParameterValue (freq);
+        band.prmGain = vts.getRawParameterValue (gain);
+        band.prmQ    = vts.getRawParameterValue (q);
 
         band.active = *band.prmOn > 0.5f;
 
-        parameters.addParameterListener (on,   &band);
-        parameters.addParameterListener (type, &band);
-        parameters.addParameterListener (freq, &band);
-        parameters.addParameterListener (gain, &band);
-        parameters.addParameterListener (q,    &band);
+        vts.addParameterListener (on,   &band);
+        vts.addParameterListener (type, &band);
+        vts.addParameterListener (freq, &band);
+        vts.addParameterListener (gain, &band);
+        vts.addParameterListener (q,    &band);
     }
 
-    prmOutputGain = parameters.getRawParameterValue (idOutputGain);
-    parameters.addParameterListener (idOutputGain, this);
+    prmOutputGain = vts.getRawParameterValue (idOutputGain);
+    vts.addParameterListener (idOutputGain, this);
 }
 
-void Processor::prepareToPlay (const double _sampleRate, const int samplesPerBlock)
+Processor::~Processor() = default;
+
+void Processor::prepareToPlay (const double sampleRate, const int samplesPerBlock)
 {
-    sampleRate = _sampleRate;
-    
-    const juce::dsp::ProcessSpec spec { _sampleRate, static_cast<juce::uint32>(samplesPerBlock),
+    const juce::dsp::ProcessSpec spec { sampleRate, static_cast<juce::uint32>(samplesPerBlock),
         static_cast<juce::uint32>(getTotalNumOutputChannels()) };
 
     for (auto& band : bands)
     {
         band.updateFilter();
-        band.processor.prepare (spec);
+        band.dspProcessor.prepare (spec);
     }
 }
 
@@ -61,23 +61,34 @@ void Processor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer
     juce::dsp::AudioBlock<float> ioBuffer{buffer};
     const juce::dsp::ProcessContextReplacing context{ioBuffer};
 
-    if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
+    const auto shouldCopyToFifo = copyToFifo.load();
+
+    if (shouldCopyToFifo)
+        pushNextSampleToFifo (buffer, 0, 2, abstractFifoInput, audioFifoInput);
 
     for (auto& band : bands)
     {
-        if (band.active) band.processor.process (context);
+        if (!band.active)
+            continue;
+
+        band.dspProcessor.process (context);
     }
 
     buffer.applyGain (juce::Decibels::decibelsToGain (prmOutputGain->load()));
 
-    if (copyToFifo) pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
+    if (shouldCopyToFifo)
+    {
+        pushNextSampleToFifo (buffer, 0, 2, abstractFifoOutput, audioFifoOutput);
+        isNextFFTBlockReady.store(true);
+    }
 }
 
 void Processor::pushNextSampleToFifo (const juce::AudioBuffer<float>& buffer, const int startChannel,
-                                             const int numChannels, juce::AbstractFifo& absFifo,
-                                             juce::AudioBuffer<float>& fifo)
+                                      const int numChannels, juce::AbstractFifo& absFifo,
+                                      juce::AudioBuffer<float>& fifo)
 {
-    if (absFifo.getFreeSpace() < buffer.getNumSamples()) return;
+    if (absFifo.getFreeSpace() < buffer.getNumSamples())
+        return;
 
     int start1;
     int block1;
@@ -91,59 +102,63 @@ void Processor::pushNextSampleToFifo (const juce::AudioBuffer<float>& buffer, co
 
     for (int channel = startChannel + 1; channel < startChannel + numChannels; ++channel)
     {
-        if (block1 > 0) fifo.addFrom (0, start1, buffer.getReadPointer (channel), block1);
-        if (block2 > 0) fifo.addFrom (0, start2, buffer.getReadPointer (channel, block1), block2);
+        if (block1 > 0)
+            fifo.addFrom (0, start1, buffer.getReadPointer (channel), block1);
+
+        if (block2 > 0)
+            fifo.addFrom (0, start2, buffer.getReadPointer (channel, block1), block2);
     }
 
     absFifo.finishedWrite (block1 + block2);
-    nextFFTBlockReady.store (true);
 }
 
 void Processor::getStateInformation (juce::MemoryBlock& destData)
 {
-    auto editor = parameters.state.getOrCreateChildWithName (IDs::editor, nullptr);
+    auto editor = vts.state.getOrCreateChildWithName (IDs::editor, nullptr);
     editor.setProperty (IDs::sizeX, editorSize.x, nullptr);
     editor.setProperty (IDs::sizeY, editorSize.y, nullptr);
 
     juce::MemoryOutputStream stream (destData, false);
-    parameters.state.writeToStream (stream);
+    vts.state.writeToStream (stream);
 }
 
-void Processor::setStateInformation (const void* data, int sizeInBytes)
+void Processor::setStateInformation (const void* data, const int sizeInBytes)
 {
-    juce::ValueTree tree = juce::ValueTree::readFromData (data, size_t (sizeInBytes));
-    if (tree.isValid())
-    {
-        parameters.state = tree;
+    const juce::ValueTree tree = juce::ValueTree::readFromData (data, static_cast<size_t>(sizeInBytes));
+    if (!tree.isValid())
+        return;
 
-        auto editor = parameters.state.getChildWithName (IDs::editor);
-        if (editor.isValid())
-        {
-            editorSize.setX (editor.getProperty (IDs::sizeX, 68));
-            editorSize.setY (editor.getProperty (IDs::sizeY, 12));
+    vts.state = tree;
 
-            if (auto* ed = getActiveEditor())
-                ed->setSize (editorSize.x, editorSize.y);
-        }
-    }
+    const auto editor = vts.state.getChildWithName (IDs::editor);
+    if (!editor.isValid())
+        return;
+
+    editorSize.setX (editor.getProperty (IDs::sizeX, 68));
+    editorSize.setY (editor.getProperty (IDs::sizeY, 12));
+
+    if (auto* ed = getActiveEditor())
+        ed->setSize (editorSize.x, editorSize.y);
 }
 
-juce::AudioProcessorEditor* Processor::createEditor() { return new witte::Editor (*this, parameters); }
+juce::AudioProcessorEditor* Processor::createEditor() { return new witte::Editor (*this, vts); }
 
-void Processor::parameterChanged (const juce::String&, float newValue)
+void Processor::parameterChanged (const juce::String&, const float newValue)
 {
     *prmOutputGain = newValue;
 }
 
-void Processor::setCopyToFifo (bool _copyToFifo)
+void Processor::setCopyToFifo (const bool _copyToFifo)
 {
     if (_copyToFifo)
     {
-        abstractFifoInput.setTotalSize  (int (sampleRate));
-        abstractFifoOutput.setTotalSize (int (sampleRate));
+        const auto sr = static_cast<int>(getSampleRate());
 
-        audioFifoInput.setSize  (1, int (sampleRate));
-        audioFifoOutput.setSize (1, int (sampleRate));
+        abstractFifoInput.setTotalSize  (sr);
+        abstractFifoOutput.setTotalSize (sr);
+
+        audioFifoInput.setSize  (1, sr);
+        audioFifoOutput.setSize (1, sr);
 
         abstractFifoInput.reset();
         abstractFifoOutput.reset();
@@ -154,5 +169,6 @@ void Processor::setCopyToFifo (bool _copyToFifo)
 
     copyToFifo.store (_copyToFifo);
 }
+
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new Processor(); }

@@ -25,7 +25,8 @@ void Band::parameterChanged (const juce::String& parameter, const float newValue
     else if (str == "Gain") *prmGain = newValue;
     else                    *prmQ    = newValue;
 
-    if (str != "On") updateFilter();
+    if (str != "On")
+        updateFilter();
 
     active = *prmOn > 0.5f && (*prmGain == 0.0f? (*prmType == 0.0f || *prmType == 4.0f) : true);
 }
@@ -34,19 +35,19 @@ void Band::updateFilter() const
 {
     switch (static_cast<int>(*prmType))
     {
-        case 0: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass (eqProcessor.getSampleRate(),
+        case 0: *dspProcessor.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass (eqProcessor.getSampleRate(),
                                    *prmFreq, *prmQ);
             break;
-        case 1: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf (eqProcessor.getSampleRate(),
+        case 1: *dspProcessor.state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf (eqProcessor.getSampleRate(),
                                    *prmFreq, *prmQ, juce::Decibels::decibelsToGain (prmGain->load()));
             break;
-        case 2: *processor.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter (eqProcessor.getSampleRate(),
+        case 2: *dspProcessor.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter (eqProcessor.getSampleRate(),
                                    *prmFreq, *prmQ, juce::Decibels::decibelsToGain (prmGain->load()));
             break;
-        case 3: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf (eqProcessor.getSampleRate(),
+        case 3: *dspProcessor.state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf (eqProcessor.getSampleRate(),
                                    *prmFreq, *prmQ, juce::Decibels::decibelsToGain (prmGain->load()));
             break;
-        case 4: *processor.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass (eqProcessor.getSampleRate(),
+        case 4: *dspProcessor.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass (eqProcessor.getSampleRate(),
                                    *prmFreq, *prmQ);
             break;
         default:

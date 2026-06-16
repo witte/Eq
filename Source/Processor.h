@@ -1,7 +1,7 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
-#include "Helpers/ParameterHelpers.h"
+#include "Helpers/Parameter.h"
 #include "Band.h"
 
 
@@ -9,6 +9,8 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
 {
     public:
         Processor();
+        ~Processor() override;
+
 
         const juce::Identifier idOutputGain {"OutGain"};
 
@@ -26,9 +28,9 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
         const juce::String getProgramName    (int)                      override { return "Default"; }
         void               changeProgramName (int, const juce::String&) override {}
 
-        void prepareToPlay (double _sampleRate, int samplesPerBlock) override;
-        void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&)   override;
-        void releaseResources()                                      override {}
+        void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+        void processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&) override;
+        void releaseResources() override {}
 
         void getStateInformation (juce::MemoryBlock& destData)       override;
         void setStateInformation (const void* data, int sizeInBytes) override;
@@ -46,17 +48,17 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
             fftOrder  = 11,
             fftSize   = 1 << fftOrder,
         };
-        std::atomic<bool> nextFFTBlockReady {false};
+
 
         juce::AbstractFifo abstractFifoInput {1};
         juce::AudioBuffer<float> audioFifoInput;
-
         juce::AbstractFifo abstractFifoOutput {1};
         juce::AudioBuffer<float> audioFifoOutput;
+        std::atomic<bool> isNextFFTBlockReady {false};
 
         const std::array<Band, 5>& getBands() { return bands; }
 
-        juce::AudioProcessorValueTreeState& getVTS() { return parameters; }
+        juce::AudioProcessorValueTreeState& getVTS() { return vts; }
 
 
     protected:
@@ -112,16 +114,13 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
 
             witte::makePrmDb     ("OutGain", "Output Gain", 0.0f, "OutGain")
         };
-        juce::UndoManager                  undoManager;
-        juce::AudioProcessorValueTreeState parameters;
+        juce::AudioProcessorValueTreeState vts;
 
         std::array<Band, 5> bands;
 
         std::atomic<bool> copyToFifo {false};
         void pushNextSampleToFifo (const juce::AudioBuffer<float>& buffer, int startChannel, int numChannels,
                                    juce::AbstractFifo& absFifo, juce::AudioBuffer<float>& fifo);
-
-        double sampleRate  {48000.0};
 
         juce::Point<int> editorSize = { 768, 512 };
 

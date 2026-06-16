@@ -30,7 +30,8 @@ float SpectrumAnalyzer::getFftPointLevel (const float* buffer, const fftPoint& p
 
     for (int i = point.firstBinIndex; i <= point.lastBinIndex; ++i)
     {
-        if (buffer[i] > level) level = buffer[i];
+        if (buffer[i] > level)
+            level = buffer[i];
     }
 
     return juce::Decibels::gainToDecibels (level, mindB);
@@ -146,10 +147,13 @@ void SpectrumAnalyzer::drawNextFrame()
         int start1, block1, start2, block2;
         processor.abstractFifoInput.prepareToRead (fftInput.getSize(), start1, block1, start2, block2);
 
-        if (block1 > 0) fftBufferInput.copyFrom (0,      0, processor.audioFifoInput.getReadPointer (0, start1), block1);
-        if (block2 > 0) fftBufferInput.copyFrom (0, block1, processor.audioFifoInput.getReadPointer (0, start2), block2);
+        if (block1 > 0)
+            fftBufferInput.copyFrom (0, 0, processor.audioFifoInput.getReadPointer (0, start1), block1);
 
-        processor.abstractFifoInput.finishedRead ((block1 + block2) / 2);
+        if (block2 > 0)
+            fftBufferInput.copyFrom (0, block1, processor.audioFifoInput.getReadPointer (0, start2), block2);
+
+        processor.abstractFifoInput.finishedRead (block1 + block2);
 
         hannWindow.multiplyWithWindowingTable (fftBufferInput.getWritePointer (0), static_cast<size_t>(fftInput.getSize()));
         fftInput.performFrequencyOnlyForwardTransform (fftBufferInput.getWritePointer (0));
@@ -169,10 +173,13 @@ void SpectrumAnalyzer::drawNextFrame()
         int start1, block1, start2, block2;
         processor.abstractFifoOutput.prepareToRead (fftOutput.getSize(), start1, block1, start2, block2);
 
-        if (block1 > 0) fftBufferOutput.copyFrom (0,      0, processor.audioFifoOutput.getReadPointer (0, start1), block1);
-        if (block2 > 0) fftBufferOutput.copyFrom (0, block1, processor.audioFifoOutput.getReadPointer (0, start2), block2);
+        if (block1 > 0)
+            fftBufferOutput.copyFrom (0, 0, processor.audioFifoOutput.getReadPointer (0, start1), block1);
 
-        processor.abstractFifoOutput.finishedRead ((block1 + block2) / 2);
+        if (block2 > 0)
+            fftBufferOutput.copyFrom (0, block1, processor.audioFifoOutput.getReadPointer (0, start2), block2);
+
+        processor.abstractFifoOutput.finishedRead (block1 + block2);
 
         hannWindow.multiplyWithWindowingTable (fftBufferOutput.getWritePointer (0), static_cast<size_t>(fftOutput.getSize()));
         fftOutput.performFrequencyOnlyForwardTransform (fftBufferOutput.getWritePointer (0));
@@ -182,13 +189,14 @@ void SpectrumAnalyzer::drawNextFrame()
         avgOutput.copyFrom (avgOutputPtr, 0, fftBufferOutput.getReadPointer (0),      avgOutput.getNumSamples(), 1.0f / (static_cast<float> (avgOutput.getNumSamples()) * (static_cast<float> (avgOutput.getNumChannels()) - 1)));
         avgOutput.addFrom  (0,            0, avgOutput.getReadPointer (avgOutputPtr), avgOutput.getNumSamples());
 
-        if (++avgOutputPtr == avgOutput.getNumChannels()) avgOutputPtr = 1;
+        if (++avgOutputPtr == avgOutput.getNumChannels())
+            avgOutputPtr = 1;
     }
 }
 
 void SpectrumAnalyzer::timerCallback()
 {
-    if (!processor.nextFFTBlockReady.load())
+    if (!processor.isNextFFTBlockReady.load())
         return;
 
     if (resizeDebounceInFrames > 0)
@@ -203,7 +211,7 @@ void SpectrumAnalyzer::timerCallback()
 
     drawNextFrame();
 
-    processor.nextFFTBlockReady.store (false);
+    processor.isNextFFTBlockReady.store (false);
 
     repaint();
 }

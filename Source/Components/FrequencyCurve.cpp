@@ -59,7 +59,7 @@ FrequencyCurve::~FrequencyCurve()
 
 void FrequencyCurve::paint (juce::Graphics &g)
 {
-    std::unique_lock<std::mutex> lock(mutex);
+    std::unique_lock lock(mutex);
 
     g.setColour (juce::Colour {0xff4ea5ac});
     g.fillPath (frequencyCurvePath);
@@ -84,16 +84,17 @@ void FrequencyCurve::drawFrequencyCurve()
     const auto width  = bounds.getWidth();
     const auto height = bounds.getHeight();
 
-    std::fill (magnitudesOut.begin(), magnitudesOut.end(), 1.0);
+    std::ranges::fill (magnitudesOut, 1.0);
 
     for (int i = 0; i < 5; ++i)
     {
         const auto& band = processor.getBands() [i];
 
-        if (band.prmOn->load() <= 0.5f) continue;
+        if (band.prmOn->load() <= 0.5f)
+            continue;
 
         auto& magnitudesBand = magnitudes [i];
-        band.processor.state->getMagnitudeForFrequencyArray (frequencies.data(),
+        band.dspProcessor.state->getMagnitudeForFrequencyArray (frequencies.data(),
                                                              magnitudesBand.data(),
                                                              frequencies.size(), processor.getSampleRate());
 

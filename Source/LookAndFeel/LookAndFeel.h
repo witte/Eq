@@ -17,10 +17,10 @@ class LookAndFeel final : public juce::LookAndFeel_V4
         void fillTextEditorBackground (juce::Graphics&, int, int, juce::TextEditor&) override {}
         void drawTextEditorOutline    (juce::Graphics&, int, int, juce::TextEditor&) override {}
 
-        juce::Font getTextButtonFont (juce::TextButton&, int buttonHeight) override
+        juce::Font getTextButtonFont (juce::TextButton&, const int buttonHeight) override
         {
             juce::Font font (fontAudio);
-            font.setHeight (int (buttonHeight * 0.58f));
+            font.setHeight (static_cast<float>(buttonHeight) * 0.58f);
 
             return font;
         }
@@ -28,7 +28,7 @@ class LookAndFeel final : public juce::LookAndFeel_V4
         juce::Font getComboBoxFont (juce::ComboBox& box) override
         {
             juce::Font font (fontAudio);
-            font.setHeight (box.getHeight() * 0.82f);
+            font.setHeight (static_cast<float>(box.getHeight()) * 0.82f);
 
             return font;
         }
@@ -58,7 +58,7 @@ class LookAndFeel final : public juce::LookAndFeel_V4
 
         void drawLinearSlider (juce::Graphics&, int x, int y, int width, int height,
                                float sliderPos, float minSliderPos, float maxSliderPos,
-                               const juce::Slider::SliderStyle, juce::Slider&) override;
+                               juce::Slider::SliderStyle, juce::Slider&) override;
 
         void drawRotarySlider (juce::Graphics&, int x, int y, int width, int height,
                                float sliderPosProportional, float rotaryStartAngle,
