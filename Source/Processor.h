@@ -43,12 +43,6 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
 
         void setCopyToFifo (bool _copyToFifo);
 
-        enum
-        {
-            fftOrder  = 11,
-            fftSize   = 1 << fftOrder,
-        };
-
 
         juce::AbstractFifo abstractFifoInput {1};
         juce::AudioBuffer<float> audioFifoInput;
@@ -56,9 +50,8 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
         juce::AudioBuffer<float> audioFifoOutput;
         std::atomic<bool> isNextFFTBlockReady {false};
 
-        const std::array<Band, 5>& getBands() { return bands; }
-
         juce::AudioProcessorValueTreeState& getVTS() { return vts; }
+        const std::array<Band, 5>& getBands() { return bands; }
 
 
     protected:
@@ -112,7 +105,7 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
             witte::makePrmDb     ("5Gain", "5 Gain",                    0.0f, "Gain"     ),
             witte::makePrmFloat  ("5Q",    "5 Q",    0.1f, 10.0f, 1.0f, 0.7f, "Q"        ),
 
-            witte::makePrmDb     ("OutGain", "Output Gain", 0.0f, "OutGain")
+            witte::makePrmDb     ("OutGain", "Output Gain", 0.0f, "OutGain!")
         };
         juce::AudioProcessorValueTreeState vts;
 
