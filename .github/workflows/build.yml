@@ -39,6 +39,12 @@ jobs:
           max-size: 2000M
           verbose: 2
 
+      - name: Configure ccache
+        if: runner.os != 'macOS'
+        run: |
+          ccache --set-config=cache_dir=${{ github.workspace }}/.ccache
+          ccache --zero-stats
+
       - name: install linux dependencies
         if: runner.os == 'Linux'
         run: |
