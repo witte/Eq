@@ -16,8 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
-        buildType: [ Release, Debug ]
+        os: [ macos-latest, windows-latest, ubuntu-26.04 ]
 
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -33,17 +32,11 @@ jobs:
           arch: x64
 
       - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: hendrikmuhs/ccache-action@v1.2.24
         with:
           key: ${{ runner.os }}-ccache
           max-size: 2000M
           verbose: 2
-
-      - name: Configure ccache
-        if: runner.os != 'macOS'
-        run: |
-          ccache --set-config=cache_dir=${{ github.workspace }}/.ccache
-          ccache --zero-stats
 
       - name: install linux dependencies
         if: runner.os == 'Linux'
