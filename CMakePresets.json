@@ -3,8 +3,11 @@
   "configurePresets": [
     {
       "name": "default",
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/__build"
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/__build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     },
     {
       "name": "ci",

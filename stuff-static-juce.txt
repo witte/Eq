@@ -1,0 +1,116 @@
+## CMake configure
+
+# non-static
+cmake .. -GNinja -DUSE_STATIC_JUCE=OFF  29.83s user 3.51s system 405% cpu 8.221 total
+cmake .. -GNinja -DUSE_STATIC_JUCE=OFF  27.48s user 3.07s system 436% cpu 6.998 total
+cmake .. -GNinja -DUSE_STATIC_JUCE=OFF  27.63s user 3.17s system 427% cpu 7.208 total
+
+# static
+cmake .. -GNinja  29.36s user 3.23s system 423% cpu 7.696 total
+cmake .. -GNinja  32.48s user 3.50s system 412% cpu 8.725 total
+cmake .. -GNinja  27.87s user 3.11s system 410% cpu 7.551 total
+
+
+## From scratch
+
+# non-static:
+cmake --build .  476.51s user 48.44s system 930% cpu 56.421 total
+
+# Eq_VST3
+cmake --build . --target Eq_VST3  128.59s user 13.36s system 805% cpu 17.628 total
+
+# static:
+cmake --build .  205.92s user 21.30s system 744% cpu 30.517 total
+
+# Eq_VST3
+cmake --build . --target Eq_VST3  77.53s user 7.96s system 649% cpu 13.160 total
+
+
+
+## One change in Processor.h
+
+# non-static
+cmake --build .  15.72s user 2.12s system 427% cpu 4.174 total
+cmake --build .  15.71s user 2.19s system 455% cpu 3.931 total
+cmake --build .  15.81s user 2.19s system 435% cpu 4.131 total
+
+# static
+cmake --build .  10.78s user 2.15s system 369% cpu 3.504 total
+cmake --build .  10.87s user 2.18s system 448% cpu 2.910 total
+cmake --build .  10.76s user 2.13s system 442% cpu 2.915 total
+
+
+## One change in Editor.cpp
+
+# non-static
+cmake --build .  5.46s user 1.17s system 188% cpu 3.520 total
+
+# static
+cmake --build .  5.32s user 1.67s system 245% cpu 2.849 total
+
+
+
+## One change in Processor.h, target Eq_VST3
+
+# non-static
+cmake --build . --target Eq_VST3  13.39s user 1.73s system 371% cpu 4.075 total
+cmake --build . --target Eq_VST3  13.56s user 1.71s system 377% cpu 4.041 total
+
+# static
+cmake --build . --target Eq_VST3  7.81s user 1.26s system 303% cpu 2.985 total
+cmake --build . --target Eq_VST3  7.77s user 1.22s system 319% cpu 2.812 total
+
+
+
+## Single arch, one change in Processor.h, target Eq_VST3
+
+# non-static
+cmake --build . --target Eq_VST3  1.68s user 0.39s system 119% cpu 1.732 total
+
+# static
+cmake --build . --target Eq_VST3  1.30s user 0.35s system 143% cpu 1.149 total
+
+
+
+## Single arch, one change in Editor.cpp, target Eq_VST3, min macOS 26.4.1
+
+# non-static
+cmake --build . --target Eq_VST3  1.68s user 0.34s system 125% cpu 1.611 total
+cmake --build . --target Eq_VST3  6.93s user 1.00s system 387% cpu 2.046 total
+cmake --build . --target Eq_VST3  6.87s user 0.96s system 387% cpu 2.021 total
+cmake --build . --target Eq_VST3  6.92s user 1.17s system 358% cpu 2.253 total
+
+# static
+cmake --build . --target Eq_VST3  1.30s user 0.34s system 123% cpu 1.328 total
+cmake --build . --target Eq_VST3  4.05s user 0.65s system 348% cpu 1.352 total
+cmake --build . --target Eq_VST3  4.17s user 0.70s system 312% cpu 1.557 total
+cmake --build . --target Eq_VST3  2.56s user 0.88s system 217% cpu 1.581 total
+
+# pre-compiled, no pre-compiled headers
+cmake --build . --target Eq_VST3  1.47s user 0.34s system 109% cpu 1.641 total
+cmake --build . --target Eq_VST3  1.54s user 0.27s system 114% cpu 1.584 total
+cmake --build . --target Eq_VST3  1.54s user 0.27s system 113% cpu 1.603 total
+cmake --build . --target Eq_VST3  1.62s user 0.31s system 113% cpu 1.702 total
+cmake --build . --target Eq_VST3  1.56s user 0.27s system 114% cpu 1.595 total
+
+# pre-compiled, WITH pre-compiled headers
+cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release  0.91s user 0.42s system 107% cpu 1.230 total
+cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release  0.93s user 0.43s system 108% cpu 1.248 total
+cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release  0.93s user 0.43s system 105% cpu 1.296 total
+cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release  0.94s user 0.43s system 112% cpu 1.217 total
+cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release  0.94s user 0.42s system 109% cpu 1.237 total
+
+# from scratch
+cmake --build . --target Eq_VST3  14.43s user 1.68s system 178% cpu 9.040 total
+cmake --build . --target Eq_VST3  14.43s user 1.70s system 182% cpu 8.838 total
+cmake --build . --target Eq_VST3  14.45s user 1.79s system 185% cpu 8.744 total
+cmake --build . --target Eq_VST3  14.28s user 1.78s system 180% cpu 8.889 total
+cmake --build . --target Eq_VST3  14.40s user 1.70s system 184% cpu 8.750 total
+
+# on change on Editor.cpp
+cmake --build . --target Eq_VST3  0.74s user 0.24s system 105% cpu 0.928 total
+cmake --build . --target Eq_VST3  0.77s user 0.31s system  96% cpu 1.119 total
+cmake --build . --target Eq_VST3  0.77s user 0.22s system 133% cpu 0.745 total
+cmake --build . --target Eq_VST3  0.74s user 0.25s system 132% cpu 0.747 total
+cmake --build . --target Eq_VST3  0.75s user 0.28s system 110% cpu 0.938 total
+cmake --build . --target Eq_VST3  0.74s user 0.24s system 108% cpu 0.904 total
