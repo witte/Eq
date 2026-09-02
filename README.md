@@ -15,7 +15,7 @@ An equalizer plugin made with the JUCE framework, customizing JUCE's LookAndFeel
 <br>
 
 ## Dependencies
-JUCE: https://github.com/juce-framework/JUCE (8.0.13, included as a submodule)
+JUCE: https://github.com/juce-framework/JUCE (9.0.1, included as a submodule)
 <br>
 <br>
 

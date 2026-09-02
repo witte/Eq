@@ -7,11 +7,15 @@
       "binaryDir": "${sourceDir}/__build"
     },
     {
-      "name": "linux-sandbox",
+      "name": "ci",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/__build-linux-sandbox",
+      "binaryDir": "${sourceDir}/__build",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_OBJC_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_OBJCXX_COMPILER_LAUNCHER": "ccache"
       }
     }
   ],

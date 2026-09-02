@@ -1,14 +1,15 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 4.3)
+project(Eq VERSION 1.0.0)
+
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
-
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 # add_link_options(-fsanitize=thread)
 
-project(Eq VERSION 1.0.0)
 
 add_subdirectory(JUCE)
 

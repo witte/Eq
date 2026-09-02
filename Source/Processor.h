@@ -105,7 +105,7 @@ class Processor final : public juce::AudioProcessor, public juce::AudioProcessor
             witte::makePrmDb     ("5Gain", "5 Gain",                    0.0f, "Gain"     ),
             witte::makePrmFloat  ("5Q",    "5 Q",    0.1f, 10.0f, 1.0f, 0.7f, "Q"        ),
 
-            witte::makePrmDb     ("OutGain", "Output Gain", 0.0f, "OutGain!")
+            witte::makePrmDb     ("OutGain", "Output Gain", 0.0f, "OutGain")
         };
         juce::AudioProcessorValueTreeState vts;
 
